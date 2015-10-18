@@ -1,22 +1,32 @@
-### Deploying a Flask application in AWS: An end-to-end tutorial
+## Vaa3D API
 
-This is the code that goes along with the detailed writeup here:
+Backend python API for handling users requests from https://github.com/bfortuner/vaa3d-website
 
-https://medium.com/@rodkey/deploying-a-flask-application-on-aws-a72daba6bb80
+Endpoint: http://vaa3d-api-env-u4euvdicze.elasticbeanstalk.com/
 
-It's a simple Flask app that writes and reads from a database. It uses Amazon RDS for the database backend, but you can make things even simpler and use a local DB.
 
-To tool around with the app directly, here's a quickstart guide. 
+### Setup
 
-Clone this repo to your local machine. In the top level directory, create a virtual environment:
+Clone github repository:
+
 ```
-$ virtualenv flask-aws
-$ source flask-aws/bin/activate
+$ git clone https://github.com/bfortuner/vaa3d-api.git
+$ cd vaa3d-api
 ```
+
+Setup virtualenv:
+```
+$ virtualenv venv
+$ source venv/bin/activate
+```
+
 Now install the required modules:
 ```
 $ pip install -r requirements.txt
+$ pip install awsebcli
+$ pip install --upgrade google-api-python-client
 ```
+
 To play with the app right away, you can use a local database. Edit ```config.py``` by commenting out the AWS URL and uncomment this line:
 ```
 SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
@@ -31,18 +41,32 @@ $ python application.py
 ```
 And point your browser to http://0.0.0.0:5000
 
-Using the top form, you can write to the database:
 
-![Site main page](http://i.imgur.com/2d66GIB.png)
+### Deploy to Elastic Beanstalk
 
-![Data entered](http://i.imgur.com/AQWdD2Q.png)
+Deactivate your virtual env:
+```
+$ deactivate
+```
 
-Get confirmation:
+Create EB app:
+```
+$ eb init
+$ eb start
+$ eb stop
+```
 
-![confirmaton](http://i.imgur.com/JtemL7a.png)
+Push code to EB:
+```
+$ eb push
+```
 
-Using the bottom form, you can see the last 1 to 9 entires of the database in reverse chronological order:
+Links and Tutorials:
+* https://medium.com/@rodkey/deploying-a-flask-application-on-aws-a72daba6bb80
+* http://blog.uptill3.com/2012/08/25/python-on-elastic-beanstalk.html
+* http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html
+* https://realpython.com/blog/python/flask-by-example-part-2-postgres-sqlalchemy-and-alembic
 
-![results](http://i.imgur.com/LFJeKDz.png)
-
+Permissions:
+Request access tokens and permissions from bfortuner@gmail.com
 
