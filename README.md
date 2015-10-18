@@ -16,8 +16,10 @@ $ cd vaa3d-api
 
 Setup virtualenv:
 ```
+$ sudo easy_install pip
+$ sudo pip install virtualenv
 $ virtualenv venv
-$ source venv/bin/activate
+$ . venv/bin/activate
 ```
 
 Now install the required modules:
@@ -66,6 +68,7 @@ Links and Tutorials:
 * http://blog.uptill3.com/2012/08/25/python-on-elastic-beanstalk.html
 * http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html
 * https://realpython.com/blog/python/flask-by-example-part-2-postgres-sqlalchemy-and-alembic
+* https://gist.github.com/mjul/54c7c9e936588e713537 (RDS postgres config)
 
 Permissions:
 Request access tokens and permissions from bfortuner@gmail.com
