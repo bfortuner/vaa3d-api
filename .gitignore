@@ -61,3 +61,8 @@ target/
 # Virtual environment
 venv
 .elasticbeanstalk/
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
