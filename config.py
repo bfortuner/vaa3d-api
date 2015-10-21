@@ -11,8 +11,9 @@ APP_SECRET_KEY = os.environ['APP_SECRET_KEY']
 
 # DATABASE CONFIG
 
-DB_DRIVER = 'postgresql+psycopg2://'
-DB_HOSTNAME = 'vaa3d-api-db.clwja7eltdnj.us-west-2.rds.amazonaws.com'
+#DB_DRIVER = 'postgresql+psycopg2://'
+DB_DRIVER = 'mysql+pymysql://'
+DB_HOSTNAME = 'bigneuron.clwja7eltdnj.us-west-2.rds.amazonaws.com'
 DB_PORT = '3306'
 DB_NAME = 'vaa3d'
 DB_USERNAME = 'vaa3d'
