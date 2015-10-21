@@ -73,3 +73,9 @@ Links and Tutorials:
 Permissions:
 Request access tokens and permissions from bfortuner@gmail.com
 
+Troubleshooting:
+
+ERROR: Operation Denied. The security token included in the request is invalid.
+Update AWS config file with latest access tokens
+$ cat ~/.aws/config
+

@@ -9,7 +9,7 @@ from application.forms import EnterDBInfo, RetrieveDBInfo
 application = Flask(__name__)
 application.debug=True
 # change this to your own value
-application.secret_key = os.environ['APP_SECRET_KEY']  
+application.secret_key = config.APP_SECRET_KEY 
 
 @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])
