@@ -1,13 +1,11 @@
 import os
 from flask import Flask, render_template, request
 from application import db
-import config
 from application.models import Data
 from application.forms import EnterDBInfo, RetrieveDBInfo
 
 application = Flask(__name__)
-application.debug=True
-application.secret_key = config.SECRET_KEY
+application.config.from_object('config.ProdConfig')
 
 @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])
