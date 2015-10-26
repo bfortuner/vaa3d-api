@@ -54,13 +54,14 @@ $ deactivate
 Create EB app:
 ```
 $ eb init
+$ eb create
 $ eb start
 $ eb stop
 ```
 
 Push code to EB:
 ```
-$ eb push
+$ eb deploy
 ```
 
 Links and Tutorials:
