@@ -7,13 +7,15 @@ AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
 AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
 
 TEST_BUCKET_NAME = 'vaa3d-test-data'
-TEST_INPUT_FILENAME='tt2.v3draw'
+TEST_INPUT_FILENAME='input.tif'
 TEST_OUTPUT_FILENAME='output.swc'
 
-VAA3D_PATH='/Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64'
-VAA3D_PLUGIN='libvn2_debug'
+# Vaa3d Program Directory
+# /Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64
+# /home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh
+VAA3D_PATH=os.getenv('VAA3D_PATH') 
+VAA3D_PLUGIN='vn2'
 FUNC_NAME='app2'
-#/Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64 -x libvn2_debug -f app2 -i tt2.v3draw -o output.swc
 
 # Connect to bucket
 conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
