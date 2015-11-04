@@ -3,9 +3,10 @@ from flask import Flask, render_template, request
 from application import db
 from application.models import Data
 from application.forms import EnterDBInfo, RetrieveDBInfo
+from flask.ext.sqlalchemy import SQLAlchemy
 
 application = Flask(__name__)
-application.config.from_object('config.ProdConfig')
+application.config.from_object('config.' + os.getenv('VAA3D_CONFIG', 'ProdConfig'))
 
 @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])
@@ -35,17 +36,6 @@ def index():
         return render_template('results.html', results=query_db, num_return=num_return)                
     
     return render_template('index.html', form1=form1, form2=form2)
-
-def set_application_config(runtime_env):
-    if runtime_env == "test":
-        print "Using TestConfig"
-        application.config.from_object('config.TestConfig')
-    else:
-        print "Using ProdConfig"
-        application.config.from_object('config.ProdConfig')
-
-#runtime_env = sys.argv[1] if (len(sys.argv) > 1) else "prod"
-#set_application_config(runtime_env)
 
 if __name__ == '__main__':
     application.run(host='0.0.0.0')

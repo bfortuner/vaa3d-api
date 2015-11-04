@@ -2,13 +2,13 @@ import os
 
 class Config(object):
     TESTING = False
+    DEBUG = False
     SQLALCHEMY_POOL_RECYCLE = 3600
     WTF_CSRF_ENABLED = True
     AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
     AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
 
 class ProdConfig(Config):
-    DEBUG = False
     DB_DRIVER = 'mysql+pymysql://'
     DB_HOSTNAME = 'bigneuron.clwja7eltdnj.us-west-2.rds.amazonaws.com'
     DB_PORT = '3306'
