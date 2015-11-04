@@ -5,6 +5,7 @@ from application.models import Data
 from application.forms import EnterDBInfo, RetrieveDBInfo
 
 application = Flask(__name__)
+application.config.from_object('config.ProdConfig')
 
 @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])
@@ -43,7 +44,8 @@ def set_application_config(runtime_env):
         print "Using ProdConfig"
         application.config.from_object('config.ProdConfig')
 
+#runtime_env = sys.argv[1] if (len(sys.argv) > 1) else "prod"
+#set_application_config(runtime_env)
+
 if __name__ == '__main__':
-    runtime_env = sys.argv[1] if (len(sys.argv) > 1) else "prod"
-    set_application_config(runtime_env)
     application.run(host='0.0.0.0')

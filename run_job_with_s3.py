@@ -15,7 +15,7 @@ TEST_OUTPUT_FILENAME='output.swc'
 # Vaa3d Program Directory
 # /Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64
 # /home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh
-VAA3D_PATH=os.getenv('VAA3D_PATH') 
+VAA3D_PATH=os.getenv('VAA3D_PATH', '/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh')
 VAA3D_PLUGIN='vn2'
 FUNC_NAME='app2'
 
