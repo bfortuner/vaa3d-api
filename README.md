@@ -29,20 +29,22 @@ $ pip install awsebcli
 $ pip install --upgrade google-api-python-client
 ```
 
-To play with the app right away, you can use a local database. Edit ```config.py``` by commenting out the AWS URL and uncomment this line:
-```
-SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
-```
-Next run:
-```
-$ python db_create.py
-```
-And the tables are created.  Now you can launch the app:
+Create required ENV variables (add to ~/.bash_profile)
+export VAA3D_AWS_ACCESS_KEY='youraccesskey'
+export VAA3D_AWS_SECRET_KEY='yoursecretkey'
+export VAA3D_DB_PASSWORD='yourdbkey'
+export VAA3D_PATH='yourpathtoVaa3d'
+
+Now you can launch the app:
 ```
 $ python application.py
 ```
 And point your browser to http://0.0.0.0:5000
 
+Run the vaa3d script
+```
+$ python run_vaa3d.py
+```
 
 ### Deploy to Elastic Beanstalk
 
@@ -80,3 +82,11 @@ ERROR: Operation Denied. The security token included in the request is invalid.
 Update AWS config file with latest access tokens
 $ cat ~/.aws/config
 
+Cannot start x server (EC2 RedHat)
+# sudo yum install xorg-x11-server-Xvfb
+# Add the following to ~/.bash_profile
+```
+export DISPLAY=":98"
+Xvfb $DISPLAY >& Xvfb.log &
+trap "kill $! || true" EXIT
+```
