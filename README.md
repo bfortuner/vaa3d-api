@@ -85,8 +85,8 @@ Update AWS config file with latest access tokens
 $ cat ~/.aws/config
 
 Cannot start x server (EC2 RedHat)
-# sudo yum install xorg-x11-server-Xvfb
-# Add the following to ~/.bash_profile
+* sudo yum install xorg-x11-server-Xvfb
+* Add the following to ~/.bash_profile
 ```
 export DISPLAY=":98"
 Xvfb $DISPLAY >& Xvfb.log &
