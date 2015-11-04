@@ -6,7 +6,9 @@ from boto.s3.key import Key
 AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
 AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
 
-TEST_BUCKET_NAME = 'vaa3d-test-data'
+S3_INPUT_BUCKET='vaa3d-input'
+S3_OUTPUT_BUCKET='vaa3d-output'
+
 TEST_INPUT_FILENAME='input.tif'
 TEST_OUTPUT_FILENAME='output.swc'
 
@@ -19,18 +21,20 @@ FUNC_NAME='app2'
 
 # Connect to bucket
 conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
-bucket = conn.get_bucket('vaa3d-test-data', validate=False)
+
+def get_bucket(bucket_name):
+	return conn.get_bucket(bucket_name, validate=False)
 
 def download_file(filename):
 	print "Downloading file..."
-	k = Key(bucket)
+	k = Key(get_bucket(S3_INPUT_BUCKET))
 	k.key = filename
 	k.get_contents_to_filename(filename)
 	print "Downloading complete!"
 
 def upload_file(filename):
 	print "Uploading file..."
-	k = Key(bucket)
+	k = Key(get_bucket(S3_OUTPUT_BUCKET))
 	k.key = filename
 	k.set_contents_from_filename(filename)
 	print "Upload complete!"

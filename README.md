@@ -4,6 +4,7 @@ Backend python API for handling users requests from https://github.com/bfortuner
 
 Endpoint: http://vaa3d-api-env-u4euvdicze.elasticbeanstalk.com/
 
+Email bfortuner@gmail.com for access keys and credentials
 
 ### Setup
 
@@ -45,7 +46,7 @@ And point your browser to http://0.0.0.0:5000
 
 Run the vaa3d script
 ```
-$ python run_vaa3d.py
+$ python run_job_with_s3.py
 ```
 
 ### Deploy to Elastic Beanstalk
@@ -68,17 +69,17 @@ Push code to EB:
 $ eb deploy
 ```
 
-Links and Tutorials:
+### Links and Tutorials:
 * https://medium.com/@rodkey/deploying-a-flask-application-on-aws-a72daba6bb80
 * http://blog.uptill3.com/2012/08/25/python-on-elastic-beanstalk.html
 * http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html
 * https://realpython.com/blog/python/flask-by-example-part-2-postgres-sqlalchemy-and-alembic
 * https://gist.github.com/mjul/54c7c9e936588e713537 (RDS postgres config)
 
-Permissions:
+### Permissions:
 Request access tokens and permissions from bfortuner@gmail.com
 
-Troubleshooting:
+### Troubleshooting:
 
 ERROR: Operation Denied. The security token included in the request is invalid.
 Update AWS config file with latest access tokens
