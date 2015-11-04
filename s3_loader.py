@@ -1,13 +1,12 @@
 import os
-from flask import Flask
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
-app = Flask(__name__)
-app.config.from_object('config.ProdConfig')
+AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
+AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
 
 # Connect to bucket
-conn = S3Connection(app.config['AWS_ACCESS_KEY'], app.config['AWS_SECRET_KEY'])
+conn = S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
 bucket = conn.get_bucket('vaa3d-test-data', validate=False)
 
 # List files in bucket
