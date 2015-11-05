@@ -41,12 +41,17 @@ def upload_file(filename):
 
 def run_vaa3d_job(input_filename, output_filename):
     print "Tracing neuron..."
-    call([VAA3D_PATH, "-x", VAA3D_PLUGIN, "-f", FUNC_NAME, "-i", input_filename, "-o", output_filename])
+    input_file_path=os.path.abspath(input_filename)
+    output_file_path=os.path.abspath(output_filename)
+    call([VAA3D_PATH, "-x", VAA3D_PLUGIN, "-f", FUNC_NAME, "-i", input_file_path, "-o", output_file_path])
     print "Trace complete!"
 
 def cleanup():
-	os.remove(TEST_INPUT_FILENAME)
+        os.remove(TEST_INPUT_FILENAME)
 	os.remove(TEST_OUTPUT_FILENAME)
+        filelist = [ f for f in os.listdir(".") if f.endswith(".swc") ]
+        for f in filelist:
+                os.remove(f)
 
 if __name__ == '__main__':
 	download_file(TEST_INPUT_FILENAME)
