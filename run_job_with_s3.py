@@ -11,6 +11,10 @@ S3_OUTPUT_BUCKET='vaa3d-output'
 
 TEST_INPUT_FILENAME='input.tif'
 TEST_OUTPUT_FILENAME='output.swc'
+TEST_INPUT_FILE_PATH=os.path.abspath(TEST_INPUT_FILENAME)
+TEST_OUTPUT_FILE_PATH=os.path.abspath(TEST_OUTPUT_FILENAME)
+print TEST_INPUT_FILE_PATH
+print TEST_OUTPUT_FILE_PATH
 
 # Vaa3d Program Directory
 # /Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64
@@ -29,29 +33,28 @@ def download_file(filename):
 	print "Downloading file..."
 	k = Key(get_bucket(S3_INPUT_BUCKET))
 	k.key = filename
-	k.get_contents_to_filename(filename)
+	k.get_contents_to_filename(TEST_INPUT_FILE_PATH)
 	print "Downloading complete!"
 
 def upload_file(filename):
 	print "Uploading file..."
 	k = Key(get_bucket(S3_OUTPUT_BUCKET))
 	k.key = filename
-	k.set_contents_from_filename(filename)
+	k.set_contents_from_filename(TEST_OUTPUT_FILE_PATH)
 	print "Upload complete!"
 
 def run_vaa3d_job(input_filename, output_filename):
     print "Tracing neuron..."
-    input_file_path=os.path.abspath(input_filename)
-    output_file_path=os.path.abspath(output_filename)
-    call([VAA3D_PATH, "-x", VAA3D_PLUGIN, "-f", FUNC_NAME, "-i", input_file_path, "-o", output_file_path])
+    call([VAA3D_PATH, "-x", VAA3D_PLUGIN, "-f", FUNC_NAME, "-i", TEST_INPUT_FILE_PATH, "-o", TEST_OUTPUT_FILE_PATH])
     print "Trace complete!"
 
 def cleanup():
-        os.remove(TEST_INPUT_FILENAME)
-	os.remove(TEST_OUTPUT_FILENAME)
+        os.remove(TEST_INPUT_FILE_PATH)
+	os.remove(TEST_OUTPUT_FILE_PATH)
         filelist = [ f for f in os.listdir(".") if f.endswith(".swc") ]
         for f in filelist:
-                os.remove(f)
+                print os.path.abspath(f)
+                os.remove(os.path.abspath(f))
 
 if __name__ == '__main__':
 	download_file(TEST_INPUT_FILENAME)
