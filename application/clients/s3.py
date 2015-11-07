@@ -22,3 +22,11 @@ def upload_file(filename, file_path, bucket):
 	k.key = filename
 	k.set_contents_from_filename(file_path)
 	print "Upload complete!"
+
+def get_all_files(bucket_name):
+	bucket = get_bucket(get_connection(), bucket_name)
+	files = bucket.list()
+	filenames = []
+	for f in files:
+		filenames.append(f.name)
+	return filenames
