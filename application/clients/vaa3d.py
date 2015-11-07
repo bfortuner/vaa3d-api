@@ -6,7 +6,6 @@ from application.clients import s3
 
 class Vaa3dJob():
 	def __init__(self, options_dict=None):
-		self.program = VAA3D_PATH
 		self.plugin = options_dict['plugin']
 		self.func = options_dict['func']
 		self.input_filename = options_dict['input_filename']
@@ -16,7 +15,7 @@ class Vaa3dJob():
 
 def run_job(job):
 	print "Tracing neuron..."
-	call([job.program, "-x", job.plugin, "-f", job.func, 
+	call([VAA3D_PATH, "-x", job.plugin, "-f", job.func, 
 		"-i", job.input_file_path, "-o", job.output_file_path])
 	print "Trace complete!"
 
