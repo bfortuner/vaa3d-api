@@ -5,3 +5,8 @@ from flask.ext.sqlalchemy import SQLAlchemy
 application = Flask(__name__)
 application.config.from_object('config.' + os.getenv('VAA3D_CONFIG', 'ProdConfig'))
 db = SQLAlchemy(application)
+
+# Import APIs
+import bigneuron_app.jobs.api
+import bigneuron_app.job_items.api
+import bigneuron_app.users.api

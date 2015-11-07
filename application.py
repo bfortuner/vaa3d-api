@@ -1,12 +1,11 @@
 import os, sys
 from flask import Flask, render_template, request
-from application import db
-from application.models import Data
-from application.forms import EnterDBInfo, RetrieveDBInfo
+from bigneuron_app import db
+from bigneuron_app.models import Data
+from bigneuron_app.forms import EnterDBInfo, RetrieveDBInfo
 from flask.ext.sqlalchemy import SQLAlchemy
 
-application = Flask(__name__)
-application.config.from_object('config.' + os.getenv('VAA3D_CONFIG', 'ProdConfig'))
+from bigneuron_app import application
 
 @application.route('/', methods=['GET', 'POST'])
 @application.route('/index', methods=['GET', 'POST'])
@@ -36,6 +35,8 @@ def index():
         return render_template('results.html', results=query_db, num_return=num_return)                
     
     return render_template('index.html', form1=form1, form2=form2)
+
+
 
 if __name__ == '__main__':
     application.run(host='0.0.0.0')

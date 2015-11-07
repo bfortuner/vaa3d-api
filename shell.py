@@ -4,6 +4,6 @@ import readline
 from pprint import pprint
 
 from flask import *
-from application import *
+from bigneuron_app import *
 
 os.environ['PYTHONINSPECT'] = 'True'

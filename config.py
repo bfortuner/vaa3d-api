@@ -2,7 +2,7 @@ import os
 
 class Config(object):
     TESTING = False
-    DEBUG = False
+    DEBUG = True
     SQLALCHEMY_POOL_RECYCLE = 3600
     WTF_CSRF_ENABLED = True
     AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')

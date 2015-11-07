@@ -1,8 +1,8 @@
 import os
 from subprocess import call
 
-from application.clients.constants import *
-from application.clients import s3
+from bigneuron_app.clients.constants import *
+from bigneuron_app.clients import s3
 
 class Vaa3dJob():
 	def __init__(self, options_dict=None):

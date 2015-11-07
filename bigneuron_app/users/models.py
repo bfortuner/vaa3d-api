@@ -1,5 +1,5 @@
-from application import db
-from application.users.constants import *
+from bigneuron_app import db
+from bigneuron_app.users.constants import *
 
 class User(db.Model):
     __tablename__ = 'users'

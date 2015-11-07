@@ -1,4 +1,4 @@
-from application import db
+from bigneuron_app import db
 
 class Data(db.Model):
     id = db.Column(db.Integer, primary_key=True)

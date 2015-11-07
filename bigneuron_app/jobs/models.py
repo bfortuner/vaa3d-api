@@ -1,4 +1,4 @@
-from application import db
+from bigneuron_app import db
 
 class Job(db.Model):
 	__tablename__ = 'jobs'

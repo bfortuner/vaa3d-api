@@ -1,11 +1,11 @@
-from application import db
-from application.models import Data
-from application.jobs.models import Job, JobStatus
-from application.jobs.constants import JOB_STATUS_TYPES
-from application.job_items.models import JobItem, JobItemStatus
-from application.job_items.constants import JOB_ITEM_STATUS_TYPES
-from application.users.models import User
-from application.users.constants import DEFAULT_IAM_USER, DEFAULT_EMAIL, ADMIN_EMAIL, ADMIN_IAM_USER
+from bigneuron_app import db
+from bigneuron_app.models import Data
+from bigneuron_app.jobs.models import Job, JobStatus
+from bigneuron_app.jobs.constants import JOB_STATUS_TYPES
+from bigneuron_app.job_items.models import JobItem, JobItemStatus
+from bigneuron_app.job_items.constants import JOB_ITEM_STATUS_TYPES
+from bigneuron_app.users.models import User
+from bigneuron_app.users.constants import DEFAULT_IAM_USER, DEFAULT_EMAIL, ADMIN_EMAIL, ADMIN_IAM_USER
 
 """
 DO NOT RUN THIS SCRIPT IN PROD IF DATABASE ALREADY HAS LIVE DATA!

@@ -1,7 +1,7 @@
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
-from application.clients.constants import AWS_ACCESS_KEY, AWS_SECRET_KEY
+from bigneuron_app.clients.constants import AWS_ACCESS_KEY, AWS_SECRET_KEY
 
 def get_connection():
 	return S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
