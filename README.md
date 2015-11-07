@@ -32,9 +32,9 @@ $ pip install --upgrade google-api-python-client
 
 Create required ENV variables (add to ~/.bash_profile)
 ```
+export AWS_ACCESS_KEY='accesskey'
+export AWS_SECRET_KEY='secretaccesskey'
 export VAA3D_CONFIG='TestConfig'
-export VAA3D_AWS_ACCESS_KEY='youraccesskey'
-export VAA3D_AWS_SECRET_KEY='yoursecretkey'
 export VAA3D_DB_PASSWORD='yourdbkey'
 export VAA3D_PATH='yourpathtoVaa3d'
 ```

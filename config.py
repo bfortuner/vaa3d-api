@@ -5,8 +5,6 @@ class Config(object):
     DEBUG = True
     SQLALCHEMY_POOL_RECYCLE = 3600
     WTF_CSRF_ENABLED = True
-    #AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
-    #AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
 
 class ProdConfig(Config):
     DB_DRIVER = 'mysql+pymysql://'
