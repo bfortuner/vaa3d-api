@@ -8,7 +8,7 @@ class User(db.Model):
     iam_username = db.Column(db.String(128))
     created_at = db.Column(db.DateTime, default=db.func.now())
     last_updated = db.Column(db.DateTime, onupdate=db.func.now())
-    job = db.relationship("Job", backref=db.backref('users'))
+    job = db.relationship('Job', backref=db.backref('users'))
 
     def __init__(self, email, iam_username=DEFAULT_IAM_USER):
         self.email = email
@@ -16,4 +16,4 @@ class User(db.Model):
 
       
     def __repr__(self):
-        return '<User %r>' % (self.name)
+        return '<User %r>' % (self.email)

@@ -5,6 +5,7 @@ class Config(object):
     DEBUG = True
     SQLALCHEMY_POOL_RECYCLE = 3600
     WTF_CSRF_ENABLED = True
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
 class ProdConfig(Config):
     DB_DRIVER = 'mysql+pymysql://'

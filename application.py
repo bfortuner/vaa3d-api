@@ -3,7 +3,6 @@ from flask import Flask, render_template, request
 from bigneuron_app import db
 from bigneuron_app.models import Data
 from bigneuron_app.forms import EnterDBInfo, RetrieveDBInfo
-from flask.ext.sqlalchemy import SQLAlchemy
 
 from bigneuron_app import application
 
