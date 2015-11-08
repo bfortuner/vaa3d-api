@@ -5,15 +5,16 @@ class JobItem(db.Model):
 	job_item_id = db.Column(db.Integer, primary_key=True)
 	job_id = db.Column(db.Integer, db.ForeignKey('jobs.job_id'), nullable=False)
 	filename = db.Column(db.String(128), nullable=False)
-	job_item_status_id = db.Column(db.Integer, 
-		db.ForeignKey('job_item_status_types.id'), nullable=False)
+	status_id = db.Column(db.Integer, db.ForeignKey('job_item_status_types.id'), nullable=False)
 	created = db.Column(db.DateTime, default=db.func.now())
 	last_updated = db.Column(db.DateTime, onupdate=db.func.now())
+	job = db.relationship('Job', backref=db.backref('job_items', lazy='dynamic'))
+	job_item_status = db.relationship('JobItemStatus', backref=db.backref('job_items', lazy='dynamic'))
 
-	def __init__(self, job_id, filename, job_item_status_id):
+	def __init__(self, job_id, filename, status_id):
 		self.job_id = job_id
 		self.filename = filename
-		self.job_item_status_id = job_item_status_id
+		self.status_id = status_id
 
 	def __repr__(self):
 		return '<JobItem %r>' % self.job_item_id

@@ -10,3 +10,8 @@ def get_or_create_user(email_address, iam_username=DEFAULT_IAM_USER):
 		db.session.add(user)
 		db.session.commit()
 	return user
+
+def get_jobs_by_user(email_address):
+	user = User.query.filter_by(email=email_address).first()
+	jobs = user.jobs.all()
+	return jobs

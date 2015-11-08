@@ -2,13 +2,18 @@ from boto import connect_s3
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
+from bigneuron_app.clients.constants import AWS_ACCESS_KEY, AWS_SECRET_KEY
+
 
 def get_connection():
 	"""
 	For EC2 hosts this is managed by roles
 	IAM users must add the correct AWS tokens to their .bash_profile
 	"""
-	return connect_s3()
+	try:
+		return connect_s3()
+	except:
+		return S3Connection(AWS_ACCESS_KEY, AWS_SECRET_KEY)
 
 def get_bucket(connection, bucket_name):
 	return connection.get_bucket(bucket_name, validate=False)
