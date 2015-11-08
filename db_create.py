@@ -6,6 +6,8 @@ from bigneuron_app.job_items.models import JobItem, JobItemStatus
 from bigneuron_app.job_items.constants import JOB_ITEM_STATUS_TYPES
 from bigneuron_app.users.models import User
 from bigneuron_app.users.constants import DEFAULT_IAM_USER, DEFAULT_EMAIL, ADMIN_EMAIL, ADMIN_IAM_USER
+from bigneuron_app.clients.constants import VAA3D_TEST_INPUT_FILE_1, VAA3D_TEST_INPUT_FILE_2
+
 
 """
 DO NOT RUN THIS SCRIPT IN PROD IF DATABASE ALREADY HAS LIVE DATA!
@@ -47,8 +49,8 @@ print "Loaded test job data"
 
 # Insert Test Job Items
 job = Job.query.first()
-job_item1 = JobItem(job.job_id, 'file1.tif', 1)
-job_item2 = JobItem(job.job_id, 'file2.tif', 1)
+job_item1 = JobItem(job.job_id, VAA3D_TEST_INPUT_FILE_1, 1)
+job_item2 = JobItem(job.job_id, VAA3D_TEST_INPUT_FILE_2, 1)
 db.session.add(job_item1)
 db.session.add(job_item2)
 

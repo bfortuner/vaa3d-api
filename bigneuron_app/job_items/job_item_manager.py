@@ -18,7 +18,7 @@ def process_next_job_item():
 def process(job_item):
 	try:
 		print "Processing job item " + str(job_item)
-		job = vaa3d.Vaa3dJob(VAA3D_TEST_JOB)
+		job = vaa3d.build_vaa3d_job(job_item)
 		s3.download_file(job.input_filename, job.input_file_path, S3_INPUT_BUCKET)
 		vaa3d.run_job(job)
 		s3.upload_file(job.output_filename, job.output_file_path, S3_OUTPUT_BUCKET)
@@ -30,6 +30,8 @@ def process(job_item):
 		print e
 	finally:
 		db.session.commit()
+
+
 
 def get_job_items_by_status(job_status):
 	job_item_status = JobItemStatus.query.filter_by(status_name=job_status).first()

@@ -4,6 +4,7 @@ from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.job_items.models import JobItem
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.clients import s3
+from bigneuron_app.clients.constants import S3_INPUT_BUCKET
 
 def get_user_input_filenames(user_id):
 	return s3.get_all_files(S3_INPUT_BUCKET)
