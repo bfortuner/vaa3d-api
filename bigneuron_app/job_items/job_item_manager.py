@@ -31,8 +31,6 @@ def process(job_item):
 	finally:
 		db.session.commit()
 
-
-
 def get_job_items_by_status(job_status):
 	job_item_status = JobItemStatus.query.filter_by(status_name=job_status).first()
 	jobs = job_status.jobs.all()

@@ -12,7 +12,8 @@ Vaa3D Team</p>
 CREATE_JOB_CONFIRMATION_TEMPLATE = HEADER + CREATE_JOB_CONFIRMATION_TEMPLATE + FOOTER
 
 COMPLETE_JOB_CONFIRMATION_TEMPLATE="""<p>Hello,</p>
-<p>Your new Vaa3D job is complete! Please log in to AWS S3 using the link below. You can download your output files from the vaa3d-output bucket</p>
+<p>Your new Vaa3D job is complete! Please log in to AWS S3 using the link below.
+You can download your output files from the vaa3d-output bucket</p>
 <p>Job Status: %s</p>
 <p><a href="%s">Login To AWS S3</a></p>
 <p>Thanks,<br>
