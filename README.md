@@ -2,7 +2,7 @@
 
 Backend python API for handling users requests from https://github.com/bfortuner/vaa3d-website
 
-Endpoint: http://vaa3d-api-env-u4euvdicze.elasticbeanstalk.com/
+Endpoint: http://vaa3d-api-dev.elasticbeanstalk.com/
 
 Email bfortuner@gmail.com for access keys and credentials
 
