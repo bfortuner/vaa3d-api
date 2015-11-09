@@ -1,7 +1,10 @@
 import os
 
+AWS_REGION='us-west-2'
 AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
 AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
+
+AWS_IAM_USER_LOGIN_LINK='https://647215175976.signin.aws.amazon.com/console'
 
 S3_INPUT_BUCKET='vaa3d-input'
 S3_OUTPUT_BUCKET='vaa3d-output'

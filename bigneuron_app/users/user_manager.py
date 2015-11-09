@@ -15,3 +15,6 @@ def get_jobs_by_user(email_address):
 	user = User.query.filter_by(email=email_address).first()
 	jobs = user.jobs.all()
 	return jobs
+
+def get_user_by_id(user_id):
+	return User.query.get(user_id)
