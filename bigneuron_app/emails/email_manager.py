@@ -6,13 +6,11 @@ from bigneuron_app.jobs.models import Job
 
 def send_job_created_email(job):
 	user = user_manager.get_user_by_id(job.user_id)
-	print "Sending create job email: " + user.email
 	ses.send_email(CREATE_JOB_CONFIRMATION['subject'],
 		CREATE_JOB_CONFIRMATION['body'], user.email)
 
 def send_job_complete_email(job):
 	user = user_manager.get_user_by_id(job.user_id)
-	print "Sending complete job email: " + user.email
 	ses.send_email(COMPLETE_JOB_CONFIRMATION['subject'],
 		COMPLETE_JOB_CONFIRMATION['body'], user.email)
 
