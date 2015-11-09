@@ -9,7 +9,7 @@ def get_connection():
 	IAM users must add the correct AWS tokens to their .bash_profile
 	"""
 	try:
-		return boto.ses.connect_to_region()
+		return boto.ses.connect_to_region(AWS_REGION)
 	except:
 		return boto.ses.connect_to_region(AWS_REGION, aws_access_key_id=AWS_ACCESS_KEY, 
 			aws_secret_access_key=AWS_SECRET_KEY)

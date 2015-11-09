@@ -46,8 +46,8 @@ def update_jobs_created():
 	jobs_created = get_jobs_by_status("CREATED")
 	for job in jobs_created:
 		job.status_id = get_job_status_id("IN_PROGRESS")
+		db.session.commit()
 		email_manager.send_job_created_email(job)
-	db.session.commit()
 
 def get_jobs_by_status(job_status):
 	job_status = JobStatus.query.filter_by(status_name=job_status).first()
