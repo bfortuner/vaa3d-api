@@ -1,8 +1,10 @@
 import os
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.cors import CORS
 
 application = Flask(__name__)
+CORS(application)
 application.config.from_object('config.' + os.getenv('VAA3D_CONFIG', 'ProdConfig'))
 db = SQLAlchemy(application)
 
