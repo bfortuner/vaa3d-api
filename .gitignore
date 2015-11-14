@@ -1,6 +1,10 @@
 # Test database
 *test.db
 
+# Test Files
+*.gz
+*.zip
+
 # Credentials
 credentials.py
 

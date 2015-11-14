@@ -7,3 +7,5 @@ from flask import *
 from bigneuron_app import *
 
 os.environ['PYTHONINSPECT'] = 'True'
+
+from bigneuron_app.utils import zipper
