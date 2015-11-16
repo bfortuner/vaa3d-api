@@ -18,9 +18,13 @@ class ProdConfig(Config):
     DB_PASSWORD = os.getenv('VAA3D_DB_PASSWORD', 'password')
     SQLALCHEMY_DATABASE_URI = DB_DRIVER + DB_USERNAME + ':' + DB_PASSWORD + '@' + DB_HOSTNAME + ':' + DB_PORT + '/' + DB_NAME
     SECRET_KEY = os.getenv('APP_SECRET_KEY', 'secret_key')
+    S3_INPUT_BUCKET='vaa3d-input'
+    S3_OUTPUT_BUCKET='vaa3d-output'
 
 class TestConfig(Config):
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
     SECRET_KEY = 'secret'
+    S3_INPUT_BUCKET='test-vaa3d-input'
+    S3_OUTPUT_BUCKET='test-vaa3d-output'

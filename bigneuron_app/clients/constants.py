@@ -1,13 +1,14 @@
 import os
+from bigneuron_app import application
 
 AWS_REGION='us-west-2'
-AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
-AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
+AWS_ACCESS_KEY = application.config['AWS_ACCESS_KEY']
+AWS_SECRET_KEY = application.config['AWS_SECRET_KEY']
+
+S3_INPUT_BUCKET=application.config['S3_INPUT_BUCKET']
+S3_OUTPUT_BUCKET=application.config['S3_OUTPUT_BUCKET']
 
 AWS_IAM_USER_LOGIN_LINK='https://647215175976.signin.aws.amazon.com/console'
-
-S3_INPUT_BUCKET='vaa3d-input'
-S3_OUTPUT_BUCKET='vaa3d-output'
 
 # Vaa3d Program Directory
 # /Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64
