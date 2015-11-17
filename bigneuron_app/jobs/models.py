@@ -5,14 +5,16 @@ class Job(db.Model):
 	job_id = db.Column(db.Integer, primary_key=True)
 	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 	status_id = db.Column(db.Integer, db.ForeignKey('job_status_types.id'), nullable=False)
+	output_dir = db.Column(db.String(128), nullable=False)
 	created = db.Column(db.DateTime, default=db.func.now())
 	last_updated = db.Column(db.DateTime, onupdate=db.func.now())
 	job_status = db.relationship('JobStatus', backref=db.backref('jobs', lazy='dynamic'))
 	user = db.relationship('User', backref=db.backref('jobs', lazy='dynamic'))
 
-	def __init__(self, user_id, status_id):
+	def __init__(self, user_id, status_id, output_dir):
 		self.user_id = user_id
 		self.status_id = status_id
+		self.output_dir = output_dir
 
 	def __repr__(self):
 		return '<Job %r>' % self.job_id

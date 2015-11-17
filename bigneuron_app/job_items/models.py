@@ -17,7 +17,7 @@ class JobItem(db.Model):
 		self.status_id = status_id
 
 	def __repr__(self):
-		return '<JobItem %r>' % self.job_item_id
+		return '<JobItem %r>' % self.filename
 
 class JobItemStatus(db.Model):
 	__tablename__ = 'job_item_status_types'

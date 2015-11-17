@@ -9,8 +9,8 @@ from bigneuron_app.clients.constants import S3_INPUT_BUCKET
 def get_user_input_filenames(user_id):
 	return s3.get_all_files(S3_INPUT_BUCKET)
 
-def create_job(filenames, user):
-	job = Job(user.id, 1) #Status = CREATED
+def create_job(filenames, user, output_dir):
+	job = Job(user.id, 1, output_dir) #Status = CREATED
 	db.session.add(job)
 	db.session.commit()
 

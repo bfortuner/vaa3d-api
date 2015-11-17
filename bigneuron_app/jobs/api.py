@@ -14,6 +14,7 @@ def create_job():
 	print "creating job " + str(request.json)
 	filenames = request.json['filenames']
 	email = request.json['emailAddress']
+	output_dir = request.json['outputDir']
 	user = user_manager.get_or_create_user(email)
-	job_id = job_manager.create_job(filenames, user)
+	job_id = job_manager.create_job(filenames, user, output_dir)
 	return jsonify( {'job_id' : job_id} )

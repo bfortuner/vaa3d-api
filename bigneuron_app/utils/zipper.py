@@ -4,6 +4,7 @@ import zipfile
 import subprocess
 import shutil
 import mimetypes
+import ntpath
 
 GZIP_FILE_EXT = '.gz'
 ZIP_FILE_EXT = '.zip'
@@ -13,7 +14,11 @@ def call_process(command_str):
     output = p.communicate()[0]
     return output
 
-def is_zipped_file(input_file_path):
+def get_files_in_zip_dir(input_file_path):
+	zipped_files = zipfile.ZipFile(input_file_path, 'r')
+	return zipped_files
+
+def is_zip_file(input_file_path):
 	return zipfile.is_zipfile(input_file_path)
 
 def zip_file(input_file_path, output_file_path):
@@ -69,7 +74,30 @@ def cleanup(filepaths_list):
 			print "File not found"
 
 
-### Unit Tests ###
+def expand_zip_archive(zip_archive, output_dir):
+	if not os.path.exists(output_dir):   #we could use this replicate the zip dir structure 
+		os.makedirs(output_dir)
+	for member in zip_archive.namelist():
+		filename = ntpath.basename(member)
+		print "file is " + filename 
+		# skip directories
+		if not filename:
+			continue
+		ouput_file_path = os.path.join(output_dir, filename)
+		extract_file_from_archive(zip_archive, member, ouput_file_path)
+
+def extract_file_from_archive(zip_archive, filename, output_file_path):
+	source = zip_archive.open(filename)
+	target = file(output_file_path, 'w+')
+	with source, target:
+		shutil.copyfileobj(source, target)
+	target.close()
+
+
+
+
+
+###### Unit Tests ######
 
 TEST_FILE_NAME = 'myfile.txt'
 CURRENT_DIR = os.getcwd()
@@ -98,7 +126,7 @@ def test_gzip_gunzip():
 def test_zip_unzip():
 	create_test_file()
 	zip_file_path = zip_file(INPUT_FILE_PATH, OUTPUT_FILE_PATH)
-	assert is_zipped_file(zip_file_path) == True
+	assert is_zip_file(zip_file_path) == True
 	unzip_file_path = unzip_file(zip_file_path, OUTPUT_FILE_PATH)
 	print_file_contents(unzip_file_path)
 	cleanup([zip_file_path, unzip_file_path, INPUT_FILE_PATH])
@@ -109,7 +137,14 @@ def test_is_gzipped():
 	assert is_gzipped_file(gzip_file_path) == True
 	cleanup([gzip_file_path, INPUT_FILE_PATH])
 
+def test_get_files_in_zip_dir(input_file_path=INPUT_FILE_PATH):
+	#create_test_file()
+	#zip_file_path = zip_file(input_file_path, OUTPUT_FILE_PATH)
+	get_files_in_zip_dir(input_file_path)
+	#cleanup([zip_file_path, INPUT_FILE_PATH])
+
 def test_all():
 	test_gzip_gunzip()
 	test_zip_unzip()
 	test_is_gzipped()
+	test_get_files_in_zip_dir()

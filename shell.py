@@ -9,3 +9,5 @@ from bigneuron_app import *
 os.environ['PYTHONINSPECT'] = 'True'
 
 from bigneuron_app.utils import zipper
+from bigneuron_app.job_items import job_item_manager
+from bigneuron_app.job_items.models import JobItem

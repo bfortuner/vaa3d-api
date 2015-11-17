@@ -1,8 +1,12 @@
 import sys
+import zipfile
+
 from bigneuron_app import db
 from bigneuron_app.job_items.models import JobItem, JobItemStatus
 from bigneuron_app.clients import s3, vaa3d
 from bigneuron_app.clients.constants import *
+from bigneuron_app.utils import zipper 
+
 
 def process_next_job_item():
 	new_job_status = JobItemStatus.query.filter_by(status_name="CREATED").first()
@@ -18,13 +22,16 @@ def process_next_job_item():
 def process(job_item):
 	try:
 		print "Processing job item " + str(job_item)
-		job = vaa3d.build_vaa3d_job(job_item)
-		s3.download_file(job.input_filename, job.input_file_path, S3_INPUT_BUCKET)
-		vaa3d.run_job(job)
-		s3.upload_file(job.output_filename, job.output_file_path, S3_OUTPUT_BUCKET)
-		vaa3d.cleanup(job.input_file_path, job.output_file_path)
+		local_file_path = os.path.abspath(job_item.filename)
+		bucket_name = s3.get_bucket_name_from_filename(job_item.filename, 
+			[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
+		s3.download_file(job_item.filename, local_file_path, bucket_name)
+		if zipper.is_zip_file(local_file_path):
+			process_zip_file(job_item, local_file_path)
+		else:
+			process_non_zip_file(job_item)
+
 		job_item.status_id = get_job_item_status_id("COMPLETE")
-		db.session.commit()
 	except Exception as e:
 		job_item.status_id = get_job_item_status_id("ERROR")
 		print e
@@ -38,3 +45,48 @@ def get_job_items_by_status(job_status):
 
 def get_job_item_status_id(name):
 	return JobItemStatus.query.filter_by(status_name=name).first().id
+
+def process_non_zip_file(job_item):
+	vaa3d_job = vaa3d.build_vaa3d_job(job_item)
+	vaa3d.run_job(vaa3d_job)
+	s3_key = job_item.job.output_dir + "/" + vaa3d_job.output_filename
+	s3.upload_file(s3_key, vaa3d_job.output_file_path, S3_OUTPUT_BUCKET)
+	vaa3d.cleanup(vaa3d_job.input_file_path, vaa3d_job.output_file_path)
+
+def process_zip_file(job_item, zip_file_path):
+	"""
+	Unzips a compressed file
+	Creates new job_item record(s)
+	Uploads new uncompressed file(s) to s3
+	"""
+	output_dir = os.path.dirname(zip_file_path)
+	zip_archive = zipfile.ZipFile(zip_file_path, "r")
+	filenames = zip_archive.namelist()
+	if len(filenames) > 1:
+		output_dir = os.path.join(output_dir, zip_file_path[:zip_file_path.find(zipper.ZIP_FILE_EXT)])
+		zipper.expand_zip_archive(zip_archive, output_dir)
+		zip_archive.close()
+		create_job_items_from_directory(job_item, output_dir)
+	else:
+		filename = filenames[0]
+		file_path = os.path.join(output_dir, filename)
+		zipper.extract_file_from_archive(zip_archive, filename, file_path)
+		zip_archive.close()
+		create_job_item(job_item.job.job_id, filename, file_path)
+
+def create_job_items_from_directory(job_item, dir_path):
+	fileslist = []
+	for (dirpath, dirnames, filenames) in os.walk(dir_path):
+		for f in filenames:
+			fileslist.append({
+				"filename": f,
+				"file_path": os.path.join(dirpath,f),				
+			})
+	for f in fileslist:
+		create_job_item(job_item.job.job_id, f['filename'], f['file_path'])
+
+def create_job_item(job_id, filename, file_path):
+	s3.upload_file(filename, file_path, S3_WORKING_INPUT_BUCKET)
+	job_item = JobItem(job_id, filename, 1)
+	db.session.add(job_item)
+	db.session.commit()
