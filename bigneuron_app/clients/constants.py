@@ -7,6 +7,7 @@ AWS_SECRET_KEY = application.config['AWS_SECRET_KEY']
 
 S3_INPUT_BUCKET=application.config['S3_INPUT_BUCKET']
 S3_OUTPUT_BUCKET=application.config['S3_OUTPUT_BUCKET']
+S3_WORKING_INPUT_BUCKET=application.config['S3_WORKING_INPUT_BUCKET']
 
 AWS_IAM_USER_LOGIN_LINK='https://647215175976.signin.aws.amazon.com/console'
 

@@ -20,6 +20,7 @@ class ProdConfig(Config):
     SECRET_KEY = os.getenv('APP_SECRET_KEY', 'secret_key')
     S3_INPUT_BUCKET='vaa3d-input'
     S3_OUTPUT_BUCKET='vaa3d-output'
+    S3_WORKING_INPUT_BUCKET='vaa3d-working'
 
 class TestConfig(Config):
     TESTING = True
@@ -28,3 +29,4 @@ class TestConfig(Config):
     SECRET_KEY = 'secret'
     S3_INPUT_BUCKET='test-vaa3d-input'
     S3_OUTPUT_BUCKET='test-vaa3d-output'
+    S3_WORKING_INPUT_BUCKET='test-vaa3d-working'

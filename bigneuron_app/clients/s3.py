@@ -18,16 +18,26 @@ def get_connection():
 def get_bucket(connection, bucket_name):
 	return connection.get_bucket(bucket_name, validate=False)
 
-def download_file(filename, file_path, bucket):
+def get_bucket_name_from_filename(filename, bucket_names):
+	connection = get_connection()
+	for name in bucket_names:
+		bucket = get_bucket(connection, name)
+		files = bucket.list()
+		for f in files:
+			if f.name == filename:
+				return bucket.name
+	return None
+
+def download_file(filename, file_path, bucket_name):
 	print "Downloading file..."
-	k = Key(get_bucket(get_connection(), bucket))
+	k = Key(get_bucket(get_connection(), bucket_name))
 	k.key = filename
 	k.get_contents_to_filename(file_path)
 	print "Downloading complete!"
 
-def upload_file(filename, file_path, bucket):
+def upload_file(filename, file_path, bucket_name):
 	print "Uploading file..."
-	k = Key(get_bucket(get_connection(), bucket))
+	k = Key(get_bucket(get_connection(), bucket_name))
 	k.key = filename
 	k.set_contents_from_filename(file_path)
 	print "Upload complete!"
