@@ -66,7 +66,6 @@ def compress_dir(dir_name, dir_path):
     return dir_name + GZIP_FILE_EXT
 
 def cleanup(filepaths_list):
-	print filepaths_list
 	for filepath in filepaths_list:
 		try:
 			os.remove(filepath)
@@ -79,9 +78,11 @@ def expand_zip_archive(zip_archive, output_dir):
 		os.makedirs(output_dir)
 	for member in zip_archive.namelist():
 		filename = ntpath.basename(member)
-		print "file is " + filename 
 		# skip directories
 		if not filename:
+			continue
+		# skip hidden files
+		if filename.startswith('.'):
 			continue
 		ouput_file_path = os.path.join(output_dir, filename)
 		extract_file_from_archive(zip_archive, member, ouput_file_path)

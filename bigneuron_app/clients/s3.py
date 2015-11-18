@@ -29,14 +29,14 @@ def get_bucket_name_from_filename(filename, bucket_names):
 	return None
 
 def download_file(file_key, file_path, bucket_name):
-	print "Downloading file..."
+	print "Downloading file: %s" % file_key
 	k = Key(get_bucket(get_connection(), bucket_name))
 	k.key = file_key
 	k.get_contents_to_filename(file_path)
 	print "Downloading complete!"
 
 def upload_file(file_key, file_path, bucket_name):
-	print "Uploading file..."
+	print "Uploading file: %s" % file_key
 	k = Key(get_bucket(get_connection(), bucket_name))
 	k.key = file_key
 	k.set_contents_from_filename(file_path)

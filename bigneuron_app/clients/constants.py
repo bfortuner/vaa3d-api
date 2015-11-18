@@ -20,10 +20,10 @@ VAA3D_DEFAULT_FUNC='app2'
 
 # Test Data
 VAA3D_TEST_INPUT_FILE_1='ex_Repo_hb9_eve.tif'
-VAA3D_TEST_INPUT_FILE_2='human_brain_from_itk_example.tif'
+VAA3D_TEST_INPUT_FILE_2='zipdirtest.zip'
+VAA3D_TEST_INPUT_FILE_3='v3draw_zip.zip'
 
 VAA3D_TEST_OUTPUT_FILE_1='ex_Repo_hb9_eve.tif.swc'
-VAA3D_TEST_OUTPUT_FILE_2='human_brain_from_itk_example.tif.swc'
 
 VAA3D_TEST_INPUT_FILE_PATH_1=os.path.abspath(VAA3D_TEST_INPUT_FILE_1)
 VAA3D_TEST_OUTPUT_FILE_PATH_1=os.path.abspath(VAA3D_TEST_OUTPUT_FILE_1)

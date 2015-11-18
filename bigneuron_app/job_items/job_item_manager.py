@@ -1,5 +1,6 @@
 import sys
 import zipfile
+import shutil
 
 from bigneuron_app import db
 from bigneuron_app.job_items.models import JobItem, JobItemStatus
@@ -17,20 +18,19 @@ def process_next_job_item():
 	print "Found new job_item"
 	job_item.status_id = get_job_item_status_id("IN_PROGRESS")
 	db.session.commit()
-	process(job_item)
+	local_file_path = os.path.abspath(job_item.filename)
+	bucket_name = s3.get_bucket_name_from_filename(job_item.filename, 
+		[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
+	s3.download_file(job_item.filename, local_file_path, bucket_name)
+	run_job_item(job_item)
 
-def process(job_item):
+def run_job_item(job_item):
+	local_file_path = os.path.abspath(job_item.filename)
 	try:
-		print "Processing job item " + str(job_item)
-		local_file_path = os.path.abspath(job_item.filename)
-		bucket_name = s3.get_bucket_name_from_filename(job_item.filename, 
-			[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
-		s3.download_file(job_item.filename, local_file_path, bucket_name)
 		if zipper.is_zip_file(local_file_path):
 			process_zip_file(job_item, local_file_path)
 		else:
 			process_non_zip_file(job_item)
-
 		job_item.status_id = get_job_item_status_id("COMPLETE")
 	except Exception as e:
 		job_item.status_id = get_job_item_status_id("ERROR")
@@ -67,12 +67,16 @@ def process_zip_file(job_item, zip_file_path):
 		zipper.expand_zip_archive(zip_archive, output_dir)
 		zip_archive.close()
 		create_job_items_from_directory(job_item, output_dir)
+		shutil.rmtree(output_dir)
 	else:
 		filename = filenames[0]
 		file_path = os.path.join(output_dir, filename)
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
-		create_job_item(job_item.job.job_id, filename, file_path)
+
+		new_job_item = create_job_item(job_item.job.job_id, filename, file_path)
+		run_job_item(new_job_item)
+	os.remove(zip_file_path)
 
 def create_job_items_from_directory(job_item, dir_path):
 	fileslist = []
@@ -83,10 +87,11 @@ def create_job_items_from_directory(job_item, dir_path):
 				"file_path": os.path.join(dirpath,f),				
 			})
 	for f in fileslist:
+		s3.upload_file(f['filename'], f['file_path'], S3_WORKING_INPUT_BUCKET)
 		create_job_item(job_item.job.job_id, f['filename'], f['file_path'])
 
 def create_job_item(job_id, filename, file_path):
-	s3.upload_file(filename, file_path, S3_WORKING_INPUT_BUCKET)
 	job_item = JobItem(job_id, filename, 1)
 	db.session.add(job_item)
 	db.session.commit()
+	return job_item
