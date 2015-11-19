@@ -70,6 +70,62 @@ Push code to EB:
 $ eb deploy
 ```
 
+### Worker Setup on EC2
+
+Download Vaa3D
+```
+cd; 
+wget http://home.penglab.com/proj/vaa3d/v3100/Vaa3D_CentOS_64bit_v3.100.tar.gz
+gunzip Vaa3D_CentOS_64bit_v3.100.tar.gz
+```
+
+Crontab to Run Vaa3d jobs on EC2
+```
+* * * * * . $HOME/.bash_profile; /usr/bin/python /home/ec2-user/vaa3d-api/task_runner.py process_jobs &>> /home/ec2-user/cronlog.log
+*/1 * * * * . $HOME/.bash_profile; /usr/bin/python /home/ec2-user/vaa3d-api/task_runner.py process_job_items &>> /home/ec2-user/cronlog.log
+```
+
+Bash_Profile on EC2
+```
+export VAA3D_DB_PASSWORD='your-db-password'
+export VAA3D_PATH='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
+export EDITOR="emacs"
+
+export DISPLAY=":98"
+Xvfb $DISPLAY >& Xvfb.log &
+trap "kill $! || true" EXIT
+```
+
+Libraries required to deploy Vaa3D
+```
+sudo yum install emacs
+sudo yum install git
+sudo yum install freeglut
+sudo yum install mesa-libGL-devel mesa-libGLU-devel
+sudo yum install gcc-c++
+sudo yum install libXrender-devel.x86_64
+sudo yum install xorg-x11-server-Xvfb
+```
+
+Run Vaa3D Command (***Absolute file paths are important***)
+```
+$VAA3D_PATH -x vn2 -f app2 -i /home/ec2-user/ziptest2.tif -o /home/ec2-user/output.swc
+```
+**make sure the test data is good quality (will say job is killed)
+
+Clone GitHub
+```
+git clone https://github.com/bfortuner/vaa3d-api
+cd vaa3d-api
+sudo pip install -r requirements.txt
+```
+
+Kill Processes by Pattern
+```
+pgrep -f vaa3d
+pkill -f vaa3d
+```
+
 ### Links and Tutorials:
 * https://medium.com/@rodkey/deploying-a-flask-application-on-aws-a72daba6bb80
 * http://blog.uptill3.com/2012/08/25/python-on-elastic-beanstalk.html

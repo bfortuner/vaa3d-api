@@ -30,12 +30,49 @@ vaa3d -x Vaa3D-FarSight_snake_tracing -f help
 vaa3d -x Vaa3D_Neuron2 -f help
 
 
+
+####### Beta Plugins w Required Parameters ########
+
+vaa3d -x Vaa3D_Neuron2 -f app2 -i ~/testfiles/smalltest.v3dpbd -o ~/testfiles/output/smalltest.v3dpbd_Vaa3D_Neuron2_app2.swc -p 1
+* default output looks like this smalltest.v3dpbd_x286_y166_z13_app2.swc with custom params
+** should probably specify the output file name.. 
+
+vaa3d -x Vaa3D-FarSight_snake_tracing -f snake_trace  -i ~/testfiles/smalltest.v3dpbd -p 1
+* outputs filename - smalltest.v3dpbd_snake.swc in same directory as input file
+** some memory errors running
+
+vaa3d -x CWlab_method1_version1 -f tracing_func -i ~/testfiles/smalltest.v3dpbd -p 1
+* outputs filename - smalltest.v3dpbd_Cwlab_ver1.swc
+
+vaa3d -x MOST_tracing -f MOST_trace -i ~/testfiles/smalltest.v3dpbd -p 1
+* outputs filename - smalltest.v3dpbd_MOST.swc
+
+vaa3d -x CWlab_method1_version1 -f tracing_func -i ~/testfiles/smalltest.v3dpbd -p 1
+* outputs filename - smalltest.v3dpbd_Cwlab_ver1.swc
+
+vaa3d -x neuTube -f neutube_trace -i ~/testfiles/smalltest.v3dpbd -p 1
+* outputs filename - smalltest.v3dpbd_neutube.swc
+
+vaa3d -x TReMap -f trace_mip -i ~/testfiles/smalltest.v3dpbd
+* outputs filename - smalltest.v3dpbd_XY_3D_TreMap.swc
+
+vaa3d -x MST_tracing -f trace_mst -i ~/testfiles/smalltest.v3dpbd -p 1
+* outputs filename - smalltest.v3dpbd_MST_Tracing.swc
+
+### Killed on t1.micro ###
+vaa3d -x smartTrace -f smartTrace -i ~/testfiles/smalltest.v3dpbd -p 1
+vaa3d -x SimpleTracing -f tracing -i ~/testfiles/smalltest.v3dpbd
+vaa3d -x NeuronAssembler_neuroGPSTree -f trace_tc -i ~/testfiles/smalltest.v3dpbd (special req)
+
+
+
 ######## Sample Commands ########
 
 ### Advantra ###
 vaa3d -x Advantra -f help
-vaa3d -x Advantra -f advantra_func -i <inimg_file>
 vaa3d -x Advantra -f advantra_func -i <inimg_file> -p <scal bratio perc znccTh Ndir angSig Ni Ns zDist>
+vaa3d -x Advantra -f advantra_func -i ~/smalltest.tif -o ~/smalltest.tif_Advantra.swc -p 12 0.5 99 0.6 5 60 30 5 1
+** Needs all 9 parameters
 # Help Menu
 inimg_file          The input image
 scal                Scale (5, 20] pix.
@@ -52,13 +89,14 @@ outswc_file         Will be named automatically based on the input image file na
 
 #### BJUT_fastmarching_spanningtree ###
 vaa3d -x BJUT_fastmarching_spanningtree -f help
-vaa3d -x fastmarching_spanningtree -f tracing_func -i <inimg_file>
 vaa3d -x fastmarching_spanningtree -f tracing_func -i <inimg_file> -p <channel> <other parameters>
+vaa3d -x fastmarching_spanningtree -f tracing_func -i ~/smalltest.tif -o ~/smalltest.tif_BJUT_fastmarching_spanningtree.swc -p 1
 # Help Menu
 inimg_file       The input image
 channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
-
+# File Types: smalltest.tif || smalltest.v3draw
+** Killed on EC2
 
 #### BJUT_meanshift ###
 vaa3d -x BJUT_meanshift -f help
@@ -90,20 +128,10 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### EnsembleNeuronTracerV2n ###
+#### EnsembleNeuronTracerV2n - DOES NOT WORK -- HELP DOCS BAD !!
 vaa3d -x EnsembleNeuronTracerV2n -f help
-vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file>
-vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file> -p <channel> <other parameters>
-# Help Menu
-inimg_file       The input image
-channel          Data channel for tracing. Start from 1 (default 1).
-outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
-
-
-#### EnsembleNeuronTracerV2s ###
-vaa3d -x EnsembleNeuronTracerV2s -f help
-vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file>
-vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file> -p <channel> <other parameters>
+vaa3d -x CWlab_method1_version2 -f tracing_func -i <inimg_file>
+vaa3d -x CWlab_method1_version3 -f tracing_func -i <inimg_file> -p <channel> <other parameters>
 # Help Menu
 inimg_file       The input image
 channel          Data channel for tracing. Start from 1 (default 1).
@@ -127,6 +155,7 @@ th			Required by the tracing algorithm. Default value is 10
 outswc_file		Will be named automatically based on the input image file name, so you don't have to specify it.
 
 # Method trace_raw
+* only accepts 8 bit v3draw/raw image
 vaa3d -x NeuronAssembler_neuroGPSTree -f trace_raw -i <inimg_file> -p <inmarker_file> <block size> <tracing_entire_image> <xR> <yR> <zR> <th>
 vaa3d -x NeuronAssembler_neuroGPSTree -f trace_raw -i <inimg_file>
 # Help Menu
@@ -177,8 +206,8 @@ The output swc file will be named automatically based on the input image file na
 
 #### MST_tracing ###
 vaa3d -x MST_tracing -f help
-vaa3d -x plugin_name -f trace_mst -i <inimg_file>
-vaa3d -x plugin_name -f trace_mst -i <inimg_file> -p <channel> <window size>
+vaa3d -x MST_tracing -f trace_mst -i <inimg_file>
+vaa3d -x MST_tracing -f trace_mst -i <inimg_file> -p <channel> <window size>
 # Help Menu
 inimg_file       Should be 8 bit image
 channel          Data channel for tracing. Start from 1 (default 1).
@@ -240,8 +269,8 @@ outswc_file      Will be named automatically based on the input image file name,
 
 #### neuTube ###
 vaa3d -x neuTube -f help
-Usage : vaa3d -x dllname -f neutube_trace -i <inimg_file>
-Usage : vaa3d -x dllname -f neutube_trace -i <inimg_file> -p <ch> <merge>
+vaa3d -x dllname -f neutube_trace -i <inimg_file>
+vaa3d -x dllname -f neutube_trace -i <inimg_file> -p <ch> <merge>
 # Help Menu
 ch           the input channel value, start from 1, default 1
 merge        Merge close nodes after enhancement, 1: merge, 0: not merge, default 0
@@ -285,7 +314,6 @@ vaa3d -x SimpleTracing -f <one of the above options> -i <input_image_file> -o <o
 -f ray_shooting : Additional tracing method 1
 -f dfs          : Additional tracing method 2
 
-
 #### smartTrace ###
 vaa3d -x smartTrace -f help
 # Func selfCorrection
@@ -316,8 +344,8 @@ outswc_file      Will be named automatically based on the input image file name,
 
 #### TReMap ###
 vaa3d -x TReMap -f help
-vaa3d -x plugin_name -f trace_mip -i <inimg_file>
-vaa3d -x plugin_name -f trace_mip -i <inimg_file> -p <mip_plane> <channel> <bkg_thresh> <b_256cube> <is_gsdt> <is_gap> <length_thresh>
+vaa3d -x TReMap -f trace_mip -i <inimg_file>
+vaa3d -x TReMap -f trace_mip -i <inimg_file> -p <mip_plane> <channel> <bkg_thresh> <b_256cube> <is_gsdt> <is_gap> <length_thresh>
 # Help Menu
 inimg_file       Should be 8/16/32bit image
 mip_plane        Maximum projection plane, 0 for XY plane, 1 for XZ plane, 2 for YZ plane, Default 0
@@ -330,9 +358,9 @@ length_thresh    Default 5
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### Vaa3D ###
+#### Vaa3D-FarSight_snake_tracing ###
 vaa3d -x Vaa3D-FarSight_snake_tracing -f help
-vaa3d -x dllname -f snake_trace -i <inimg_file> -p <ch> 
+vaa3d -x Vaa3D-FarSight_snake_tracing -f snake_trace -i <inimg_file> -p <ch> 
 # Help Menu
 ch           the input channel value, start from 1, default 1.1
 The output swc file will be named automatically based on the input image file nmae
@@ -340,8 +368,8 @@ The output swc file will be named automatically based on the input image file nm
 
 #### Vaa3D_Neuron2 ###
 vaa3d -x Vaa3D_Neuron2 -f help
-vaa3d -x plugin_name -f app2 -i <inimg_file>
-vaa3d -x plugin_name -f app2 -i <inimg_file> -o <outswc_file> -p [<inmarker_file> [<channel> [<bkg_thresh> [<b_256cube> [<b_RadiusFrom2D> [<is_gsdt> [<is_gap> [<length_thresh> [is_resample][is_brightfield][is_high_intensity]]]]]]]]]
+vaa3d -x Vaa3D_Neuron2 -f app2 -i <inimg_file>
+vaa3d -x Vaa3D_Neuron2 -f app2 -i <inimg_file> -o <outswc_file> -p [<inmarker_file> [<channel> [<bkg_thresh> [<b_256cube> [<b_RadiusFrom2D> [<is_gsdt> [<is_gap> [<length_thresh> [is_resample][is_brightfield][is_high_intensity]]]]]]]]]
 inimg_file          Should be 8/16/32bit image
 inmarker_file       If no input marker file, please set this para to NULL and it will detect soma automatically. 
                     When the file is set, then the first marker is used as root/soma.
