@@ -9,13 +9,16 @@ from bigneuron_app.clients.constants import S3_INPUT_BUCKET
 def get_user_input_filenames(user_id):
 	return s3.get_all_files(S3_INPUT_BUCKET)
 
-def create_job(filenames, user, output_dir):
-	job = Job(user.id, 1, output_dir) #Status = CREATED
+def create_job(user, data):
+	print data
+	print type(data)
+	job = Job(user.id, 1, data['outputDir'], data['pluginName'], 
+		data['pluginSettings']['method'], data['pluginSettings']['channel'])
 	db.session.add(job)
 	db.session.commit()
 
-	for f in filenames:
-		job_item = JobItem(job.job_id, f, 1) #Status = CREATED
+	for f in data['filenames']:
+		job_item = JobItem(job.job_id, f, 1)
 		db.session.add(job_item)
 	db.session.commit()
 

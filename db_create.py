@@ -42,7 +42,8 @@ for status_str in JOB_ITEM_STATUS_TYPES:
 print "JobItemStatusType table loaded"
 
 # Insert Test Job
-job = Job(User.query.filter_by(iam_username='vaa3d-admin').first().id, 1, 'testjob1')
+job = Job(User.query.filter_by(iam_username='vaa3d-admin').first().id, 1, 
+		'testjob1', VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1)
 db.session.add(job)
 
 print "Loaded test job data"

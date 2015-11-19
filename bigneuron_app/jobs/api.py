@@ -12,9 +12,7 @@ def get_available_input_filenames(user_id=None):
 @application.route('/create_job', methods=['POST'])
 def create_job():
 	print "creating job " + str(request.json)
-	filenames = request.json['filenames']
-	email = request.json['emailAddress']
-	output_dir = request.json['outputDir']
-	user = user_manager.get_or_create_user(email)
-	job_id = job_manager.create_job(filenames, user, output_dir)
+	data = request.json
+	user = user_manager.get_or_create_user(data['emailAddress'])
+	job_id = job_manager.create_job(user, data)
 	return jsonify( {'job_id' : job_id} )
