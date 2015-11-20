@@ -31,7 +31,7 @@ def run_job(job):
 	print job.input_file_path
 	cmd = " ".join([VAA3D_PATH, "-x", job.plugin, "-f", job.method, "-i", job.input_file_path, "-p", str(job.channel)])
 	print "COMMAND: " + cmd
-	call([VAA3D_PATH, "-x", job.plugin, "-f", job.method, "-i", job.input_file_path, "-p", str(job.channel)])
+	call([VAA3D_PATH, "-x", job.plugin, "-f", job.method, "-i", job.input_file_path, "-p", str(job.channel), "-o", job.output_file_path])
 	print "Trace complete!"
 
 def cleanup(input_file_path, output_file_path):
@@ -69,8 +69,8 @@ def prepare_test_files(filenames):
 def test_single_plugin():
 	input_filename =  VAA3D_TEST_INPUT_FILE_1
 	input_file_path = os.path.abspath(input_filename)
-	#prepare_test_files([input_filename])
-	plugin_name = 'MST_tracing'
+	prepare_test_files([input_filename])
+	plugin_name = 'Vaa3D_Neuron2' #'MST_tracing'
 	test_plugin(plugin_name, PLUGINS[plugin_name], 
 		input_filename, input_file_path)
 
