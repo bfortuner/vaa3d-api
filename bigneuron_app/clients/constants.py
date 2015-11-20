@@ -1,5 +1,6 @@
 import os
 from bigneuron_app import application
+from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 
 AWS_REGION='us-west-2'
 AWS_ACCESS_KEY = application.config['AWS_ACCESS_KEY']
@@ -17,11 +18,13 @@ AWS_IAM_USER_LOGIN_LINK='https://647215175976.signin.aws.amazon.com/console'
 VAA3D_PATH=os.getenv('VAA3D_PATH', '/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh')
 VAA3D_DEFAULT_PLUGIN='Vaa3D_Neuron2'
 VAA3D_DEFAULT_FUNC='app2'
+VAA3D_DEFAULT_OUTPUT_SUFFIX=OUTPUT_FILE_SUFFIXES[VAA3D_DEFAULT_PLUGIN]
 
 # Test Data
 VAA3D_TEST_INPUT_FILE_1='ex_Repo_hb9_eve.tif'
 VAA3D_TEST_INPUT_FILE_2='zipdirtest.zip'
 VAA3D_TEST_INPUT_FILE_3='v3draw_zip.zip'
+VAA3D_TEST_INPUT_FILE_4='neuron01.tif'
 
 VAA3D_TEST_OUTPUT_FILE_1='ex_Repo_hb9_eve.tif.swc'
 

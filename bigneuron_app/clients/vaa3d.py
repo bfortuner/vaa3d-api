@@ -41,31 +41,44 @@ def cleanup(input_file_path, output_file_path):
 	for f in filelist:
 		os.remove(os.path.abspath(f))
 
-def cleanup_all(list_of_file_paths):
+def cleanup_all(list_of_filenames):
 	filelist = [ f for f in os.listdir(".") if f.endswith(".swc") ]
-	filelist.extend(list_of_file_paths)
+	filelist.extend(list_of_filenames)
 	for f in filelist:
 		os.remove(os.path.abspath(f))
 
-def test_jobs():
+def test_plugins():
 	# Download S3 Test Data
-	input_filename = VAA3D_TEST_INPUT_FILE_1
+	filenames = [VAA3D_TEST_INPUT_FILE_1]
+	for f in filenames:
+		input_filename = f
+		input_file_path = os.path.abspath(f)
+		s3.download_file(f, os.path.abspath(f), S3_INPUT_BUCKET)
+
+	# Test all plugins
+	for name in PLUGINS.keys():
+		print "Running plugin : " + name
+		test_plugin(name, PLUGINS[name], input_filename, input_file_path)
+
+	cleanup_all(filenames)
+
+def prepare_test_files(filenames):
+	for f in filenames:
+		s3.download_file(f, os.path.abspath(f), S3_INPUT_BUCKET)
+
+def test_single_plugin():
+	input_filename =  VAA3D_TEST_INPUT_FILE_1
 	input_file_path = os.path.abspath(input_filename)
-	s3.download_file(input_filename, input_file_path, S3_INPUT_BUCKET)
+	#prepare_test_files([input_filename])
+	plugin_name = 'MST_tracing'
+	test_plugin(plugin_name, PLUGINS[plugin_name], 
+		input_filename, input_file_path)
 
-	# Loop through plugins and run Vaa3D job
-	#test_plugin(PLUGINS[1], input_filename, input_file_path)
-	#for plugin in PLUGINS:
-#		test_plugin(plugin, input_filename, input_file_path)
-
-	cleanup_all([input_file_path])
-
-
-def test_plugin(plugin, input_filename, input_file_path):
-	output_filename = input_filename + OUTPUT_FILE_SUFFIXES[plugin['name']]
+def test_plugin(plugin_name, plugin, input_filename, input_file_path):
+	output_filename = input_filename + OUTPUT_FILE_SUFFIXES[plugin_name]
 	output_file_path = os.path.abspath(output_filename)
 	job = Vaa3dJob(input_filename, output_filename, input_file_path,
-	output_file_path, plugin['name'], plugin['method']['default'], 1)
+	output_file_path, plugin_name, plugin['method']['default'], 1)
 	run_job(job)
 	s3.upload_file(job.output_filename, job.output_file_path, S3_OUTPUT_BUCKET)
 	os.remove(job.output_file_path)

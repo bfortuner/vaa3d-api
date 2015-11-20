@@ -1,5 +1,6 @@
 from bigneuron_app import application
 from bigneuron_app.jobs import job_manager
+from bigneuron_app.jobs.constants import JOB_TYPES, JOB_TYPE_PLUGINS, PLUGINS
 from bigneuron_app.users import user_manager
 from flask import jsonify, request
 
@@ -8,6 +9,14 @@ from flask import jsonify, request
 def get_available_input_filenames(user_id=None):
 	filenames = job_manager.get_user_input_filenames(user_id)
 	return jsonify( {'filenames' : filenames} )
+
+@application.route('/plugins', methods=['GET'])
+def get_job_type_plugins():
+	return jsonify({
+		'job_types' : JOB_TYPES,
+		'job_type_plugins' : JOB_TYPE_PLUGINS,
+		'plugins' : PLUGINS
+	})
 
 @application.route('/create_job', methods=['POST'])
 def create_job():

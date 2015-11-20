@@ -13,4 +13,5 @@ from bigneuron_app.clients import vaa3d
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.job_items.models import JobItem
 
-vaa3d.test_jobs()
+#vaa3d.test_plugins()
+vaa3d.test_single_plugin()
