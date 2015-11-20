@@ -15,7 +15,7 @@ AWS_IAM_USER_LOGIN_LINK='https://647215175976.signin.aws.amazon.com/console'
 # /Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64
 # /home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh
 VAA3D_PATH=os.getenv('VAA3D_PATH', '/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh')
-VAA3D_DEFAULT_PLUGIN='vn2'
+VAA3D_DEFAULT_PLUGIN='Vaa3D_Neuron2'
 VAA3D_DEFAULT_FUNC='app2'
 
 # Test Data

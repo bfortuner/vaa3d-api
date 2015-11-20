@@ -74,23 +74,10 @@ $ eb deploy
 
 Download Vaa3D
 ```
-cd; 
+cd;
 wget http://home.penglab.com/proj/vaa3d/v3100/Vaa3D_CentOS_64bit_v3.100.tar.gz
 gunzip Vaa3D_CentOS_64bit_v3.100.tar.gz
 tar -xvf Vaa3D_CentOS_64bit_v3.100.tar
-```
-
-Bash_Profile on EC2
-```
-export VAA3D_DB_PASSWORD='your-db-password'
-export VAA3D_PATH='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
-export EDITOR="emacs"
-
-export DISPLAY=":98"
-Xvfb $DISPLAY >& Xvfb.log &
-trap "kill $! || true" EXIT
-
-alias vaa3d='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
 ```
 
 Libraries required to deploy Vaa3D
@@ -104,11 +91,17 @@ sudo yum -y install libXrender-devel.x86_64
 sudo yum -y install xorg-x11-server-Xvfb
 ```
 
-Clone GitHub
+Add to Bash_Profile on EC2
 ```
-git clone https://github.com/bfortuner/vaa3d-api
-cd vaa3d-api
-sudo pip install -r requirements.txt
+export VAA3D_DB_PASSWORD='your-db-password'
+export VAA3D_PATH='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
+export EDITOR="emacs"
+
+export DISPLAY=":98"
+Xvfb $DISPLAY >& Xvfb.log &
+trap "kill $! || true" EXIT
+
+alias vaa3d='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
 ```
 
 Download Test Data
@@ -123,6 +116,13 @@ vaa3d -x vn2 -f app2 -i ~/testfilesdir/smalltest.v3dpbd
 ```
 **make sure the test data is good quality (will say job is killed)
 ***Absolute file paths are important
+
+Clone GitHub
+```
+git clone https://github.com/bfortuner/vaa3d-api
+cd vaa3d-api
+sudo pip install -r requirements.txt
+```
 
 Crontab to Run Vaa3d jobs on EC2
 ```

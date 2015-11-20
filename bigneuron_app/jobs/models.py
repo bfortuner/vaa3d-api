@@ -9,18 +9,20 @@ class Job(db.Model):
 	plugin = db.Column(db.String(128), nullable=False)
 	method = db.Column(db.String(128), nullable=False)
 	channel = db.Column(db.Integer, nullable=False)
+	output_file_suffix = db.Column(db.String(128), nullable=False)
 	created = db.Column(db.DateTime, default=db.func.now())
 	last_updated = db.Column(db.DateTime, onupdate=db.func.now())
 	job_status = db.relationship('JobStatus', backref=db.backref('jobs', lazy='dynamic'))
 	user = db.relationship('User', backref=db.backref('jobs', lazy='dynamic'))
 
-	def __init__(self, user_id, status_id, output_dir, plugin, method, channel):
+	def __init__(self, user_id, status_id, output_dir, plugin, method, channel, output_file_suffix):
 		self.user_id = user_id
 		self.status_id = status_id
 		self.output_dir = output_dir
 		self.plugin = plugin
 		self.method = method
 		self.channel = channel
+		self.output_file_suffix = output_file_suffix
 
 	def __repr__(self):
 		return '<Job %r>' % self.job_id

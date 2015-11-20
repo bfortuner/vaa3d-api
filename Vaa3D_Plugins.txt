@@ -59,7 +59,11 @@ vaa3d -x TReMap -f trace_mip -i ~/testfiles/smalltest.v3dpbd
 vaa3d -x MST_tracing -f trace_mst -i ~/testfiles/smalltest.v3dpbd -p 1
 * outputs filename - smalltest.v3dpbd_MST_Tracing.swc
 
-### Killed on t1.micro ###
+vaa3d -x SimpleAxisAnalyzer -f medial_axis_analysis -i ~/testfiles/smalltest.v3dpbd -p 1
+* outputs filename smalltest.v3dpbd_axis_analyzer.swc
+
+
+### Killed on EC2 ###
 vaa3d -x smartTrace -f smartTrace -i ~/testfiles/smalltest.v3dpbd -p 1
 vaa3d -x SimpleTracing -f tracing -i ~/testfiles/smalltest.v3dpbd
 vaa3d -x NeuronAssembler_neuroGPSTree -f trace_tc -i ~/testfiles/smalltest.v3dpbd (special req)

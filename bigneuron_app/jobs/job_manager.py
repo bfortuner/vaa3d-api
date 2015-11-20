@@ -5,15 +5,20 @@ from bigneuron_app.job_items.models import JobItem
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.clients import s3
 from bigneuron_app.clients.constants import S3_INPUT_BUCKET
+from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 
 def get_user_input_filenames(user_id):
 	return s3.get_all_files(S3_INPUT_BUCKET)
 
 def create_job(user, data):
 	print data
-	print type(data)
-	job = Job(user.id, 1, data['outputDir'], data['pluginName'], 
-		data['pluginSettings']['method'], data['pluginSettings']['channel'])
+	plugin_name = data['plugin']['name']
+	method = data['plugin']['method']
+	settings = data['plugin']['settings']
+	output_file_suffix = get_output_file_suffix(plugin_name, settings)
+	channel = data['plugin']['settings']['params']['channel']
+	job = Job(user.id, 1, data['outputDir'], plugin_name, method, 
+		channel, output_file_suffix)
 	db.session.add(job)
 	db.session.commit()
 
@@ -59,3 +64,6 @@ def get_jobs_by_status(job_status):
 
 def get_job_status_id(name):
 	return JobStatus.query.filter_by(status_name=name).first().id
+
+def get_output_file_suffix(plugin_name, settings):
+	return OUTPUT_FILE_SUFFIXES[plugin_name]
