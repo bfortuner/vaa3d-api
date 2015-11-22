@@ -11,6 +11,9 @@ class JobItem(db.Model):
 	job = db.relationship('Job', backref=db.backref('job_items', lazy='dynamic'))
 	job_item_status = db.relationship('JobItemStatus', backref=db.backref('job_items', lazy='dynamic'))
 
+	def get_output_s3_key(self):
+		return self.job.output_dir + "/" + self.filename + self.job.output_file_suffix
+
 	def __init__(self, job_id, filename, status_id):
 		self.job_id = job_id
 		self.filename = filename
@@ -18,6 +21,9 @@ class JobItem(db.Model):
 
 	def __repr__(self):
 		return '<JobItem %r>' % self.filename
+
+	def as_dict(self):
+		return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 class JobItemStatus(db.Model):
 	__tablename__ = 'job_item_status_types'

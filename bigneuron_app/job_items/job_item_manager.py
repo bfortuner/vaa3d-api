@@ -6,7 +6,9 @@ from bigneuron_app import db
 from bigneuron_app.job_items.models import JobItem, JobItemStatus
 from bigneuron_app.clients import s3, vaa3d
 from bigneuron_app.clients.constants import *
-from bigneuron_app.utils import zipper 
+from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
+from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
+from bigneuron_app.utils import zipper
 
 
 def process_next_job_item():
@@ -95,3 +97,9 @@ def create_job_item(job_id, filename, file_path):
 	db.session.add(job_item)
 	db.session.commit()
 	return job_item
+
+def get_job_item_download_url(job_item_id):
+	job_item = JobItem.query.get(job_item_id)
+	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
+	link_expiry_secs = 3600 # 1 hour
+	return s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, job_item.get_output_s3_key(), link_expiry_secs)

@@ -34,6 +34,8 @@ Create required ENV variables (add to ~/.bash_profile)
 ```
 export VAA3D_AWS_ACCESS_KEY='accesskey'		
 export VAA3D_AWS_SECRET_KEY='secretkey'
+export VAA3D_USER_AWS_ACCESS_KEY='accesskey'		
+export VAA3D_USER_AWS_SECRET_KEY='secretkey'
 export VAA3D_CONFIG='TestConfig'
 export VAA3D_DB_PASSWORD='yourdbkey'
 export VAA3D_PATH='yourpathtoVaa3d'

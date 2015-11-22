@@ -3,6 +3,7 @@ from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
 from bigneuron_app.clients.constants import AWS_ACCESS_KEY, AWS_SECRET_KEY
+from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 
 
 def get_connection():
@@ -49,3 +50,13 @@ def get_all_files(bucket_name):
 	for f in files:
 		filenames.append(f.name)
 	return filenames
+
+def get_download_url(conn, bucket, path, expiry):
+	return conn.generate_url(
+	    expires_in=int(expiry),
+	    method='GET',
+	    bucket=bucket,
+	    key=path,
+	    query_auth=True,
+	    force_http=(True)
+	)

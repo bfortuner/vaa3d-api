@@ -17,7 +17,9 @@ def send_job_complete_email(job):
 		body, user.email)
 
 def get_job_complete_template(job):
-	return COMPLETE_JOB_CONFIRMATION['body'] % (job.job_status.status_name, AWS_IAM_USER_LOGIN_LINK)
+	output_files_link = WEBSITE_URL + '/#/view_job_items/' + str(job.job_id) 
+	return COMPLETE_JOB_CONFIRMATION['body'] % (job.job_status.status_name, 
+		output_files_link, AWS_IAM_USER_LOGIN_LINK)
 
 def test_email_manager():
 	job = Job.query.first()

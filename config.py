@@ -8,6 +8,7 @@ class Config(object):
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
     AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
+    WEBSITE_URL = 'http://vaa3d-website.s3-website-us-west-2.amazonaws.com'
 
 class ProdConfig(Config):
     DB_DRIVER = 'mysql+pymysql://'
@@ -21,6 +22,8 @@ class ProdConfig(Config):
     S3_INPUT_BUCKET='vaa3d-input'
     S3_OUTPUT_BUCKET='vaa3d-output'
     S3_WORKING_INPUT_BUCKET='vaa3d-working'
+    VAA3D_USER_AWS_ACCESS_KEY = os.getenv('VAA3D_USER_AWS_ACCESS_KEY', 'password')
+    VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_USER_AWS_SECRET_KEY', 'password')
 
 class TestConfig(Config):
     TESTING = True
@@ -30,3 +33,5 @@ class TestConfig(Config):
     S3_INPUT_BUCKET='test-vaa3d-input'
     S3_OUTPUT_BUCKET='test-vaa3d-output'
     S3_WORKING_INPUT_BUCKET='test-vaa3d-working'
+    VAA3D_USER_AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
+    VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')

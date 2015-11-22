@@ -1,17 +1,18 @@
+import time
 from bigneuron_app import db
 from bigneuron_app.emails import email_manager
 from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.job_items.models import JobItem
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.clients import s3
-from bigneuron_app.clients.constants import S3_INPUT_BUCKET
+from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
+from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 
 def get_user_input_filenames(user_id):
 	return s3.get_all_files(S3_INPUT_BUCKET)
 
 def create_job(user, data):
-	print data
 	plugin_name = data['plugin']['name']
 	method = data['plugin']['method']
 	settings = data['plugin']['settings']
@@ -67,3 +68,18 @@ def get_job_status_id(name):
 
 def get_output_file_suffix(plugin_name, settings):
 	return OUTPUT_FILE_SUFFIXES[plugin_name]
+
+def get_job_items(job_id):
+	job_items = JobItem.query.filter_by(job_id=job_id)
+	link_expiry_secs = 3600 # 1 hour
+	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
+	job_items_dict_list = []
+	for item in job_items:
+		item_dict = item.as_dict()
+		item_dict['download_link'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, item.get_output_s3_key(), link_expiry_secs)
+		job_items_dict_list.append(item_dict)
+	return job_items_dict_list
+
+def test_get_job_items():
+	job_id = 1
+	get_job_items(job_id)

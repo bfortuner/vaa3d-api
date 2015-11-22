@@ -1,4 +1,7 @@
+from bigneuron_app import application
 from bigneuron_app.clients.constants import AWS_IAM_USER_LOGIN_LINK
+
+WEBSITE_URL=application.config['WEBSITE_URL']
 
 ADMIN_EMAIL='vaa3dapi@gmail.com'
 
@@ -12,10 +15,11 @@ Vaa3D Team</p>
 CREATE_JOB_CONFIRMATION_TEMPLATE = HEADER + CREATE_JOB_CONFIRMATION_TEMPLATE + FOOTER
 
 COMPLETE_JOB_CONFIRMATION_TEMPLATE="""<p>Hello,</p>
-<p>Your new Vaa3D job is complete! Please log in to AWS S3 using the link below.
-You can download your output files from the vaa3d-output bucket</p>
+<p>Your new Vaa3D job is complete! Please use the download link below OR 
+log into the AWS S3 <b>vaa3d-output</b> bucket to view your files.</p>
 <p>Job Status: %s</p>
-<p><a href="%s">Login To AWS S3</a></p>
+<p><a href="%s">View Output Files</a></p>
+<p><a href="%s">Login to S3</a> (email vaa3dapi@gmail.com for password)</p>
 <p>Thanks,<br>
 Vaa3D Team</p>
 """
