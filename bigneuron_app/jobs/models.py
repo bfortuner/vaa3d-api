@@ -1,4 +1,5 @@
 from bigneuron_app import db
+from bigneuron_app.utils import zipper
 
 class Job(db.Model):
 	__tablename__ = 'jobs'
@@ -24,8 +25,15 @@ class Job(db.Model):
 		self.channel = channel
 		self.output_file_suffix = output_file_suffix
 
+	def get_output_s3_key(self):
+		return self.output_dir + zipper.ZIP_FILE_EXT
+
 	def __repr__(self):
 		return '<Job %r>' % self.job_id
+
+	def as_dict(self):
+		return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class JobStatus(db.Model):
 	__tablename__ = 'job_status_types'

@@ -26,8 +26,12 @@ def create_job():
 	job_id = job_manager.create_job(user, data)
 	return jsonify( {'job_id' : job_id} )
 
+@application.route('/job/<job_id>', methods=['GET'])
+def get_job(job_id):
+	job = job_manager.get_job(job_id)
+	return jsonify( {'job' : job} )
+
 @application.route('/job_items/<job_id>', methods=['GET'])
 def get_job_items(job_id):
 	job_items = job_manager.get_job_items(job_id)
-	print job_items
 	return jsonify( {'job_items' : job_items} )

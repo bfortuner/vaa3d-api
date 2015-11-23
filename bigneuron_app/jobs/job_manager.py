@@ -9,6 +9,30 @@ from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 
+def get_job(job_id):
+	job = Job.query.get(job_id)
+	job_dict = job.as_dict()
+	job_dict['job_status'] = job.job_status.status_name
+	link_expiry_secs = 3600 # 1 hour
+	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
+	job_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
+		job.get_output_s3_key(), link_expiry_secs)
+	return job_dict	
+
+def get_job_items(job_id):
+	job_items = JobItem.query.filter_by(job_id=job_id)
+	link_expiry_secs = 3600 # 1 hour
+	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
+	job_items_dict_list = []
+	for item in job_items:
+		item_dict = item.as_dict()
+		item_dict['job_item_status'] = item.job_item_status.status_name
+		item_dict['output_filename'] = item.get_output_filename()
+		item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
+			item.get_output_s3_key(), link_expiry_secs)
+		job_items_dict_list.append(item_dict)
+	return job_items_dict_list
+
 def get_user_input_filenames(user_id):
 	return s3.get_all_files(S3_INPUT_BUCKET)
 
@@ -68,19 +92,6 @@ def get_job_status_id(name):
 
 def get_output_file_suffix(plugin_name, settings):
 	return OUTPUT_FILE_SUFFIXES[plugin_name]
-
-def get_job_items(job_id):
-	job_items = JobItem.query.filter_by(job_id=job_id)
-	link_expiry_secs = 3600 # 1 hour
-	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
-	job_items_dict_list = []
-	for item in job_items:
-		item_dict = item.as_dict()
-		item_dict['output_filename'] = item.get_output_filename()
-		item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
-			item.get_output_s3_key(), link_expiry_secs)
-		job_items_dict_list.append(item_dict)
-	return job_items_dict_list
 
 def test_get_job_items():
 	job_id = 1

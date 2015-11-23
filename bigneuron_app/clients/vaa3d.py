@@ -26,9 +26,6 @@ def build_vaa3d_job(job_item):
 
 def run_job(job):
 	print "Tracing neuron..."
-	print job.plugin
-	print job.method
-	print job.input_file_path
 	cmd = " ".join([VAA3D_PATH, "-x", job.plugin, "-f", job.method, "-i", job.input_file_path, "-p", str(job.channel)])
 	print "COMMAND: " + cmd
 	call([VAA3D_PATH, "-x", job.plugin, "-f", job.method, "-i", job.input_file_path, "-p", str(job.channel), "-o", job.output_file_path])
