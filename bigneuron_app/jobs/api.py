@@ -29,4 +29,5 @@ def create_job():
 @application.route('/job_items/<job_id>', methods=['GET'])
 def get_job_items(job_id):
 	job_items = job_manager.get_job_items(job_id)
+	print job_items
 	return jsonify( {'job_items' : job_items} )

@@ -76,7 +76,9 @@ def get_job_items(job_id):
 	job_items_dict_list = []
 	for item in job_items:
 		item_dict = item.as_dict()
-		item_dict['download_link'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, item.get_output_s3_key(), link_expiry_secs)
+		item_dict['output_filename'] = item.get_output_filename()
+		item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
+			item.get_output_s3_key(), link_expiry_secs)
 		job_items_dict_list.append(item_dict)
 	return job_items_dict_list
 

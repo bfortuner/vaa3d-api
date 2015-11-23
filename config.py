@@ -8,9 +8,9 @@ class Config(object):
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
     AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
-    WEBSITE_URL = 'http://vaa3d-website.s3-website-us-west-2.amazonaws.com'
 
 class ProdConfig(Config):
+    WEBSITE_URL = 'http://vaa3d-website.s3-website-us-west-2.amazonaws.com'
     DB_DRIVER = 'mysql+pymysql://'
     DB_HOSTNAME = 'bigneuron.clwja7eltdnj.us-west-2.rds.amazonaws.com'
     DB_PORT = '3306'
@@ -26,6 +26,7 @@ class ProdConfig(Config):
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_USER_AWS_SECRET_KEY', 'password')
 
 class TestConfig(Config):
+    WEBSITE_URL = 'http://localhost:9000'
     TESTING = True
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
