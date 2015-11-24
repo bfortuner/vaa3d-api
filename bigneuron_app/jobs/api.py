@@ -22,6 +22,7 @@ def get_job_type_plugins():
 def create_job():
 	print "creating job " + str(request.json)
 	data = request.json
+	print data
 	user = user_manager.get_or_create_user(data['emailAddress'])
 	job_id = job_manager.create_job(user, data)
 	return jsonify( {'job_id' : job_id} )

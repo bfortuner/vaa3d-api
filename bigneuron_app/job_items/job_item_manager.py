@@ -3,12 +3,15 @@ import zipfile
 import shutil
 
 from bigneuron_app import db
-from bigneuron_app.job_items.models import JobItem, JobItemStatus
+from bigneuron_app.job_items.models import JobItem, JobItemStatus, JobItemDocument
+from bigneuron_app.jobs.models import Job
 from bigneuron_app.clients import s3, vaa3d
 from bigneuron_app.clients.constants import *
 from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
+from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE
 from bigneuron_app.utils import zipper
+from bigneuron_app.clients import dynamo
 
 
 def process_next_job_item():
@@ -103,3 +106,49 @@ def get_job_item_download_url(job_item_id):
 	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
 	link_expiry_secs = 3600 # 1 hour
 	return s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, job_item.get_output_s3_key(), link_expiry_secs)
+
+def build_job_item_doc(job, input_filename):
+	output_filename = input_filename + job.output_file_suffix
+	job_item = JobItemDocument(job.job_id, input_filename, output_filename, 
+		job.output_dir, job.plugin, job.method)
+	return job_item
+
+def create_job_item_doc(job_item_doc):
+	conn = dynamo.get_connection()
+	table = dynamo.get_table(conn, DYNAMO_JOB_ITEMS_TABLE)
+	dynamo.insert(table, job_item_doc.as_dict())
+
+def get_job_item_doc(job_item_id):
+	# This can be modified like a dictionary, and saved to Dynamo
+	conn = dynamo.get_connection()
+	table = dynamo.get_table(conn, DYNAMO_JOB_ITEMS_TABLE)
+	return dynamo.get(table, job_item_id)
+	
+
+
+## Unit Tests ##
+
+def test_all():
+	from bigneuron_app.utils import id_generator
+	input_filename = id_generator.generate_job_item_id()[:10] + ".tif"
+	conn = dynamo.get_connection()
+	table_name = id_generator.generate_job_item_id()[:10] + "_table"
+	table = dynamo.create_table(conn, table_name, 'job_item_id', 'S')
+	table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
+
+	job = Job(1, 1, "mytestdir", VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, VAA3D_DEFAULT_OUTPUT_SUFFIX)
+	db.session.add(job)
+	db.session.commit()
+	print "job_id: " + str(job.job_id)
+	job_item_doc = build_job_item_doc(job, input_filename)
+	print job_item_doc.as_dict()
+	create_job_item_doc(job_item_doc)
+	print job_item_doc.job_item_id
+	job_item_record = get_job_item_doc(job_item_doc.job_item_id)
+	print job_item_record
+
+	print job_item_record['channel'], job_item_record['input_filename']
+
+	dynamo.drop_table(conn, table_name)
+
+

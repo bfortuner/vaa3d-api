@@ -8,6 +8,7 @@ class Config(object):
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
     AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
     AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
+    AWS_REGION='us-west-2'
 
 class ProdConfig(Config):
     WEBSITE_URL = 'http://vaa3d-website.s3-website-us-west-2.amazonaws.com'
@@ -24,6 +25,7 @@ class ProdConfig(Config):
     S3_WORKING_INPUT_BUCKET='vaa3d-working'
     VAA3D_USER_AWS_ACCESS_KEY = os.getenv('VAA3D_USER_AWS_ACCESS_KEY', 'password')
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_USER_AWS_SECRET_KEY', 'password')
+    DYNAMO_JOB_ITEMS_TABLE='job_items'
 
 class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
@@ -36,3 +38,4 @@ class TestConfig(Config):
     S3_WORKING_INPUT_BUCKET='test-vaa3d-working'
     VAA3D_USER_AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
+    DYNAMO_JOB_ITEMS_TABLE='test_job_items'

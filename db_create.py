@@ -2,11 +2,13 @@ from bigneuron_app import db
 from bigneuron_app.models import Data
 from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.jobs.constants import JOB_STATUS_TYPES
+from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.job_items.models import JobItem, JobItemStatus
 from bigneuron_app.job_items.constants import JOB_ITEM_STATUS_TYPES
 from bigneuron_app.users.models import User
 from bigneuron_app.users.constants import DEFAULT_IAM_USER, DEFAULT_EMAIL, ADMIN_EMAIL, ADMIN_IAM_USER
 from bigneuron_app.clients.constants import *
+from bigneuron_app.clients import dynamo
 
 
 """
@@ -60,3 +62,22 @@ db.session.add(job_item3)
 print "Loaded test job item data"
 
 db.session.commit()
+
+
+
+## Dynamo Tables ##
+
+# Drop and recreate DB
+dynamo_conn = dynamo.get_connection()
+dynamo.drop_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE)
+dynamo.create_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE, 'job_item_id', 'S')
+
+# Insert Test Data
+job_item_doc1 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_1)
+job_item_doc2 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_2)
+job_item_doc3 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_3)
+
+job_item_manager.create_job_item_doc(job_item_doc1)
+job_item_manager.create_job_item_doc(job_item_doc2)
+job_item_manager.create_job_item_doc(job_item_doc3)
+

@@ -3,11 +3,13 @@ from bigneuron_app import db
 from bigneuron_app.emails import email_manager
 from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.job_items.models import JobItem
+from bigneuron_app.users.models import User
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.clients import s3
 from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
+from bigneuron_app.emails.constants import ADMIN_EMAIL
 
 def get_job(job_id):
 	job = Job.query.get(job_id)
@@ -48,8 +50,11 @@ def create_job(user, data):
 	db.session.commit()
 
 	for f in data['filenames']:
+		job_item_doc = job_item_manager.build_job_item_doc(job, f)
+		job_item_manager.create_job_item_doc(job_item_doc)
 		job_item = JobItem(job.job_id, f, 1)
 		db.session.add(job_item)
+
 	db.session.commit()
 
 	return job.job_id
@@ -93,6 +98,35 @@ def get_job_status_id(name):
 def get_output_file_suffix(plugin_name, settings):
 	return OUTPUT_FILE_SUFFIXES[plugin_name]
 
-def test_get_job_items():
-	job_id = 1
-	get_job_items(job_id)
+
+
+
+## Unit Tests ##
+
+def test_all():
+	data = {
+		"output_dir" : "testdir",
+		"plugin" : {
+			"name" : "test_plugin",
+			"method" : "test_method",
+			"settings" : {
+				"params" : {
+					"channel" : 1
+				}
+			}
+		},
+
+	}
+	user = user_manager.get_or_create_user(ADMIN_EMAIL)
+	job = create_job(user, data)
+
+	# plugin_name = data['plugin']['name']
+	# method = data['plugin']['method']
+	# settings = data['plugin']['settings']
+	# output_dir = data['outputDir']
+	# channel = data['plugin']['settings']['params']['channel']
+	# output_file_suffix = get_output_file_suffix(plugin_name, settings)
+	# job = Job(user.id, 1, output_dir, plugin_name, method, 
+	# 	channel, output_file_suffix)
+
+	

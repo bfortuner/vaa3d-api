@@ -1,4 +1,6 @@
+from datetime import datetime
 from bigneuron_app import db
+from bigneuron_app.utils import id_generator
 
 class JobItem(db.Model):
 	__tablename__ = 'job_items'
@@ -43,3 +45,42 @@ class JobItemStatus(db.Model):
 
 	def __repr__(self):
 		return '<JobItemStatus %r>' % self.status_name
+
+
+# DynamoDB JobItem JSON
+
+class JobItemDocument():
+
+	def __init__(self, job_id, input_filename, output_filename, 
+		output_dir, plugin, method, channel=1, status_id=1):
+		self.job_item_id = id_generator.generate_job_item_id()
+		self.job_id = job_id
+		self.input_filename = input_filename
+		self.output_filename = output_filename
+		self.output_dir = output_dir
+		self.plugin = plugin
+		self.method = method
+		self.channel = channel
+		self.status_id = status_id
+
+	def __repr__(self):
+		return '<JobItemDocument %r>' % self.input_filename
+
+	def as_dict(self):
+		return self.__dict__
+
+
+
+# key = job_item_id
+# data = {
+# 	"job_item_id" : job_item_id,
+# 	"job_id" : job_id,
+# 	"input_filename" : input_filename,
+# 	"output_filename" : output_filename,
+# 	"output_dir" : output_dir,
+# 	"status_id" : status_id,
+# 	"plugin" : plugin,
+# 	"method" : method,
+# 	"channel" : channel,
+# 	"created" : created
+# }
