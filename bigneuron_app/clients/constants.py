@@ -14,6 +14,9 @@ S3_WORKING_INPUT_BUCKET=application.config['S3_WORKING_INPUT_BUCKET']
 
 AWS_IAM_USER_LOGIN_LINK='https://vaa3d.signin.aws.amazon.com/console/s3'
 
+DYNAMO_READS_LIMIT=2
+DYNAMO_WRITES_LIMIT=2
+
 # Vaa3d Program Directory
 # /Applications/vaa3d/vaa3d64.app/Contents/MacOS/vaa3d64
 # /home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh
