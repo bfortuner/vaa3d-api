@@ -5,6 +5,7 @@ from bigneuron_app.utils import id_generator
 class JobItem(db.Model):
 	__tablename__ = 'job_items'
 	job_item_id = db.Column(db.Integer, primary_key=True)
+	job_item_key = db.Column(db.String(128), nullable=False)
 	job_id = db.Column(db.Integer, db.ForeignKey('jobs.job_id'), nullable=False)
 	filename = db.Column(db.String(128), nullable=False)
 	status_id = db.Column(db.Integer, db.ForeignKey('job_item_status_types.id'), nullable=False)
@@ -19,8 +20,9 @@ class JobItem(db.Model):
 	def get_output_s3_key(self):
 		return self.job.output_dir + "/" + self.get_output_filename()
 
-	def __init__(self, job_id, filename, status_id):
+	def __init__(self, job_id, job_item_key, filename, status_id):
 		self.job_id = job_id
+		self.job_item_key = job_item_key
 		self.filename = filename
 		self.status_id = status_id
 
@@ -53,7 +55,7 @@ class JobItemDocument():
 
 	def __init__(self, job_id, input_filename, output_filename, 
 		output_dir, plugin, method, channel=1, status_id=1):
-		self.job_item_id = id_generator.generate_job_item_id()
+		self.job_item_key = id_generator.generate_job_item_id()
 		self.job_id = job_id
 		self.input_filename = input_filename
 		self.output_filename = output_filename
@@ -73,7 +75,7 @@ class JobItemDocument():
 
 # key = job_item_id
 # data = {
-# 	"job_item_id" : job_item_id,
+# 	"job_item_key" : job_item_id,
 # 	"job_id" : job_id,
 # 	"input_filename" : input_filename,
 # 	"output_filename" : output_filename,

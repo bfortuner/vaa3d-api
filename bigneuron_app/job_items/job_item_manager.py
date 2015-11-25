@@ -21,6 +21,9 @@ def process_next_job_item():
 		print "No job items found in Queue"
 		return
 	print "Found new job_item"
+	process_job_item(job_item)
+
+def process_job_item(job_item):
 	job_item.status_id = get_job_item_status_id("IN_PROGRESS")
 	db.session.commit()
 	local_file_path = os.path.abspath(job_item.filename)
@@ -30,6 +33,7 @@ def process_next_job_item():
 	run_job_item(job_item)
 
 def run_job_item(job_item):
+	print "running job item " + str(job_item)
 	local_file_path = os.path.abspath(job_item.filename)
 	try:
 		if zipper.is_zip_file(local_file_path):
@@ -60,9 +64,9 @@ def process_non_zip_file(job_item):
 
 def process_zip_file(job_item, zip_file_path):
 	"""
-	Unzips a compressed file
-	Creates new job_item record(s)
-	Uploads new uncompressed file(s) to s3
+	Unzip compressed file
+	Create new job_item record(s)
+	Upload new uncompressed file(s) to s3
 	"""
 	output_dir = os.path.dirname(zip_file_path)
 	zip_archive = zipfile.ZipFile(zip_file_path, "r")
@@ -78,8 +82,7 @@ def process_zip_file(job_item, zip_file_path):
 		file_path = os.path.join(output_dir, filename)
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
-
-		new_job_item = create_job_item(job_item.job.job_id, filename, file_path)
+		new_job_item = create_job_item(job_item.job, filename, file_path)
 		run_job_item(new_job_item)
 	os.remove(zip_file_path)
 
@@ -93,10 +96,12 @@ def create_job_items_from_directory(job_item, dir_path):
 			})
 	for f in fileslist:
 		s3.upload_file(f['filename'], f['file_path'], S3_WORKING_INPUT_BUCKET)
-		create_job_item(job_item.job.job_id, f['filename'], f['file_path'])
+		create_job_item(job_item.job, f['filename'], f['file_path'])
 
-def create_job_item(job_id, filename, file_path):
-	job_item = JobItem(job_id, filename, 1)
+def create_job_item(job, filename, file_path):
+	job_item_doc = build_job_item_doc(job, filename)
+	create_job_item_doc(job_item_doc)
+	job_item = JobItem(job.job_id, job_item_doc.job_item_key, filename, 1)
 	db.session.add(job_item)
 	db.session.commit()
 	return job_item
@@ -128,6 +133,11 @@ def get_job_item_doc(job_item_id):
 
 ## Unit Tests ##
 
+def test_get_next_job_item():
+	new_job_status = JobItemStatus.query.filter_by(status_name="CREATED").first()
+	job_item = JobItem.query.filter_by(status_id=new_job_status.id).order_by(JobItem.created).first()
+	print job_item.job
+
 def test_all():
 	from bigneuron_app.utils import id_generator
 	input_filename = id_generator.generate_job_item_id()[:10] + ".tif"
@@ -143,8 +153,8 @@ def test_all():
 	job_item_doc = build_job_item_doc(job, input_filename)
 	print job_item_doc.as_dict()
 	create_job_item_doc(job_item_doc)
-	print job_item_doc.job_item_id
-	job_item_record = get_job_item_doc(job_item_doc.job_item_id)
+	print job_item_doc.job_item_key
+	job_item_record = get_job_item_doc(job_item_doc.job_item_key)
 	print job_item_record
 
 	print job_item_record['channel'], job_item_record['input_filename']

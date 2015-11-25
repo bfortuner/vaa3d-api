@@ -52,11 +52,10 @@ def create_job(user, data):
 	for f in data['filenames']:
 		job_item_doc = job_item_manager.build_job_item_doc(job, f)
 		job_item_manager.create_job_item_doc(job_item_doc)
-		job_item = JobItem(job.job_id, f, 1)
+		job_item = JobItem(job.job_id, job_item_doc.job_item_key, f, 1)
 		db.session.add(job_item)
 
 	db.session.commit()
-
 	return job.job_id
 
 def update_jobs_in_progress():

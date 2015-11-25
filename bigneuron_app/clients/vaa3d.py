@@ -44,6 +44,10 @@ def cleanup_all(list_of_filenames):
 	for f in filelist:
 		os.remove(os.path.abspath(f))
 
+
+
+## Unit Tests ##
+
 def test_plugins():
 	# Download S3 Test Data
 	filenames = [VAA3D_TEST_INPUT_FILE_1]

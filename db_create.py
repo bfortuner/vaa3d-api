@@ -52,9 +52,25 @@ print "Loaded test job data"
 
 # Insert Test Job Items
 job = Job.query.first()
-job_item1 = JobItem(job.job_id, VAA3D_TEST_INPUT_FILE_1, 1)
-job_item2 = JobItem(job.job_id, VAA3D_TEST_INPUT_FILE_2, 1)
-job_item3 = JobItem(job.job_id, VAA3D_TEST_INPUT_FILE_3, 1)
+
+# Dynamo - Drop and recreate DB
+dynamo_conn = dynamo.get_connection()
+dynamo.drop_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE)
+dynamo.create_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE, 'job_item_key', 'S')
+
+# Dynamo - Insert Test Data
+job_item_doc1 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_1)
+job_item_doc2 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_2)
+job_item_doc3 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_3)
+
+job_item_manager.create_job_item_doc(job_item_doc1)
+job_item_manager.create_job_item_doc(job_item_doc2)
+job_item_manager.create_job_item_doc(job_item_doc3)
+
+# SQL - Insert Test Data
+job_item1 = JobItem(job.job_id, job_item_doc1.job_item_key, VAA3D_TEST_INPUT_FILE_1, 1)
+job_item2 = JobItem(job.job_id, job_item_doc2.job_item_key, VAA3D_TEST_INPUT_FILE_2, 1)
+job_item3 = JobItem(job.job_id, job_item_doc3.job_item_key, VAA3D_TEST_INPUT_FILE_3, 1)
 db.session.add(job_item1)
 db.session.add(job_item2)
 db.session.add(job_item3)
@@ -64,20 +80,4 @@ print "Loaded test job item data"
 db.session.commit()
 
 
-
-## Dynamo Tables ##
-
-# Drop and recreate DB
-dynamo_conn = dynamo.get_connection()
-dynamo.drop_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE)
-dynamo.create_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE, 'job_item_id', 'S')
-
-# Insert Test Data
-job_item_doc1 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_1)
-job_item_doc2 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_2)
-job_item_doc3 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_3)
-
-job_item_manager.create_job_item_doc(job_item_doc1)
-job_item_manager.create_job_item_doc(job_item_doc2)
-job_item_manager.create_job_item_doc(job_item_doc3)
 
