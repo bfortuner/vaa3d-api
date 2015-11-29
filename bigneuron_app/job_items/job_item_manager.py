@@ -10,19 +10,10 @@ from bigneuron_app.clients.constants import *
 from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE, SQS_JOB_ITEMS_QUEUE
+from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 
 from bigneuron_app.utils import zipper
 from decimal import Decimal
-
-
-def process_next_job_item():
-	job_item_key = get_next_job_item_from_queue()
-	if job_item_key is None: 
-		print "No job items found in Queue"
-		return
-	print "Found new job_item"
-	job_item = get_job_item_doc(job_item_key)
-	process_job_item(job_item)
 
 def process_job_item(job_item):
 	job_item['status_id'] = get_job_item_status_id("IN_PROGRESS")
@@ -145,20 +136,9 @@ def add_job_item_to_queue(job_item_key):
 	msg_text = "JOB_ITEM %s" % job_item_key
 	message_id = sqs.send_message(queue, msg_text, msg_dict={
 		"job_item_key" : { "StringValue" : job_item_key, "DataType" : "String"},
-		"job_type" : { "StringValue" : "process_job_item", "DataType" : "String"}
+		"job_type" : { "StringValue" : PROCESS_JOB_ITEM_TASK, "DataType" : "String"}
 		})
 	return message_id
-
-def get_next_job_item_from_queue():
-	conn = sqs.get_connection()
-	client = sqs.get_client()
-	queue = sqs.get_queue(conn, SQS_JOB_ITEMS_QUEUE)
-	msg = sqs.get_next_message(client, queue.url)
-	if msg is None:
-		return None
-	job_item_key = msg['MessageAttributes']['job_item_key']['StringValue']
-	sqs.delete_message(client, queue, msg)
-	return job_item_key
 
 def convert_dynamo_job_item_to_dict(dynamo_item):
 	item_dict = {}
@@ -178,14 +158,6 @@ def test_convert_dynamo_item_to_dict():
 	print "JOB_ITEM = " + str(job_item)
 	job_item_dict = convert_dynamo_job_item_to_dict(job_item)
 	print "JOB_ITEM_DICT = " + str(job_item_dict)
-
-def test_process_next_job_item():
-	job = Job(1, 1, "mytestdir", VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, VAA3D_DEFAULT_OUTPUT_SUFFIX)
-	db.session.add(job)
-	db.session.commit()
-	job_item = create_job_item(job.job_id, VAA3D_TEST_INPUT_FILE_1)
-	print "JOB_ITEM_KEY " + job_item.job_item_key
-	process_next_job_item()
 
 def test_all():
 	from bigneuron_app.utils import id_generator
@@ -209,8 +181,6 @@ def test_all():
 	print job_item_record['channel'], job_item_record['input_filename']
 
 	add_job_item_to_queue("fake_job_item_key")
-	job_item_key = get_next_job_item_from_queue()
-	print job_item_key
 	
 
 	dynamo.drop_table(conn, table_name)

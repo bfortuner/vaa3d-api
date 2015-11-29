@@ -1,12 +1,30 @@
 import sys
-from bigneuron_app.jobs import job_manager
-from bigneuron_app.job_items import job_item_manager
+import signal
+from multiprocessing import Process
 
-method = sys.argv[1]
-print "Running " + method
+import bigneuron_app.job_items.tasks as job_item_tasks
+import bigneuron_app.jobs.tasks as job_tasks
 
-if method == "process_jobs":
-	job_manager.update_jobs_created()
-	job_manager.update_jobs_in_progress()
-elif method =="process_job_items":
-	job_item_manager.process_next_job_item()
+
+def start_workers():
+	print "Starting workers.."
+	jobs_created_worker = Process(name='jobs_created_worker', target=job_tasks.poll_jobs_created_queue)
+	jobs_in_progress_worker = Process(name='jobs_in_progress_worker', target=job_tasks.poll_jobs_in_progress_queue)
+	job_items_worker = Process(name='job_items_worker', target=job_item_tasks.poll_job_items_queue)
+
+	print "starting worker " + jobs_created_worker.name
+	jobs_created_worker.start()
+	print "starting worker " + jobs_in_progress_worker.name
+	jobs_in_progress_worker.start()
+	print "starting worker " + job_items_worker.name
+	job_items_worker.start()
+
+def signal_handler(signal, frame):
+	print "Exiting..."
+	sys.exit(0)
+
+
+if __name__ == "__main__":
+	#method = sys.argv[1]
+	signal.signal(signal.SIGINT, signal_handler)
+	start_workers()

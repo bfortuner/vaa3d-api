@@ -22,6 +22,7 @@ DYNAMO_WRITES_PER_SEC=2
 
 # SQS Config
 SQS_JOB_ITEMS_QUEUE=application.config['SQS_JOB_ITEMS_QUEUE']
+SQS_JOBS_QUEUE=application.config['SQS_JOBS_QUEUE']
 
 
 # Vaa3D Config

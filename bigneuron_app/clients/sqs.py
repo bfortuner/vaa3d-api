@@ -2,7 +2,7 @@ import boto3
 import time
 
 from bigneuron_app.clients.constants import AWS_REGION, AWS_ACCESS_KEY, AWS_SECRET_KEY
-from bigneuron_app.clients.constants import SQS_JOB_ITEMS_QUEUE
+from bigneuron_app.clients.constants import SQS_JOB_ITEMS_QUEUE, SQS_JOBS_QUEUE
 
 
 def get_connection():
@@ -89,8 +89,8 @@ def get_messages(client, queue_url, num_msgs=1):
 		return response['Messages']
 	return []
 
-def get_next_message(client, queue_url):
-	messages = get_messages(client, queue_url, 1)
+def get_next_message(client, queue):
+	messages = get_messages(client, queue.url, 1)
 	print messages
 	if len(messages) < 1:
 		return None
@@ -111,8 +111,6 @@ def drop_and_recreate_queue(queue_name):
 	else:
 		print "Creating new SQS queue " + queue_name
 		new_queue = create_queue(conn, queue_name)	
-
-
 
 
 
@@ -172,10 +170,10 @@ def test_all():
 		}
 	})
 
-	message = get_next_message(client, new_queue.url)
+	message = get_next_message(client, new_queue)
 	print message
 
-	message = get_next_message(client, new_queue.url)
+	message = get_next_message(client, new_queue)
 	print message
 	#print message["MessageId"] == message_id
 

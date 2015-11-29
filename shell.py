@@ -20,6 +20,11 @@ from bigneuron_app.jobs import job_manager
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.utils import id_generator
 
+import bigneuron_app.job_items.tasks as job_item_tasks
+import bigneuron_app.jobs.tasks as job_tasks
+
+import task_runner
+
 
 
 #email_manager.test_email_manager()
@@ -28,18 +33,23 @@ from bigneuron_app.utils import id_generator
 #vaa3d.test_single_plugin()
 
 #job_manager.test_get_job_items()
+#job_manager.test_get_job_items()
+
 #print s3.get_download_url('vaa3d-output', 'Mynewtest/smalltest.tif_x72_y57_z64_app2.swc', 3600)
 #dynamo.test_all()
 #id_generator.test_all()
 
 #job_item_manager.test_all()
-#job_item_manager.test_process_next_job_item()
+#job_item_manager.test_convert_dynamo_item_to_dict()
+
 #sqs.test_all()
 #sqs.test_clear_queue()
 #sqs.test_get_queue()
 #sqs.test_get_queue_name()
 
-#job_item_manager.test_process_next_job_item()
+#job_item_tasks.test_process_next_job_item()
+#job_item_tasks.poll_queue()
 
-job_manager.test_get_job_items()
-#job_item_manager.test_convert_dynamo_item_to_dict()
+
+#job_tasks.poll_jobs_created_queue()
+#job_tasks.poll_jobs_in_progress_queue()

@@ -1,6 +1,8 @@
 import os
 
 JOB_STATUS_TYPES = ['CREATED','IN_PROGRESS','COMPLETE','COMPLETE_WITH_ERRORS']
+PROCESS_JOBS_CREATED_TASK='process_jobs_created'
+PROCESS_JOBS_IN_PROGRESS_TASK='process_jobs_in_progress'
 
 OUTPUT_FILE_SUFFIXES = {
 	'Vaa3D_Neuron2': '_x72_y57_z64_app2.swc',
