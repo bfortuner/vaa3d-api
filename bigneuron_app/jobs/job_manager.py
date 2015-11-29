@@ -2,10 +2,11 @@ import time
 from bigneuron_app import db
 from bigneuron_app.emails import email_manager
 from bigneuron_app.jobs.models import Job, JobStatus
-from bigneuron_app.job_items.models import JobItem
+from bigneuron_app.job_items.models import JobItemStatus
 from bigneuron_app.users.models import User
 from bigneuron_app.job_items import job_item_manager
-from bigneuron_app.clients import s3
+from bigneuron_app.clients import s3, dynamo, sqs
+from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE, SQS_JOB_ITEMS_QUEUE
 from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
@@ -22,18 +23,20 @@ def get_job(job_id):
 	return job_dict	
 
 def get_job_items(job_id):
-	job_items = JobItem.query.filter_by(job_id=job_id)
+	dynamo_conn = dynamo.get_connection()
+	table = dynamo.get_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE)
+	job_items = dynamo.query_all(table, "job_id", job_id)
 	link_expiry_secs = 3600 # 1 hour
 	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
-	job_items_dict_list = []
+	job_items_list = []
 	for item in job_items:
-		item_dict = item.as_dict()
-		item_dict['job_item_status'] = item.job_item_status.status_name
-		item_dict['output_filename'] = item.get_output_filename()
+		item_dict = job_item_manager.convert_dynamo_job_item_to_dict(item)
+		item_dict['job_item_status'] = JobItemStatus.query.get(int(item_dict['status_id'])).status_name
+		output_s3_key = item_dict['output_dir'] + "/" + item_dict['output_filename']
 		item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
-			item.get_output_s3_key(), link_expiry_secs)
-		job_items_dict_list.append(item_dict)
-	return job_items_dict_list
+			output_s3_key, link_expiry_secs)
+		job_items_list.append(item_dict)
+	return job_items_list
 
 def get_user_input_filenames(user_id):
 	return s3.get_all_files(S3_INPUT_BUCKET)
@@ -52,23 +55,20 @@ def create_job(user, data):
 	for f in data['filenames']:
 		job_item_doc = job_item_manager.build_job_item_doc(job, f)
 		job_item_manager.create_job_item_doc(job_item_doc)
-		job_item = JobItem(job.job_id, job_item_doc.job_item_key, f, 1)
-		db.session.add(job_item)
+		job_item_manager.add_job_item_to_queue(job_item_doc.job_item_key)
 
-	db.session.commit()
 	return job.job_id
 
 def update_jobs_in_progress():
 	jobs_in_progress = get_jobs_by_status("IN_PROGRESS")
 	for job in jobs_in_progress:
-		job_items = job.job_items.all()
+		job_items = get_job_items(job.job_id)
 		complete = True
 		has_error = False
 		for job_item in job_items:
-			if job_item.status_id == job_item_manager.get_job_item_status_id("ERROR"):
+			if job_item['job_item_status'] == 'ERROR':
 				has_error = True
-			elif job_item.status_id in [job_item_manager.get_job_item_status_id("IN_PROGRESS"), 
-					job_item_manager.get_job_item_status_id("CREATED")]:
+			elif job_item['job_item_status'] in ['IN_PROGRESS', 'CREATED']:
 				complete = False
 
 		if complete:
@@ -101,6 +101,15 @@ def get_output_file_suffix(plugin_name, settings):
 
 
 ## Unit Tests ##
+
+
+def test_get_job_items():
+	job_id = 2
+	job_items = get_job_items(job_id)
+	print job_items
+
+def test_update_jobs_in_progress():
+	update_jobs_in_progress()
 
 def test_all():
 	data = {

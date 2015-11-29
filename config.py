@@ -26,6 +26,7 @@ class ProdConfig(Config):
     VAA3D_USER_AWS_ACCESS_KEY = os.getenv('VAA3D_USER_AWS_ACCESS_KEY', 'password')
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_USER_AWS_SECRET_KEY', 'password')
     DYNAMO_JOB_ITEMS_TABLE='job_items'
+    SQS_JOB_ITEMS_QUEUE='vaa3d-job_items'
 
 class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
@@ -39,3 +40,4 @@ class TestConfig(Config):
     VAA3D_USER_AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
     DYNAMO_JOB_ITEMS_TABLE='test_job_items'
+    SQS_JOB_ITEMS_QUEUE='test-vaa3d-job-items'

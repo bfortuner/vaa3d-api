@@ -16,6 +16,9 @@ class Vaa3dJob():
 		self.input_file_path = input_file_path
 		self.output_file_path = output_file_path
 
+	def as_dict(self):
+		return self.__dict__
+
 def build_vaa3d_job(job_item):
 	input_filename = job_item.filename
 	output_filename = input_filename + job_item.job.output_file_suffix
@@ -26,9 +29,13 @@ def build_vaa3d_job(job_item):
 
 def run_job(job):
 	print "Tracing neuron..."
-	cmd = " ".join([VAA3D_PATH, "-x", job.plugin, "-f", job.method, "-i", job.input_file_path, "-p", str(job.channel)])
+	input_file_path = os.path.abspath(job['input_filename'])
+	output_file_path = os.path.abspath(job['output_filename'])
+	cmd = " ".join([VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
+		"-i", input_file_path, "-p", str(job['channel'])])
 	print "COMMAND: " + cmd
-	call([VAA3D_PATH, "-x", job.plugin, "-f", job.method, "-i", job.input_file_path, "-p", str(job.channel), "-o", job.output_file_path])
+	call([VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], "-i", 
+		input_file_path, "-p", str(job['channel']), "-o", output_file_path])
 	print "Trace complete!"
 
 def cleanup(input_file_path, output_file_path):
@@ -80,6 +87,6 @@ def test_plugin(plugin_name, plugin, input_filename, input_file_path):
 	output_file_path = os.path.abspath(output_filename)
 	job = Vaa3dJob(input_filename, output_filename, input_file_path,
 	output_file_path, plugin_name, plugin['method']['default'], 1)
-	run_job(job)
+	run_job(job.as_dict())
 	s3.upload_file(job.output_filename, job.output_file_path, S3_OUTPUT_BUCKET)
 	os.remove(job.output_file_path)

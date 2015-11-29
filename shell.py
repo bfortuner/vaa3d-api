@@ -12,12 +12,12 @@ os.environ['PYTHONINSPECT'] = 'True'
 from bigneuron_app.emails import email_manager
 from bigneuron_app.clients.constants import S3_OUTPUT_BUCKET
 from bigneuron_app.clients import s3
+from bigneuron_app.clients import sqs
 from bigneuron_app.clients import dynamo
 from bigneuron_app.utils import zipper
 from bigneuron_app.clients import vaa3d
 from bigneuron_app.jobs import job_manager
 from bigneuron_app.job_items import job_item_manager
-from bigneuron_app.job_items.models import JobItem
 from bigneuron_app.utils import id_generator
 
 
@@ -33,5 +33,13 @@ from bigneuron_app.utils import id_generator
 #id_generator.test_all()
 
 #job_item_manager.test_all()
-job_item_manager.test_get_next_job_item()
+#job_item_manager.test_process_next_job_item()
+#sqs.test_all()
+#sqs.test_clear_queue()
+#sqs.test_get_queue()
+#sqs.test_get_queue_name()
 
+#job_item_manager.test_process_next_job_item()
+
+job_manager.test_get_job_items()
+#job_item_manager.test_convert_dynamo_item_to_dict()

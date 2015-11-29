@@ -3,49 +3,50 @@ import zipfile
 import shutil
 
 from bigneuron_app import db
-from bigneuron_app.job_items.models import JobItem, JobItemStatus, JobItemDocument
+from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
-from bigneuron_app.clients import s3, vaa3d
+from bigneuron_app.clients import s3, vaa3d, sqs, dynamo
 from bigneuron_app.clients.constants import *
 from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
-from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE
+from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE, SQS_JOB_ITEMS_QUEUE
+
 from bigneuron_app.utils import zipper
-from bigneuron_app.clients import dynamo
+from decimal import Decimal
 
 
 def process_next_job_item():
-	new_job_status = JobItemStatus.query.filter_by(status_name="CREATED").first()
-	job_item = JobItem.query.filter_by(status_id=new_job_status.id).order_by(JobItem.created).first()
-	if job_item is None: 
+	job_item_key = get_next_job_item_from_queue()
+	if job_item_key is None: 
 		print "No job items found in Queue"
 		return
 	print "Found new job_item"
+	job_item = get_job_item_doc(job_item_key)
 	process_job_item(job_item)
 
 def process_job_item(job_item):
-	job_item.status_id = get_job_item_status_id("IN_PROGRESS")
-	db.session.commit()
-	local_file_path = os.path.abspath(job_item.filename)
-	bucket_name = s3.get_bucket_name_from_filename(job_item.filename, 
+	job_item['status_id'] = get_job_item_status_id("IN_PROGRESS")
+	save_job_item(job_item)
+	local_file_path = os.path.abspath(job_item['input_filename'])
+	bucket_name = s3.get_bucket_name_from_filename(job_item['input_filename'], 
 		[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
-	s3.download_file(job_item.filename, local_file_path, bucket_name)
+	s3.download_file(job_item['input_filename'], local_file_path, bucket_name)
 	run_job_item(job_item)
 
 def run_job_item(job_item):
 	print "running job item " + str(job_item)
-	local_file_path = os.path.abspath(job_item.filename)
+	local_file_path = os.path.abspath(job_item['input_filename'])
 	try:
 		if zipper.is_zip_file(local_file_path):
 			process_zip_file(job_item, local_file_path)
 		else:
 			process_non_zip_file(job_item)
-		job_item.status_id = get_job_item_status_id("COMPLETE")
+		job_item['status_id'] = get_job_item_status_id("COMPLETE")
 	except Exception as e:
-		job_item.status_id = get_job_item_status_id("ERROR")
+		job_item['status_id'] = get_job_item_status_id("ERROR")
 		print e
 	finally:
-		db.session.commit()
+		save_job_item(job_item)
 
 def get_job_items_by_status(job_status):
 	job_item_status = JobItemStatus.query.filter_by(status_name=job_status).first()
@@ -56,11 +57,12 @@ def get_job_item_status_id(name):
 	return JobItemStatus.query.filter_by(status_name=name).first().id
 
 def process_non_zip_file(job_item):
-	vaa3d_job = vaa3d.build_vaa3d_job(job_item)
-	vaa3d.run_job(vaa3d_job)
-	s3_key = job_item.job.output_dir + "/" + vaa3d_job.output_filename
-	s3.upload_file(s3_key, vaa3d_job.output_file_path, S3_OUTPUT_BUCKET)
-	vaa3d.cleanup(vaa3d_job.input_file_path, vaa3d_job.output_file_path)
+	vaa3d.run_job(job_item)
+	input_file_path = os.path.abspath(job_item['input_filename'])
+	output_file_path = os.path.abspath(job_item['output_filename'])
+	s3_key = job_item['output_dir'] + "/" + job_item['output_filename']
+	s3.upload_file(s3_key, output_file_path, S3_OUTPUT_BUCKET)
+	vaa3d.cleanup(input_file_path, output_file_path)
 
 def process_zip_file(job_item, zip_file_path):
 	"""
@@ -72,21 +74,24 @@ def process_zip_file(job_item, zip_file_path):
 	zip_archive = zipfile.ZipFile(zip_file_path, "r")
 	filenames = zip_archive.namelist()
 	if len(filenames) > 1:
+		print "found more than 1 file inside .zip"
 		output_dir = os.path.join(output_dir, zip_file_path[:zip_file_path.find(zipper.ZIP_FILE_EXT)])
 		zipper.expand_zip_archive(zip_archive, output_dir)
 		zip_archive.close()
 		create_job_items_from_directory(job_item, output_dir)
 		shutil.rmtree(output_dir)
 	else:
+		print "found only 1 file inside .zip"
 		filename = filenames[0]
 		file_path = os.path.join(output_dir, filename)
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
-		new_job_item = create_job_item(job_item.job, filename, file_path)
+		new_job_item = create_job_item(job_item['job_id'], filename)
 		run_job_item(new_job_item)
 	os.remove(zip_file_path)
 
 def create_job_items_from_directory(job_item, dir_path):
+	print "Creating job items from directory"
 	fileslist = []
 	for (dirpath, dirnames, filenames) in os.walk(dir_path):
 		for f in filenames:
@@ -96,21 +101,21 @@ def create_job_items_from_directory(job_item, dir_path):
 			})
 	for f in fileslist:
 		s3.upload_file(f['filename'], f['file_path'], S3_WORKING_INPUT_BUCKET)
-		create_job_item(job_item.job, f['filename'], f['file_path'])
+		create_job_item(job_item['job_id'], f['filename'])
 
-def create_job_item(job, filename, file_path):
+def create_job_item(job_id, filename):
+	job = Job.query.get(int(job_id))
 	job_item_doc = build_job_item_doc(job, filename)
 	create_job_item_doc(job_item_doc)
-	job_item = JobItem(job.job_id, job_item_doc.job_item_key, filename, 1)
-	db.session.add(job_item)
-	db.session.commit()
-	return job_item
+	add_job_item_to_queue(job_item_doc.job_item_key)
+	return get_job_item_doc(job_item_doc.job_item_key)
 
-def get_job_item_download_url(job_item_id):
-	job_item = JobItem.query.get(job_item_id)
+def get_job_item_download_url(job_item_key):
+	job_item = get_job_item_doc(job_item_key)
+	s3_key = job_item['output_dir'] + "/" + job_item['output_filename']
 	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
 	link_expiry_secs = 3600 # 1 hour
-	return s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, job_item.get_output_s3_key(), link_expiry_secs)
+	return s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, s3_key, link_expiry_secs)
 
 def build_job_item_doc(job, input_filename):
 	output_filename = input_filename + job.output_file_suffix
@@ -123,20 +128,64 @@ def create_job_item_doc(job_item_doc):
 	table = dynamo.get_table(conn, DYNAMO_JOB_ITEMS_TABLE)
 	dynamo.insert(table, job_item_doc.as_dict())
 
-def get_job_item_doc(job_item_id):
+def get_job_item_doc(job_item_key):
 	# This can be modified like a dictionary, and saved to Dynamo
 	conn = dynamo.get_connection()
 	table = dynamo.get_table(conn, DYNAMO_JOB_ITEMS_TABLE)
-	return dynamo.get(table, job_item_id)
-	
+	return dynamo.get(table, job_item_key)
+
+def save_job_item(job_item):
+	conn = dynamo.get_connection()
+	table = dynamo.get_table(conn, DYNAMO_JOB_ITEMS_TABLE)
+	table.put_item(Item=job_item)
+
+def add_job_item_to_queue(job_item_key):
+	conn = sqs.get_connection()
+	queue = sqs.get_queue(conn, SQS_JOB_ITEMS_QUEUE)
+	msg_text = "JOB_ITEM %s" % job_item_key
+	message_id = sqs.send_message(queue, msg_text, msg_dict={
+		"job_item_key" : { "StringValue" : job_item_key, "DataType" : "String"},
+		"job_type" : { "StringValue" : "process_job_item", "DataType" : "String"}
+		})
+	return message_id
+
+def get_next_job_item_from_queue():
+	conn = sqs.get_connection()
+	client = sqs.get_client()
+	queue = sqs.get_queue(conn, SQS_JOB_ITEMS_QUEUE)
+	msg = sqs.get_next_message(client, queue.url)
+	if msg is None:
+		return None
+	job_item_key = msg['MessageAttributes']['job_item_key']['StringValue']
+	sqs.delete_message(client, queue, msg)
+	return job_item_key
+
+def convert_dynamo_job_item_to_dict(dynamo_item):
+	item_dict = {}
+	for key in dynamo_item:
+		if type(dynamo_item[key]) == Decimal:
+			item_dict[key] = int(dynamo_item[key])
+		else:
+			item_dict[key] = dynamo_item[key]
+	return item_dict
+
 
 
 ## Unit Tests ##
 
-def test_get_next_job_item():
-	new_job_status = JobItemStatus.query.filter_by(status_name="CREATED").first()
-	job_item = JobItem.query.filter_by(status_id=new_job_status.id).order_by(JobItem.created).first()
-	print job_item.job
+def test_convert_dynamo_item_to_dict():
+	job_item = create_job_item(1, VAA3D_TEST_INPUT_FILE_1)
+	print "JOB_ITEM = " + str(job_item)
+	job_item_dict = convert_dynamo_job_item_to_dict(job_item)
+	print "JOB_ITEM_DICT = " + str(job_item_dict)
+
+def test_process_next_job_item():
+	job = Job(1, 1, "mytestdir", VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, VAA3D_DEFAULT_OUTPUT_SUFFIX)
+	db.session.add(job)
+	db.session.commit()
+	job_item = create_job_item(job.job_id, VAA3D_TEST_INPUT_FILE_1)
+	print "JOB_ITEM_KEY " + job_item.job_item_key
+	process_next_job_item()
 
 def test_all():
 	from bigneuron_app.utils import id_generator
@@ -158,6 +207,11 @@ def test_all():
 	print job_item_record
 
 	print job_item_record['channel'], job_item_record['input_filename']
+
+	add_job_item_to_queue("fake_job_item_key")
+	job_item_key = get_next_job_item_from_queue()
+	print job_item_key
+	
 
 	dynamo.drop_table(conn, table_name)
 

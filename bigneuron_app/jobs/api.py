@@ -22,7 +22,6 @@ def get_job_type_plugins():
 def create_job():
 	print "creating job " + str(request.json)
 	data = request.json
-	print data
 	user = user_manager.get_or_create_user(data['emailAddress'])
 	job_id = job_manager.create_job(user, data)
 	return jsonify( {'job_id' : job_id} )
@@ -32,7 +31,8 @@ def get_job(job_id):
 	job = job_manager.get_job(job_id)
 	return jsonify( {'job' : job} )
 
-@application.route('/job_items/<job_id>', methods=['GET'])
+@application.route('/job_items/<int:job_id>', methods=['GET'])
 def get_job_items(job_id):
 	job_items = job_manager.get_job_items(job_id)
+	print job_items
 	return jsonify( {'job_items' : job_items} )
