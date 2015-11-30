@@ -20,7 +20,7 @@ def poll_jobs_created_queue():
 		except Exception, err:
 			log.error("ERROR while reading and processing job_created \n" + err)
 		finally:
-			time.sleep(10)
+			time.sleep(20)
 
 def poll_jobs_in_progress_queue():
 	log = logger.get_logger("JobsInProgressTask")
@@ -31,7 +31,7 @@ def poll_jobs_in_progress_queue():
 		except Exception, err:
 			log.error("ERROR while reading and processing job_in_progress \n" + err)
 		finally:
-			time.sleep(10)
+			time.sleep(20)
 
 def update_jobs_in_progress():
 	jobs_in_progress = job_manager.get_jobs_by_status("IN_PROGRESS")

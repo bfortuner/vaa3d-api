@@ -21,7 +21,7 @@ def poll_job_items_queue():
 		except Exception, err:
 			log.error("ERROR while reading and processing job_item \n" + err)
 		finally:
-			time.sleep(5)
+			time.sleep(10)
 
 def process_next_job_item():
 	job_item_key = get_next_job_item_from_queue()
