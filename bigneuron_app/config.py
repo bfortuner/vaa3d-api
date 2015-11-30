@@ -29,7 +29,8 @@ class ProdConfig(Config):
     DYNAMO_JOB_ITEMS_TABLE='job_items'
     SQS_JOB_ITEMS_QUEUE='vaa3d-job-items'
     SQS_JOBS_QUEUE='vaa3d-jobs'
-    LOG_LEVEL=logging.INFO
+    APP_LOG_LEVEL=logging.INFO
+    MAIL_LOG_LEVEL=logging.ERROR
 
 class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
@@ -45,6 +46,7 @@ class TestConfig(Config):
     DYNAMO_JOB_ITEMS_TABLE='test_job_items'
     SQS_JOB_ITEMS_QUEUE='test-vaa3d-job-items'
     SQS_JOBS_QUEUE='test-vaa3d-jobs'
-    LOG_LEVEL=logging.INFO
+    APP_LOG_LEVEL=logging.INFO
+    MAIL_LOG_LEVEL=logging.ERROR
 
 config = globals()[os.getenv('VAA3D_CONFIG', 'ProdConfig')]

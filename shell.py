@@ -4,9 +4,6 @@ import time
 import readline
 from pprint import pprint
 
-from flask import *
-from bigneuron_app import *
-
 os.environ['PYTHONINSPECT'] = 'True'
 
 from bigneuron_app.emails import email_manager
@@ -48,8 +45,7 @@ import bigneuron_app.utils.logger as logger
 #sqs.test_get_queue_name()
 
 #job_item_tasks.test_process_next_job_item()
-#job_item_tasks.poll_queue()
-
+#job_item_tasks.poll_job_items_queue()
 
 #job_tasks.poll_jobs_created_queue()
 #job_tasks.poll_jobs_in_progress_queue()

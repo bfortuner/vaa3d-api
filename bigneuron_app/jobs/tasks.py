@@ -7,31 +7,29 @@ from bigneuron_app.jobs import job_manager
 from bigneuron_app.clients import sqs, dynamo
 from bigneuron_app.jobs.constants import PROCESS_JOBS_CREATED_TASK, PROCESS_JOBS_IN_PROGRESS_TASK
 from bigneuron_app.emails import email_manager
-
 import bigneuron_app.clients.constants as client_constants
+from bigneuron_app.utils import logger
 
 
 def poll_jobs_created_queue():
-	signal.signal(signal.SIGINT, signal_handler)
+	log = logger.get_logger("JobsCreatedTask")
 	while True:
 		try:
-			print "[JOBS] " + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ": polling jobs_created queue"
+			log.info("Polling jobs_created queue")
 			update_jobs_created()
 		except Exception, err:
-			print "ERROR while reading and processing job_created"
-			print err
+			log.error("ERROR while reading and processing job_created \n" + err)
 		finally:
 			time.sleep(10)
 
 def poll_jobs_in_progress_queue():
-	signal.signal(signal.SIGINT, signal_handler)
+	log = logger.get_logger("JobsInProgressTask")
 	while True:
 		try:
-			print "[JOBS] " + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ": polling jobs_in_progress queue"
+			log.info("Polling jobs_in_progress queue")
 			update_jobs_in_progress()
 		except Exception, err:
-			print "ERROR while reading and processing job_in_progress"
-			print err
+			log.error("ERROR while reading and processing job_in_progress \n" + err)
 		finally:
 			time.sleep(10)
 

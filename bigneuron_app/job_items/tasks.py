@@ -9,26 +9,26 @@ from bigneuron_app.clients import sqs, dynamo
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 
 import bigneuron_app.clients.constants as client_constants
+from bigneuron_app.utils import logger
 
+log = logger.get_logger("JobItemsTask")
 
 def poll_job_items_queue():
-	signal.signal(signal.SIGINT, signal_handler)
 	while True:
 		try:
-			print "[JOB_ITEMS] " + strftime("%Y-%m-%d %H:%M:%S", gmtime()) + ": polling job_items queue"
+			log.info("Polling job_items queue")
 			process_next_job_item()
 		except Exception, err:
-			print "ERROR while reading and processing job_item"
-			print err
+			log.error("ERROR while reading and processing job_item \n" + err)
 		finally:
 			time.sleep(5)
 
 def process_next_job_item():
 	job_item_key = get_next_job_item_from_queue()
 	if job_item_key is None: 
-		print "No job items found in Queue"
+		log.info("No job items found in Queue")
 		return
-	print "Found new job_item"
+	log.info("Found new job_item")
 	job_item = job_item_manager.get_job_item_doc(job_item_key)
 	job_item_manager.process_job_item(job_item)
 

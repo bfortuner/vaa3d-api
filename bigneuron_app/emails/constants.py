@@ -5,7 +5,7 @@ WEBSITE_URL=config.WEBSITE_URL
 
 ADMIN_EMAIL='vaa3dapi@gmail.com'
 DEV_EMAIL='bfortuner@gmail.com'
-ERRORS_EMAIL='vaa3dapi-errors@gmail.com'
+ERRORS_EMAIL=ADMIN_EMAIL
 
 HEADER="<html>"
 FOOTER="</html>"

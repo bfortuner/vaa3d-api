@@ -1,5 +1,4 @@
 from bigneuron_app import db
-from bigneuron_app.models import Data
 from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.jobs.constants import JOB_STATUS_TYPES
 from bigneuron_app.job_items import job_item_manager
