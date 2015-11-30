@@ -1,9 +1,11 @@
-from bigneuron_app import application
+from bigneuron_app import config
 from bigneuron_app.clients.constants import AWS_IAM_USER_LOGIN_LINK
 
-WEBSITE_URL=application.config['WEBSITE_URL']
+WEBSITE_URL=config.WEBSITE_URL
 
 ADMIN_EMAIL='vaa3dapi@gmail.com'
+DEV_EMAIL='bfortuner@gmail.com'
+ERRORS_EMAIL='vaa3dapi-errors@gmail.com'
 
 HEADER="<html>"
 FOOTER="</html>"

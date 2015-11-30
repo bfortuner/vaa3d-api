@@ -1,28 +1,28 @@
 import os
-from bigneuron_app import application
+from bigneuron_app import config
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 
 # AWS Config
-AWS_REGION = application.config['AWS_REGION']
-AWS_ACCESS_KEY = application.config['AWS_ACCESS_KEY']
-AWS_SECRET_KEY = application.config['AWS_SECRET_KEY']
-VAA3D_USER_AWS_ACCESS_KEY = application.config['VAA3D_USER_AWS_ACCESS_KEY']
-VAA3D_USER_AWS_SECRET_KEY = application.config['VAA3D_USER_AWS_SECRET_KEY']
+AWS_REGION = config.AWS_REGION
+AWS_ACCESS_KEY = config.AWS_ACCESS_KEY
+AWS_SECRET_KEY = config.AWS_SECRET_KEY
+VAA3D_USER_AWS_ACCESS_KEY = config.VAA3D_USER_AWS_ACCESS_KEY
+VAA3D_USER_AWS_SECRET_KEY = config.VAA3D_USER_AWS_SECRET_KEY
 AWS_IAM_USER_LOGIN_LINK='https://vaa3d.signin.aws.amazon.com/console/s3'
 
 # S3 Config
-S3_INPUT_BUCKET=application.config['S3_INPUT_BUCKET']
-S3_OUTPUT_BUCKET=application.config['S3_OUTPUT_BUCKET']
-S3_WORKING_INPUT_BUCKET=application.config['S3_WORKING_INPUT_BUCKET']
+S3_INPUT_BUCKET=config.S3_INPUT_BUCKET
+S3_OUTPUT_BUCKET=config.S3_OUTPUT_BUCKET
+S3_WORKING_INPUT_BUCKET=config.S3_WORKING_INPUT_BUCKET
 
 # Dynamo Config
-DYNAMO_JOB_ITEMS_TABLE=application.config['DYNAMO_JOB_ITEMS_TABLE']
+DYNAMO_JOB_ITEMS_TABLE=config.DYNAMO_JOB_ITEMS_TABLE
 DYNAMO_READS_PER_SEC=2
 DYNAMO_WRITES_PER_SEC=2
 
 # SQS Config
-SQS_JOB_ITEMS_QUEUE=application.config['SQS_JOB_ITEMS_QUEUE']
-SQS_JOBS_QUEUE=application.config['SQS_JOBS_QUEUE']
+SQS_JOB_ITEMS_QUEUE=config.SQS_JOB_ITEMS_QUEUE
+SQS_JOBS_QUEUE=config.SQS_JOBS_QUEUE
 
 
 # Vaa3D Config

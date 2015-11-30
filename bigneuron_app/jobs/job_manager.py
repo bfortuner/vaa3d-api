@@ -59,33 +59,6 @@ def create_job(user, data):
 
 	return job.job_id
 
-def update_jobs_in_progress():
-	jobs_in_progress = get_jobs_by_status("IN_PROGRESS")
-	for job in jobs_in_progress:
-		job_items = get_job_items(job.job_id)
-		complete = True
-		has_error = False
-		for job_item in job_items:
-			if job_item['job_item_status'] == 'ERROR':
-				has_error = True
-			elif job_item['job_item_status'] in ['IN_PROGRESS', 'CREATED']:
-				complete = False
-
-		if complete:
-			if has_error:
-				job.status_id = get_job_status_id("COMPLETE_WITH_ERRORS")
-			else:
-				job.status_id = get_job_status_id("COMPLETE")
-			db.session.commit()
-			email_manager.send_job_complete_email(job)
-
-def update_jobs_created():
-	jobs_created = get_jobs_by_status("CREATED")
-	for job in jobs_created:
-		job.status_id = get_job_status_id("IN_PROGRESS")
-		db.session.commit()
-		email_manager.send_job_created_email(job)
-
 def get_jobs_by_status(job_status):
 	job_status = JobStatus.query.filter_by(status_name=job_status).first()
 	jobs = job_status.jobs.all()

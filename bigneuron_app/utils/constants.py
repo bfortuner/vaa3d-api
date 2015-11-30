@@ -1,0 +1,7 @@
+from bigneuron_app import config
+
+LOG_LEVEL=config.LOG_LEVEL
+LOG_FILE_PATH='logs'
+LOG_INTERVAL_TYPE='S'
+LOG_BACKUP_INCR=2
+LOG_INTERVAL=5

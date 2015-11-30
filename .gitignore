@@ -1,6 +1,9 @@
 # Test database
 *test.db
 
+# Logs
+logs/
+
 # Credentials
 credentials.py
 

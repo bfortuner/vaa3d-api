@@ -25,7 +25,7 @@ import bigneuron_app.jobs.tasks as job_tasks
 
 import task_runner
 
-
+import bigneuron_app.utils.logger as logger
 
 #email_manager.test_email_manager()
 
