@@ -1,20 +1,23 @@
-from bigneuron_app import db
+from bigneuron_app.database import Base
 from bigneuron_app.utils import zipper
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, UniqueConstraint
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql import func
 
-class Job(db.Model):
+class Job(Base):
 	__tablename__ = 'jobs'
-	job_id = db.Column(db.Integer, primary_key=True)
-	user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-	status_id = db.Column(db.Integer, db.ForeignKey('job_status_types.id'), nullable=False)
-	output_dir = db.Column(db.String(128), nullable=False)
-	plugin = db.Column(db.String(128), nullable=False)
-	method = db.Column(db.String(128), nullable=False)
-	channel = db.Column(db.Integer, nullable=False)
-	output_file_suffix = db.Column(db.String(128), nullable=False)
-	created = db.Column(db.DateTime, default=db.func.now())
-	last_updated = db.Column(db.DateTime, onupdate=db.func.now())
-	job_status = db.relationship('JobStatus', backref=db.backref('jobs', lazy='dynamic'))
-	user = db.relationship('User', backref=db.backref('jobs', lazy='dynamic'))
+	job_id = Column(Integer, primary_key=True)
+	user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+	status_id = Column(Integer, ForeignKey('job_status_types.id'), nullable=False)
+	output_dir = Column(String(128), nullable=False)
+	plugin = Column(String(128), nullable=False)
+	method = Column(String(128), nullable=False)
+	channel = Column(Integer, nullable=False)
+	output_file_suffix = Column(String(128), nullable=False)
+	created = Column(DateTime, default=func.now())
+	last_updated = Column(DateTime, onupdate=func.now())
+	job_status = relationship('JobStatus', backref=backref('jobs', lazy='dynamic'))
+	user = relationship('User', backref=backref('jobs', lazy='dynamic'))
 
 	def __init__(self, user_id, status_id, output_dir, plugin, method, channel, output_file_suffix):
 		self.user_id = user_id
@@ -35,14 +38,14 @@ class Job(db.Model):
 		return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
-class JobStatus(db.Model):
+class JobStatus(Base):
 	__tablename__ = 'job_status_types'
-	id = db.Column(db.Integer, primary_key=True)
-	status_name = db.Column(db.String(32), nullable=False)
-	description = db.Column(db.String(128))	
+	id = Column(Integer, primary_key=True)
+	status_name = Column(String(32), nullable=False)
+	description = Column(String(128))	
 
 	__table_args__ = (
-        db.UniqueConstraint("id", "status_name"),
+        UniqueConstraint("id", "status_name"),
     )
 
 	def __init__(self, status_name):

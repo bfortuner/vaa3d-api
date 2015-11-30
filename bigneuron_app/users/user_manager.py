@@ -7,8 +7,8 @@ def get_or_create_user(email_address, iam_username=DEFAULT_IAM_USER):
 	if user is None:
 		print "Creating new user"
 		user = User(email_address, iam_username)
-		db.session.add(user)
-		db.session.commit()
+		db.add(user)
+		db.commit()
 	return user
 
 def get_jobs_by_user(email_address):

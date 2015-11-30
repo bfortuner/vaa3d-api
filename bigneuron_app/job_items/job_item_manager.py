@@ -170,8 +170,8 @@ def test_all():
 	table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
 
 	job = Job(1, 1, "mytestdir", VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, VAA3D_DEFAULT_OUTPUT_SUFFIX)
-	db.session.add(job)
-	db.session.commit()
+	db.add(job)
+	db.commit()
 	print "job_id: " + str(job.job_id)
 	job_item_doc = build_job_item_doc(job, input_filename)
 	print job_item_doc.as_dict()

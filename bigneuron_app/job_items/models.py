@@ -1,16 +1,20 @@
 from datetime import datetime
-from bigneuron_app import db
 from bigneuron_app.utils import id_generator
+from bigneuron_app.database import Base
+from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import UniqueConstraint, ForeignKey
+from sqlalchemy.orm import relationship, backref
+from sqlalchemy.sql import func
 
 
-class JobItemStatus(db.Model):
+class JobItemStatus(Base):
 	__tablename__ = 'job_item_status_types'
-	id = db.Column(db.Integer, primary_key=True)
-	status_name = db.Column(db.String(32), nullable=False)
-	description = db.Column(db.String(128))
+	id = Column(Integer, primary_key=True)
+	status_name = Column(String(32), nullable=False)
+	description = Column(String(128))
 
 	__table_args__ = (
-        db.UniqueConstraint("id", "status_name"),
+        UniqueConstraint("id", "status_name"),
     )
 
 	def __init__(self, status_name):

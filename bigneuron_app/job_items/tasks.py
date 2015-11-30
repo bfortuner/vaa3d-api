@@ -54,8 +54,8 @@ def signal_handler(signal, frame):
 def test_process_next_job_item():
 	job = Job(1, 1, "mytestdir", client_constants.VAA3D_DEFAULT_PLUGIN, 
 		client_constants.VAA3D_DEFAULT_FUNC, 1, client_constants.VAA3D_DEFAULT_OUTPUT_SUFFIX)
-	db.session.add(job)
-	db.session.commit()
+	db.add(job)
+	db.commit()
 	job_item = job_item_manager.create_job_item(job.job_id, client_constants.VAA3D_TEST_INPUT_FILE_1)
 	print "JOB_ITEM_KEY " + job_item['job_item_key']
 	process_next_job_item()

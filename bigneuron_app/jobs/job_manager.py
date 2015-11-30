@@ -49,8 +49,8 @@ def create_job(user, data):
 	channel = data['plugin']['settings']['params']['channel']
 	job = Job(user.id, 1, data['outputDir'], plugin_name, method, 
 		channel, output_file_suffix)
-	db.session.add(job)
-	db.session.commit()
+	db.add(job)
+	db.commit()
 
 	for f in data['filenames']:
 		job_item_doc = job_item_manager.build_job_item_doc(job, f)

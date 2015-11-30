@@ -1,4 +1,4 @@
-from bigneuron_app import db
+from bigneuron_app.database import db, init_db
 from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.jobs.constants import JOB_STATUS_TYPES
 from bigneuron_app.job_items import job_item_manager
@@ -15,37 +15,40 @@ DO NOT RUN THIS SCRIPT IN ''PROD'' IF DATABASE ALREADY HAS LIVE DATA!
 """
 
 # Drop and recreate DB
-db.drop_all()
-db.create_all()
+init_db()
 
 print "DB tables created"
 
 # Load Default Users
 admin_user = User(ADMIN_EMAIL, ADMIN_IAM_USER)
 default_user = User(DEFAULT_EMAIL, DEFAULT_IAM_USER)
-db.session.add(admin_user)
-db.session.add(default_user)
+db.add(admin_user)
+db.add(default_user)
+db.commit()
 
 print "User table loaded"
 
 # Load Job Status Types
 for status_str in JOB_STATUS_TYPES:
 	job_status = JobStatus(status_str)
-	db.session.add(job_status)
+	db.add(job_status)
+db.commit()
 
 print "JobStatusType table loaded"
 
 # Load Job Item Status Types
 for status_str in JOB_ITEM_STATUS_TYPES:
 	job_item_status = JobItemStatus(status_str)
-	db.session.add(job_item_status)
+	db.add(job_item_status)
+db.commit()
 
 print "JobItemStatusType table loaded"
 
 # Insert Test Job
 job = Job(User.query.filter_by(iam_username='vaa3d-admin').first().id, 1, 
 		'testjob1', VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, VAA3D_DEFAULT_OUTPUT_SUFFIX)
-db.session.add(job)
+db.add(job)
+db.commit()
 
 print "Loaded test job data"
 
@@ -76,7 +79,7 @@ job_item_manager.add_job_item_to_queue(job_item_doc2.job_item_key)
 
 print "Loaded test job item data"
 
-db.session.commit()
+
 
 
 

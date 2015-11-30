@@ -10,9 +10,9 @@ from bigneuron_app.emails import email_manager
 import bigneuron_app.clients.constants as client_constants
 from bigneuron_app.utils import logger
 
+log = logger.get_logger("JobsTask")
 
 def poll_jobs_created_queue():
-	log = logger.get_logger("JobsCreatedTask")
 	while True:
 		try:
 			log.info("Polling jobs_created queue")
@@ -23,7 +23,6 @@ def poll_jobs_created_queue():
 			time.sleep(20)
 
 def poll_jobs_in_progress_queue():
-	log = logger.get_logger("JobsInProgressTask")
 	while True:
 		try:
 			log.info("Polling jobs_in_progress queue")
@@ -50,14 +49,15 @@ def update_jobs_in_progress():
 				job.status_id = job_manager.get_job_status_id("COMPLETE_WITH_ERRORS")
 			else:
 				job.status_id = job_manager.get_job_status_id("COMPLETE")
-			db.session.commit()
+			db.commit()
 			email_manager.send_job_complete_email(job)
 
 def update_jobs_created():
 	jobs_created = job_manager.get_jobs_by_status("CREATED")
 	for job in jobs_created:
+		log.info("Found new job")
 		job.status_id = job_manager.get_job_status_id("IN_PROGRESS")
-		db.session.commit()
+		db.commit()
 		email_manager.send_job_created_email(job)
 
 def signal_handler(signal, frame):
