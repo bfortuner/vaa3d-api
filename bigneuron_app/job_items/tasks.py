@@ -1,38 +1,39 @@
 import sys, time
+import traceback
 from time import gmtime, strftime
 import signal
 from bigneuron_app import db
+from bigneuron_app import tasks_log
 from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.clients import sqs, dynamo
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
-
 import bigneuron_app.clients.constants as client_constants
 from bigneuron_app.utils import logger
 
-log = logger.get_logger("JobItemsTask")
 
 def poll_job_items_queue():
 	while True:
 		try:
-			log.info("Polling job_items queue")
+			tasks_log.info("Polling job_items queue")
 			process_next_job_item()
 		except Exception, err:
-			log.error("ERROR while reading and processing job_item \n" + err)
+			tasks_log.error(traceback.format_exc())
 		finally:
 			time.sleep(10)
 
 def process_next_job_item():
 	job_item_key = get_next_job_item_from_queue()
 	if job_item_key is None: 
-		log.info("No job items found in Queue")
+		tasks_log.info("No job items found in Queue")
 		return
-	log.info("Found new job_item")
+	tasks_log.info("Found new job_item")
 	job_item = job_item_manager.get_job_item_doc(job_item_key)
 	job_item_manager.process_job_item(job_item)
 
 def get_next_job_item_from_queue():
+	tasks_log.info("Getting next job_item from queue")
 	conn = sqs.get_connection()
 	client = sqs.get_client()
 	queue = sqs.get_queue(conn, client_constants.SQS_JOB_ITEMS_QUEUE)

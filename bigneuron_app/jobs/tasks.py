@@ -1,34 +1,46 @@
 import sys, time
 import signal
+import traceback
 from time import gmtime, strftime
 from bigneuron_app import db
+from bigneuron_app import tasks_log
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.jobs import job_manager
 from bigneuron_app.clients import sqs, dynamo
 from bigneuron_app.jobs.constants import PROCESS_JOBS_CREATED_TASK, PROCESS_JOBS_IN_PROGRESS_TASK
 from bigneuron_app.emails import email_manager
 import bigneuron_app.clients.constants as client_constants
-from bigneuron_app.utils import logger
 
-log = logger.get_logger("JobsTask")
+
+def poll_jobs_queue():
+	while True:
+		try:
+			tasks_log.info("Polling jobs created queue")
+			update_jobs_created()
+			tasks_log.info("Polling jobs in-progress queue")
+			update_jobs_in_progress()
+		except Exception, err:
+			tasks_log.error(traceback.format_exc())
+		finally:
+			time.sleep(20)
 
 def poll_jobs_created_queue():
 	while True:
 		try:
-			log.info("Polling jobs_created queue")
+			tasks_log.info("Polling jobs_created queue")
 			update_jobs_created()
 		except Exception, err:
-			log.error("ERROR while reading and processing job_created \n" + err)
+			tasks_log.error("ERROR while reading and processing job_created \n" + str(err))
 		finally:
 			time.sleep(20)
 
 def poll_jobs_in_progress_queue():
 	while True:
 		try:
-			log.info("Polling jobs_in_progress queue")
+			tasks_log.info("Polling jobs_in_progress queue")
 			update_jobs_in_progress()
 		except Exception, err:
-			log.error("ERROR while reading and processing job_in_progress \n" + err)
+			tasks_log.error("ERROR while reading and processing job_in_progress \n" + str(err))
 		finally:
 			time.sleep(20)
 
@@ -55,7 +67,7 @@ def update_jobs_in_progress():
 def update_jobs_created():
 	jobs_created = job_manager.get_jobs_by_status("CREATED")
 	for job in jobs_created:
-		log.info("Found new job")
+		tasks_log.info("Found new job")
 		job.status_id = job_manager.get_job_status_id("IN_PROGRESS")
 		db.commit()
 		email_manager.send_job_created_email(job)

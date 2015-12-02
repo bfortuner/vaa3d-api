@@ -43,7 +43,6 @@ def insert(table, data_dict):
 def get(table, key):
 	key_column = get_primary_key(table)
 	response = table.get_item(Key={key_column : key})
-	print "RESPONSE " + str(response)
 	return response['Item']
 
 def delete(table, key):
@@ -55,7 +54,6 @@ def get_primary_key(table):
 
 def query_all(table, name, value):
 	# boto3.readthedocs.org/en/latest/reference/customizations/dynamodb.html#dynamodb-conditions
-	print name, value
 	response = table.scan(FilterExpression=Attr(name).eq(value))
 	items = response['Items']
 	return items

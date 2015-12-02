@@ -1,8 +1,9 @@
 import sys
+import traceback
 import zipfile
 import shutil
-
 from bigneuron_app import db
+from bigneuron_app import items_log
 from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.clients import s3, vaa3d, sqs, dynamo
@@ -11,11 +12,9 @@ from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE, SQS_JOB_ITEMS_QUEUE
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
-
 from bigneuron_app.utils import zipper
 from decimal import Decimal
-from bigneuron_app.utils import logger
-log = logger.get_logger("JobsItems")
+
 
 def process_job_item(job_item):
 	job_item['status_id'] = get_job_item_status_id("IN_PROGRESS")
@@ -27,7 +26,7 @@ def process_job_item(job_item):
 	run_job_item(job_item)
 
 def run_job_item(job_item):
-	log.info("running job item " + str(job_item))
+	items_log.info("running job item " + str(job_item))
 	local_file_path = os.path.abspath(job_item['input_filename'])
 	try:
 		if zipper.is_zip_file(local_file_path):
@@ -37,7 +36,7 @@ def run_job_item(job_item):
 		job_item['status_id'] = get_job_item_status_id("COMPLETE")
 	except Exception as e:
 		job_item['status_id'] = get_job_item_status_id("ERROR")
-		log.error("Job Item Error " + e)
+		items_log.error(traceback.format_exc())
 	finally:
 		save_job_item(job_item)
 
@@ -67,14 +66,14 @@ def process_zip_file(job_item, zip_file_path):
 	zip_archive = zipfile.ZipFile(zip_file_path, "r")
 	filenames = zip_archive.namelist()
 	if len(filenames) > 1:
-		log.info("found more than 1 file inside .zip")
+		items_log.info("found more than 1 file inside .zip")
 		output_dir = os.path.join(output_dir, zip_file_path[:zip_file_path.find(zipper.ZIP_FILE_EXT)])
 		zipper.expand_zip_archive(zip_archive, output_dir)
 		zip_archive.close()
 		create_job_items_from_directory(job_item, output_dir)
 		shutil.rmtree(output_dir)
 	else:
-		log.info("found only 1 file inside .zip")
+		items_log.info("found only 1 file inside .zip")
 		filename = filenames[0]
 		file_path = os.path.join(output_dir, filename)
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
@@ -84,7 +83,7 @@ def process_zip_file(job_item, zip_file_path):
 	os.remove(zip_file_path)
 
 def create_job_items_from_directory(job_item, dir_path):
-	log.info("Creating job items from directory")
+	items_log.info("Creating job items from directory")
 	fileslist = []
 	for (dirpath, dirnames, filenames) in os.walk(dir_path):
 		for f in filenames:

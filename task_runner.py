@@ -8,14 +8,14 @@ import bigneuron_app.jobs.tasks as job_tasks
 
 def start_workers():
 	print "Starting workers.."
-	jobs_created_worker = Process(name='jobs_created_worker', target=job_tasks.poll_jobs_created_queue)
-	jobs_in_progress_worker = Process(name='jobs_in_progress_worker', target=job_tasks.poll_jobs_in_progress_queue)
+	jobs_worker = Process(name='jobs_worker', target=job_tasks.poll_jobs_queue)
+	#jobs_in_progress_worker = Process(name='jobs_in_progress_worker', target=job_tasks.poll_jobs_in_progress_queue)
 	job_items_worker = Process(name='job_items_worker', target=job_item_tasks.poll_job_items_queue)
 
-	print "starting worker " + jobs_created_worker.name
-	jobs_created_worker.start()
-	print "starting worker " + jobs_in_progress_worker.name
-	jobs_in_progress_worker.start()
+	print "starting worker " + jobs_worker.name
+	jobs_worker.start()
+	#print "starting worker " + jobs_in_progress_worker.name
+	#jobs_in_progress_worker.start()
 	print "starting worker " + job_items_worker.name
 	job_items_worker.start()
 

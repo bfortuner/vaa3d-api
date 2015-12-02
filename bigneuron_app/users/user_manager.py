@@ -5,7 +5,6 @@ from bigneuron_app.users.constants import DEFAULT_IAM_USER
 def get_or_create_user(email_address, iam_username=DEFAULT_IAM_USER):
 	user = User.query.filter_by(email=email_address).first()
 	if user is None:
-		print "Creating new user"
 		user = User(email_address, iam_username)
 		db.add(user)
 		db.commit()

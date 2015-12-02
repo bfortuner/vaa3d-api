@@ -38,8 +38,7 @@ def get_mail_handler(name, log_level=MAIL_LOG_LEVEL):
 	'''))
 	return mail_handler
 
-def get_rotating_file_handler(logger_name, log_level=LOG_LEVEL):
-	logger_path = LOG_FILE_PATH + '/' + logger_name + '.log'
+def get_rotating_file_handler(logger_path, log_level=LOG_LEVEL):
 	create_log_dir(logger_path)
 	rotating_file_handler = TimedRotatingFileHandler(logger_path, 
 		when=LOG_INTERVAL_TYPE, interval=LOG_INTERVAL, backupCount=LOG_BACKUP_INCR)

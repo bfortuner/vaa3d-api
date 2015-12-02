@@ -1,5 +1,6 @@
 import time
 from bigneuron_app import db
+from bigneuron_app import jobs_log
 from bigneuron_app.emails import email_manager
 from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.job_items.models import JobItemStatus

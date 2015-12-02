@@ -1,9 +1,8 @@
 import boto3
 import time
-
 from bigneuron_app.clients.constants import AWS_REGION, AWS_ACCESS_KEY, AWS_SECRET_KEY
 from bigneuron_app.clients.constants import SQS_JOB_ITEMS_QUEUE, SQS_JOBS_QUEUE
-
+from bigneuron_app import items_log
 
 def get_connection():
 	return boto3.resource('sqs', region_name=AWS_REGION, 
@@ -84,14 +83,12 @@ def get_messages(client, queue_url, num_msgs=1):
 		QueueUrl=queue_url,
 		MaxNumberOfMessages=num_msgs,
 		MessageAttributeNames=['All'])
-	print "Response is " + str(response)
 	if 'Messages' in response:
 		return response['Messages']
 	return []
 
 def get_next_message(client, queue):
 	messages = get_messages(client, queue.url, 1)
-	print messages
 	if len(messages) < 1:
 		return None
 	return messages[0]

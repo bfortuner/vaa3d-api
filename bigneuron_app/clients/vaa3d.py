@@ -1,9 +1,10 @@
 import os
 from subprocess import call
-
+from bigneuron_app import items_log
 from bigneuron_app.clients.constants import *
 from bigneuron_app.clients import s3
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES, PLUGINS
+from bigneuron_app.utils.constants import JOB_ITEMS_LOG_FILE
 
 class Vaa3dJob():
 	def __init__(self, input_filename, output_filename, input_file_path, 
@@ -28,15 +29,16 @@ def build_vaa3d_job(job_item):
 		job_item.job.plugin, job_item.job.method, job_item.job.channel)
 
 def run_job(job):
-	print "Tracing neuron..."
+	logfile = open(JOB_ITEMS_LOG_FILE, "w")
+	items_log.info("Tracing neuron... ")
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
-	cmd = " ".join([VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
-		"-i", input_file_path, "-p", str(job['channel'])])
-	print "COMMAND: " + cmd
-	call([VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], "-i", 
-		input_file_path, "-p", str(job['channel']), "-o", output_file_path])
-	print "Trace complete!"
+	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
+		"-i", input_file_path, "-p", str(job['channel'])]
+	items_log.info("COMMAND: " + " ".join(cmd_args))
+	call(cmd_args, stdout=logfile, stderr=logfile)
+	items_log.info("Trace complete!")
+	logfile.close()
 
 def cleanup(input_file_path, output_file_path):
 	os.remove(input_file_path)

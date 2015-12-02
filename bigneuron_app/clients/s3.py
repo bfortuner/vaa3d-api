@@ -2,6 +2,7 @@ from boto import connect_s3
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 
+from bigneuron_app import items_log
 from bigneuron_app.clients.constants import AWS_ACCESS_KEY, AWS_SECRET_KEY
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 
@@ -30,18 +31,18 @@ def get_bucket_name_from_filename(filename, bucket_names):
 	return None
 
 def download_file(file_key, file_path, bucket_name):
-	print "Downloading file: %s" % file_key
+	items_log.info("Downloading file: %s" % file_key)
 	k = Key(get_bucket(get_connection(), bucket_name))
 	k.key = file_key
 	k.get_contents_to_filename(file_path)
-	print "Downloading complete!"
+	items_log.info("Downloading complete!")
 
 def upload_file(file_key, file_path, bucket_name):
-	print "Uploading file: %s" % file_key
+	items_log.info("Uploading file: %s" % file_key)
 	k = Key(get_bucket(get_connection(), bucket_name))
 	k.key = file_key
 	k.set_contents_from_filename(file_path)
-	print "Upload complete!"
+	items_log.info("Upload complete!")
 
 def get_all_files(bucket_name):
 	bucket = get_bucket(get_connection(), bucket_name)

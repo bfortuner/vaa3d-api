@@ -28,9 +28,7 @@ def is_email_address_verified(email_address):
 	return False
 
 def send_email(subject, body, to_email, from_email=ADMIN_EMAIL):
-	print "Attempting to send email to %s from %s" % (to_email, from_email)
 	get_connection().send_email(from_email, subject, body, [to_email], html_body=body)
-	print "Sent email to %s from %s" % (to_email, from_email)
 
 def test_ses_client():
 	TEST_TO_EMAIL='bfortuner@gmail.com'
