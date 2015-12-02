@@ -34,7 +34,7 @@ def run_job(job):
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
 	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
-		"-i", input_file_path, "-p", str(job['channel'])]
+		"-i", input_file_path, "-p", str(job['channel']), "-o", output_file_path]
 	items_log.info("COMMAND: " + " ".join(cmd_args))
 	call(cmd_args, stdout=logfile, stderr=logfile)
 	items_log.info("Trace complete!")

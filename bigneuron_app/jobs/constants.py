@@ -5,7 +5,7 @@ PROCESS_JOBS_CREATED_TASK='process_jobs_created'
 PROCESS_JOBS_IN_PROGRESS_TASK='process_jobs_in_progress'
 
 OUTPUT_FILE_SUFFIXES = {
-	'Vaa3D_Neuron2': '_x72_y57_z64_app2.swc',
+	'Vaa3D_Neuron2': '_app2.swc',
 	'Vaa3D-FarSight_snake_tracing' : '_snake.swc',
 	'SimpleAxisAnalyzer' : '_axis_analyzer.swc',
 	'CWlab_method1_version1' : '_Cwlab_ver1.swc',
