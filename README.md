@@ -126,16 +126,23 @@ cd vaa3d-api
 sudo pip install -r requirements.txt
 ```
 
-Crontab to Run Vaa3d jobs on EC2
+Command To Run Circus Workers
 ```
-* * * * * . $HOME/.bash_profile; /usr/bin/python /home/ec2-user/vaa3d-api/task_runner.py process_jobs &>> /home/ec2-user/cronlog.log
-*/1 * * * * . $HOME/.bash_profile; /usr/bin/python /home/ec2-user/vaa3d-api/task_runner.py process_job_items &>> /home/ec2-user/cronlog.log
+cd ~/vaa3d-api
+circusd --daemon circus.ini
+```
+
+Monitor Circus Workers
+```
+ps aux | grep task_runner
+localhost:8080
+circusctl quit
 ```
 
 Kill Processes by Pattern
 ```
-pgrep -f vaa3d
-pkill -f vaa3d
+pgrep -f task_runner
+pkill -f task_runner
 ```
 
 ### Links and Tutorials:
@@ -144,6 +151,8 @@ pkill -f vaa3d
 * http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/create-deploy-python-flask.html
 * https://realpython.com/blog/python/flask-by-example-part-2-postgres-sqlalchemy-and-alembic
 * https://gist.github.com/mjul/54c7c9e936588e713537 (RDS postgres config)
+* http://circus.readthedocs.org/en/latest/tutorial/step-by-step
+* https://github.com/circus-tent/circus/tree/master/examples
 
 ### Permissions:
 Request access tokens and permissions from bfortuner@gmail.com
