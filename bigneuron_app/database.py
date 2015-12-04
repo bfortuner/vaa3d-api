@@ -5,7 +5,8 @@ from bigneuron_app.config import config
 
 engine = create_engine(config.SQLALCHEMY_DATABASE_URI, 
 						convert_unicode=True,
-						isolation_level=config.DB_ISOLATION_LEVEL)
+						isolation_level=config.DB_ISOLATION_LEVEL,
+						pool_recycle=3600)
 db = scoped_session(sessionmaker(autocommit=False,
 								 autoflush=False,
 								 bind=engine))
