@@ -39,6 +39,7 @@ export VAA3D_USER_AWS_SECRET_KEY='secretkey'
 export VAA3D_CONFIG='TestConfig'
 export VAA3D_DB_PASSWORD='yourdbkey'
 export VAA3D_PATH='yourpathtoVaa3d'
+export TASK_RUNNER_PATH='xvfb-run python task_runner.py' #remove xvfb-run for local testing
 ```
 
 Now you can launch the app:
