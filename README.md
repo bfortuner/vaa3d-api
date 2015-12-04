@@ -135,6 +135,8 @@ circusd --daemon circus.ini
 Monitor Circus Workers
 ```
 ps aux | grep task_runner
+circus-top
+circusctl
 localhost:8080
 circusctl quit
 ```
