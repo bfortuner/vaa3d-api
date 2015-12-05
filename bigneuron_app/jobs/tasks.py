@@ -13,16 +13,19 @@ import bigneuron_app.clients.constants as client_constants
 
 
 def poll_jobs_queue():
-	while True:
+	count = 0
+	while count < 10:
 		try:
-			tasks_log.info("Polling jobs created queue")
+			tasks_log.info("Polling jobs created queue " + str(count))
 			update_jobs_created()
-			tasks_log.info("Polling jobs in-progress queue")
+			tasks_log.info("Polling jobs in-progress queue " + str(count))
 			update_jobs_in_progress()
 		except Exception, err:
 			tasks_log.error(traceback.format_exc())
 		finally:
+			count += 1
 			time.sleep(20)
+	db.remove()
 
 def poll_jobs_created_queue():
 	while True:

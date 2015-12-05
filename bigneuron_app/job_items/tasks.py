@@ -14,14 +14,17 @@ from bigneuron_app.utils import logger
 
 
 def poll_job_items_queue():
-	while True:
+	count = 0
+	while count < 10:
 		try:
-			tasks_log.info("Polling job_items queue")
+			tasks_log.info("Polling job_items queue " + str(count))
 			process_next_job_item()
 		except Exception, err:
 			tasks_log.error(traceback.format_exc())
 		finally:
-			time.sleep(10)
+			count+=1
+			time.sleep(20)
+	db.remove()
 
 def process_next_job_item():
 	job_item_key = get_next_job_item_from_queue()
