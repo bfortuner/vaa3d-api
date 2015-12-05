@@ -16,9 +16,8 @@ def poll_jobs_queue():
 	count = 0
 	while count < 10:
 		try:
-			tasks_log.info("Polling jobs created queue " + str(count))
+			tasks_log.info("Polling jobs created + in-progress queues " + str(count))
 			update_jobs_created()
-			tasks_log.info("Polling jobs in-progress queue " + str(count))
 			update_jobs_in_progress()
 		except Exception, err:
 			tasks_log.error(traceback.format_exc())

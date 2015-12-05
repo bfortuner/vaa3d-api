@@ -96,13 +96,16 @@ sudo yum -y install xorg-x11-server-Xvfb
 
 Add to Bash_Profile on EC2
 ```
+export VAA3D_AWS_ACCESS_KEY='accesskey'		
+export VAA3D_AWS_SECRET_KEY='secretkey'
+export VAA3D_USER_AWS_ACCESS_KEY='accesskey'		
+export VAA3D_USER_AWS_SECRET_KEY='secretkey'
 export VAA3D_DB_PASSWORD='your-db-password'
 export VAA3D_PATH='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
+export TASK_RUNNER_PATH='xvfb-run python task_runner.py'
 export EDITOR="emacs"
 
 export DISPLAY=":98"
-Xvfb $DISPLAY >& Xvfb.log &
-trap "kill $! || true" EXIT
 
 alias vaa3d='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
 ```
@@ -129,6 +132,7 @@ sudo pip install -r requirements.txt
 
 Command To Run Circus Workers
 ```
+source ~/.bash_profile
 cd ~/vaa3d-api
 circusd --daemon circus.ini
 ```
