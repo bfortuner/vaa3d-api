@@ -3,6 +3,7 @@
 
 # Logs
 logs/
+circus.log
 
 # Credentials
 credentials.py
