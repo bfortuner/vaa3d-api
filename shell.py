@@ -28,6 +28,9 @@ import bigneuron_app.utils.logger as logger
 
 #vaa3d.test_plugins()
 #vaa3d.test_single_plugin()
+#vaa3d.cleanup_all_filename_not_found()
+#vaa3d.prepare_test_files_local(['smalltest.tif'])
+vaa3d.test_single_plugin_local()
 
 #job_manager.test_get_job_items()
 #job_manager.test_get_job_items()
@@ -38,6 +41,7 @@ import bigneuron_app.utils.logger as logger
 
 #job_item_manager.test_all()
 #job_item_manager.test_convert_dynamo_item_to_dict()
+#job_item_manager.test_try_finally()
 
 #sqs.test_all()
 #sqs.test_clear_queue()
@@ -52,4 +56,4 @@ import bigneuron_app.utils.logger as logger
 
 #dynamo.test_scan_by_time()
 
-zipper.test_is_compressed_filename()
+#zipper.test_is_compressed_filename()

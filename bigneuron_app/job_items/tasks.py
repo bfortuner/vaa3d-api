@@ -12,10 +12,12 @@ from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 import bigneuron_app.clients.constants as client_constants
 from bigneuron_app.utils import logger
 
+POLL_JOB_ITEMS_SLEEP=2
+POLL_JOB_ITEMS_MAX_RUNS=20
 
 def poll_job_items_queue():
 	count = 0
-	while count < 10:
+	while count < POLL_JOB_ITEMS_MAX_RUNS:
 		try:
 			tasks_log.info("Polling job_items queue " + str(count))
 			process_next_job_item()
@@ -23,7 +25,7 @@ def poll_job_items_queue():
 			tasks_log.error(traceback.format_exc())
 		finally:
 			count+=1
-			time.sleep(2)
+			time.sleep(POLL_JOB_ITEMS_SLEEP)
 	db.remove()
 
 def process_next_job_item():

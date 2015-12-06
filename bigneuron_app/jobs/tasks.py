@@ -12,9 +12,12 @@ from bigneuron_app.emails import email_manager
 import bigneuron_app.clients.constants as client_constants
 
 
+POLL_JOBS_SLEEP=20
+POLL_JOBS_MAX_RUNS=30
+
 def poll_jobs_queue():
 	count = 0
-	while count < 10:
+	while count < POLL_JOBS_MAX_RUNS:
 		try:
 			tasks_log.info("Polling jobs created + in-progress queues " + str(count))
 			update_jobs_created()
@@ -23,7 +26,7 @@ def poll_jobs_queue():
 			tasks_log.error(traceback.format_exc())
 		finally:
 			count += 1
-			time.sleep(20)
+			time.sleep(POLL_JOBS_SLEEP)
 	db.remove()
 
 def poll_jobs_created_queue():
@@ -55,8 +58,9 @@ def update_jobs_in_progress():
 		for job_item in job_items:
 			if job_item['job_item_status'] == 'ERROR':
 				has_error = True
-			elif job_item['job_item_status'] in ['IN_PROGRESS', 'CREATED']:
+			elif job_item['job_item_status'] not in ['COMPLETE', 'ERROR']:
 				complete = False
+				break
 
 		if complete:
 			if has_error:

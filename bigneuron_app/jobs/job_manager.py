@@ -38,6 +38,9 @@ def get_job_items(job_id, include_zip=True):
 			output_s3_key = item_dict['output_dir'] + "/" + item_dict['output_filename']
 			item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
 				output_s3_key, link_expiry_secs)
+			logs_s3_key = item_dict['output_dir'] + "/logs/" + item_dict['output_filename'] + ".log"
+			item_dict['logs_download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
+				logs_s3_key, link_expiry_secs)
 			job_items_list.append(item_dict)
 	return job_items_list
 

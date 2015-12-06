@@ -49,12 +49,25 @@ def get_job_item_status_id(name):
 	return JobItemStatus.query.filter_by(status_name=name).first().id
 
 def process_non_zip_file(job_item):
-	vaa3d.run_job(job_item)
 	input_file_path = os.path.abspath(job_item['input_filename'])
-	output_file_path = os.path.abspath(job_item['output_filename'])
-	s3_key = job_item['output_dir'] + "/" + job_item['output_filename']
+	try:
+		vaa3d.run_job(job_item)
+		log_file_path = upload_log_file(job_item['output_dir'], job_item['output_filename'])
+		output_file_path = upload_output_file(job_item['output_dir'], job_item['output_filename'])
+	finally:
+		vaa3d.cleanup_all([input_file_path, log_file_path]) #swc files already included
+
+def upload_output_file(output_dir, output_filename):
+	output_file_path = os.path.abspath(output_filename)
+	s3_key = output_dir + "/" + output_filename
 	s3.upload_file(s3_key, output_file_path, S3_OUTPUT_BUCKET)
-	vaa3d.cleanup(input_file_path, output_file_path)
+	return output_file_path
+
+def upload_log_file(output_dir, output_filename):
+	log_file_path = os.path.abspath(output_filename + ".log")
+	s3_key = output_dir + "/logs/" + output_filename + ".log"
+	s3.upload_file(s3_key, log_file_path, S3_OUTPUT_BUCKET)
+	return log_file_path
 
 def process_zip_file(job_item, zip_file_path):
 	"""
@@ -185,5 +198,11 @@ def test_all():
 	
 
 	dynamo.drop_table(conn, table_name)
+
+def test_try_finally():
+	try:
+		raise Exception("hey there mister")
+	finally:
+		print "DO this regardless of exception"
 
 

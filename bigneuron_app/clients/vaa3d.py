@@ -1,5 +1,7 @@
 import os
-from subprocess import call
+import shutil
+import subprocess
+import traceback
 from bigneuron_app import items_log
 from bigneuron_app.clients.constants import *
 from bigneuron_app.clients import s3
@@ -29,16 +31,19 @@ def build_vaa3d_job(job_item):
 		job_item.job.plugin, job_item.job.method, job_item.job.channel)
 
 def run_job(job):
-	logfile = open(JOB_ITEMS_LOG_FILE, "w")
 	items_log.info("Tracing neuron... ")
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
+	log_file_path = output_file_path + ".log"
+	logfile = open(log_file_path, "w")
 	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
 		"-i", input_file_path, "-p", str(job['channel']), "-o", output_file_path]
-	items_log.info("COMMAND: " + " ".join(cmd_args))
-	call(cmd_args, stdout=logfile, stderr=logfile)
-	items_log.info("Trace complete!")
-	logfile.close()
+	items_log.info("Running Command: " + " ".join(cmd_args))
+	try:
+		subprocess.call(cmd_args, stdout=logfile, stderr=logfile)
+		items_log.info("Trace complete!")
+	finally:
+		logfile.close()		
 
 def cleanup(input_file_path, output_file_path):
 	os.remove(input_file_path)
@@ -51,8 +56,10 @@ def cleanup_all(list_of_filenames):
 	filelist = [ f for f in os.listdir(".") if f.endswith(".swc") ]
 	filelist.extend(list_of_filenames)
 	for f in filelist:
-		os.remove(os.path.abspath(f))
-
+		try:
+			os.remove(os.path.abspath(f))
+		except Exception, e:
+			items_log.info("File to remove not found " + str(e))
 
 
 ## Unit Tests ##
@@ -72,6 +79,35 @@ def test_plugins():
 
 	cleanup_all(filenames)
 
+def prepare_test_files_local(filenames):
+	for f in filenames:
+		src = os.path.abspath("testdata/" + f)
+		dest = os.path.abspath(f)
+		shutil.copyfile(src, dest)
+
+def test_single_plugin_local():
+	filenames =  ["corruptfile.tif", VAA3D_TEST_INPUT_FILE_1]
+	prepare_test_files_local(filenames)
+	plugin_name = 'Vaa3D_Neuron2' #'MST_tracing'
+	for f in filenames:
+		input_file_path = os.path.abspath(f)
+		test_plugin_local(plugin_name, PLUGINS[plugin_name], 
+			f, input_file_path)
+
+def test_plugin_local(plugin_name, plugin, input_filename, input_file_path):
+	output_filename = input_filename + OUTPUT_FILE_SUFFIXES[plugin_name]
+	output_file_path = os.path.abspath(output_filename)
+	job = Vaa3dJob(input_filename, output_filename, input_file_path,
+	output_file_path, plugin_name, plugin['method']['default'], 1)
+	print "running job"
+	try:
+		run_job(job.as_dict())
+		os.remove(job.output_file_path)
+	except Exception, e:
+		print traceback.format_exc()
+	finally:
+		print "ran job"
+
 def prepare_test_files(filenames):
 	for f in filenames:
 		s3.download_file(f, os.path.abspath(f), S3_INPUT_BUCKET)
@@ -89,6 +125,12 @@ def test_plugin(plugin_name, plugin, input_filename, input_file_path):
 	output_file_path = os.path.abspath(output_filename)
 	job = Vaa3dJob(input_filename, output_filename, input_file_path,
 	output_file_path, plugin_name, plugin['method']['default'], 1)
+	print "running job"
 	run_job(job.as_dict())
+	print "running job"
 	s3.upload_file(job.output_filename, job.output_file_path, S3_OUTPUT_BUCKET)
 	os.remove(job.output_file_path)
+
+def cleanup_all_filename_not_found():
+	filenames = ["fakefile.txt"]
+	cleanup_all(filenames)
