@@ -49,3 +49,7 @@ import bigneuron_app.utils.logger as logger
 
 #job_tasks.poll_jobs_created_queue()
 #job_tasks.poll_jobs_in_progress_queue()
+
+#dynamo.test_scan_by_time()
+
+zipper.test_is_compressed_filename()

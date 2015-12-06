@@ -1,3 +1,4 @@
+import time
 from datetime import datetime
 from bigneuron_app.utils import id_generator
 from bigneuron_app.database import Base
@@ -38,6 +39,7 @@ class JobItemDocument():
 		self.method = method
 		self.channel = int(channel)
 		self.status_id = int(status_id)
+		self.creation_time = int(time.time()) #UTC = PST + 8
 
 	def __repr__(self):
 		return '<JobItemDocument %r>' % self.input_filename

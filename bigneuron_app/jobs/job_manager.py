@@ -12,6 +12,7 @@ from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
 from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 from bigneuron_app.emails.constants import ADMIN_EMAIL
+from bigneuron_app.utils import zipper
 
 def get_job(job_id):
 	job = Job.query.get(job_id)
@@ -31,12 +32,13 @@ def get_job_items(job_id):
 	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
 	job_items_list = []
 	for item in job_items:
-		item_dict = job_item_manager.convert_dynamo_job_item_to_dict(item)
-		item_dict['job_item_status'] = JobItemStatus.query.get(int(item_dict['status_id'])).status_name
-		output_s3_key = item_dict['output_dir'] + "/" + item_dict['output_filename']
-		item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
-			output_s3_key, link_expiry_secs)
-		job_items_list.append(item_dict)
+		if not zipper.is_compressed_filename(item['input_filename']):
+			item_dict = job_item_manager.convert_dynamo_job_item_to_dict(item)
+			item_dict['job_item_status'] = JobItemStatus.query.get(int(item_dict['status_id'])).status_name
+			output_s3_key = item_dict['output_dir'] + "/" + item_dict['output_filename']
+			item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
+				output_s3_key, link_expiry_secs)
+			job_items_list.append(item_dict)
 	return job_items_list
 
 def get_user_input_filenames(user_id):

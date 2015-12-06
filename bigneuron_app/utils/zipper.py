@@ -9,6 +9,10 @@ import ntpath
 GZIP_FILE_EXT = '.gz'
 ZIP_FILE_EXT = '.zip'
 
+def is_compressed_filename(filename):
+	file_parts = filename.split(".")
+	return file_parts[-1] in ("zip","gz")
+
 def call_process(command_str):
     p = subprocess.Popen(command_str, stdout=subprocess.PIPE, shell=True)
     output = p.communicate()[0]
@@ -104,6 +108,16 @@ TEST_FILE_NAME = 'myfile.txt'
 CURRENT_DIR = os.getcwd()
 INPUT_FILE_PATH = os.path.join(CURRENT_DIR, TEST_FILE_NAME)
 OUTPUT_FILE_PATH = os.path.join(CURRENT_DIR, TEST_FILE_NAME)
+
+def test_is_compressed_filename():
+	files = [['mytest.zip',True],
+			['mytest.mytest.zip',True],
+			['mytest.mytest',False],
+			['mytest.gz',True]]
+	for f in files:
+		is_compressed = is_compressed_filename(f[0])
+		print is_compressed
+		assert(is_compressed == f[1]) 
 
 def create_test_file():
 	test_file = open(INPUT_FILE_PATH, 'w')

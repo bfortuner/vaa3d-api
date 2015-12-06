@@ -78,8 +78,8 @@ def process_zip_file(job_item, zip_file_path):
 		file_path = os.path.join(output_dir, filename)
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
-		new_job_item = create_job_item(job_item['job_id'], filename)
-		run_job_item(new_job_item)
+		job_item['input_filename'] = filename
+		run_job_item(job_item)
 	os.remove(zip_file_path)
 
 def create_job_items_from_directory(job_item, dir_path):

@@ -1,3 +1,4 @@
+import time
 import boto3
 from boto3.dynamodb.conditions import Key, Attr
 
@@ -76,8 +77,31 @@ def table_exists(conn, table_name):
 			return True
 	return False
 
+def scan_by_time(table, time_field, time_sec, operator):
+	if operator == "lt":
+		response = table.scan(FilterExpression=Attr(time_field).lt(time_sec))
+	elif operator == "gt":
+		response = table.scan(FilterExpression=Attr(time_field).gt(time_sec))
+	else:
+		response = table.scan(FilterExpression=Attr(time_field).eq(time_sec))		
+	return response['Items']
+
 
 ## Unit Tests ##
+
+def test_scan_by_time():
+	current_time_sec = int(time.time())
+	timestr = time.strftime('%m/%d/%Y %H:%M:%S',  time.gmtime(current_time_sec))
+	print timestr
+	conn = get_connection()
+	table = get_table(conn, "test_job_items")
+	name = "creation_time"
+	items = scan_by_time(table, name, 10005, "gt")
+	print items
+	items = scan_by_time(table, name, 10005, "lt")
+	print len(items) == 0
+	items = scan_by_time(table, name, 1449359215, "eq")
+	print items
 
 def test_all():
 	import random
