@@ -23,7 +23,7 @@ def poll_job_items_queue():
 			tasks_log.error(traceback.format_exc())
 		finally:
 			count+=1
-			time.sleep(5)
+			time.sleep(2)
 	db.remove()
 
 def process_next_job_item():

@@ -35,6 +35,6 @@ def get_job(job_id):
 
 @application.route('/job_items/<int:job_id>', methods=['GET'])
 def get_job_items(job_id):
-	job_items = job_manager.get_job_items(job_id)
+	job_items = job_manager.get_job_items(job_id, include_zip=False)
 	application.logger.info("Getting Job Items: " + str(request.json))
 	return jsonify( {'job_items' : job_items} )
