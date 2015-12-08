@@ -13,6 +13,7 @@ from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USE
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 from bigneuron_app.emails.constants import ADMIN_EMAIL
 from bigneuron_app.utils import zipper
+from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 
 def get_job(job_id):
 	job = Job.query.get(job_id)
@@ -38,7 +39,7 @@ def get_job_items(job_id, include_zip=True):
 			output_s3_key = item_dict['output_dir'] + "/" + item_dict['output_filename']
 			item_dict['download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
 				output_s3_key, link_expiry_secs)
-			logs_s3_key = item_dict['output_dir'] + "/logs/" + item_dict['output_filename'] + ".log"
+			logs_s3_key = item_dict['output_dir'] + "/logs/" + item_dict['output_filename'] + USER_JOB_LOG_EXT
 			item_dict['logs_download_url'] = s3.get_download_url(s3_conn, S3_OUTPUT_BUCKET, 
 				logs_s3_key, link_expiry_secs)
 			job_items_list.append(item_dict)

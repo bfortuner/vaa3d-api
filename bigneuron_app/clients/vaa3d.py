@@ -1,9 +1,11 @@
 import os
 import shutil
-import subprocess
+import time
+import subprocess32 as subprocess
 import traceback
 from bigneuron_app import items_log
 from bigneuron_app.clients.constants import *
+from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 from bigneuron_app.clients import s3
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES, PLUGINS
 from bigneuron_app.utils.constants import JOB_ITEMS_LOG_FILE
@@ -34,16 +36,45 @@ def run_job(job):
 	items_log.info("Tracing neuron... ")
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
-	log_file_path = output_file_path + ".log"
+	log_file_path = output_file_path + USER_JOB_LOG_EXT
 	logfile = open(log_file_path, "w")
 	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
 		"-i", input_file_path, "-p", str(job['channel']), "-o", output_file_path]
 	items_log.info("Running Command: " + " ".join(cmd_args))
+	start_time = int(time.time())
+	max_runtime_sec = get_timeout(input_file_path)
 	try:
-		subprocess.call(cmd_args, stdout=logfile, stderr=logfile)
+		subprocess.call(cmd_args, stdout=logfile, stderr=logfile, timeout=max_runtime_sec)
 		items_log.info("Trace complete!")
+		runtime = int(time.time()) - start_time
+		logfile.write("\nActual Runtime = " + str(runtime) + " seconds")
+		items_log.info("\nActual Runtime = " + str(runtime) + " seconds")
+	except subprocess.TimeoutExpired, e:
+		logfile.write("\nJOB RAN TOO LONG. KILLING. Max Runtime Seconds = " + str(max_runtime_sec) + " seconds")
+		items_log.info("\nJOB RAN TOO LONG. KILLING. Max Runtime Seconds = " + str(max_runtime_sec) + " seconds")
+		raise Exception(traceback.format_exc())
 	finally:
-		logfile.close()		
+		logfile.close()
+
+def get_timeout(file_path):
+	"""
+	Returns filesize in bytes
+	1000 bytes = 1 KB
+	1000000 bytes = 1 MB
+	APP1 = 3.5 secs / MB
+	APP1 = .0000033457 secs / byte
+	"""
+	MIN_RUNTIME = 20 #sec
+	BYTES_PER_MEGABYTE = 1000000
+	SECONDS_PER_BYTE = .0000033457
+	BUFFER_MULTIPLIER = 5
+	file_size_bytes = os.stat(file_path).st_size
+	items_log.info("Filesize in MB " + str(file_size_bytes/BYTES_PER_MEGABYTE))
+	estimated_runtime = SECONDS_PER_BYTE * file_size_bytes
+	items_log.info("Estimated Runtime " + str(int(estimated_runtime)) + " seconds")
+	timeout = max(MIN_RUNTIME, int(estimated_runtime * BUFFER_MULTIPLIER))
+	items_log.info("Runtime w Buffer " + str(timeout) + " seconds")
+	return timeout
 
 def cleanup(input_file_path, output_file_path):
 	os.remove(input_file_path)

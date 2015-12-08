@@ -8,11 +8,9 @@ from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.clients import s3, vaa3d, sqs, dynamo
 from bigneuron_app.clients.constants import *
-from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
-from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
-from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE, SQS_JOB_ITEMS_QUEUE
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 from bigneuron_app.utils import zipper
+from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 from decimal import Decimal
 
 
@@ -50,11 +48,13 @@ def get_job_item_status_id(name):
 
 def process_non_zip_file(job_item):
 	input_file_path = os.path.abspath(job_item['input_filename'])
+	log_file_path = None
+	output_file_path = None
 	try:
 		vaa3d.run_job(job_item)
-		log_file_path = upload_log_file(job_item['output_dir'], job_item['output_filename'])
 		output_file_path = upload_output_file(job_item['output_dir'], job_item['output_filename'])
 	finally:
+		log_file_path = upload_log_file(job_item['output_dir'], job_item['output_filename'])
 		vaa3d.cleanup_all([input_file_path, log_file_path]) #swc files already included
 
 def upload_output_file(output_dir, output_filename):
@@ -64,8 +64,8 @@ def upload_output_file(output_dir, output_filename):
 	return output_file_path
 
 def upload_log_file(output_dir, output_filename):
-	log_file_path = os.path.abspath(output_filename + ".log")
-	s3_key = output_dir + "/logs/" + output_filename + ".log"
+	log_file_path = os.path.abspath(output_filename + USER_JOB_LOG_EXT)
+	s3_key = output_dir + "/logs/" + output_filename + USER_JOB_LOG_EXT
 	s3.upload_file(s3_key, log_file_path, S3_OUTPUT_BUCKET)
 	return log_file_path
 

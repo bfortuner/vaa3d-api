@@ -63,11 +63,13 @@ dynamo.create_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE, 'job_item_key', 'S')
 # Dynamo - Insert Test Data
 job_item_doc1 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_1)
 job_item_doc2 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_2)
-#job_item_doc3 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_3)
+job_item_doc3 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_3)
+job_item_doc4 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_4)
 
 job_item_manager.create_job_item_doc(job_item_doc1)
 job_item_manager.create_job_item_doc(job_item_doc2)
-#job_item_manager.create_job_item_doc(job_item_doc3)
+job_item_manager.create_job_item_doc(job_item_doc3)
+job_item_manager.create_job_item_doc(job_item_doc4)
 
 # Drop and Recreate SQS queues
 sqs.drop_and_recreate_queue(SQS_JOB_ITEMS_QUEUE)
@@ -75,7 +77,8 @@ sqs.drop_and_recreate_queue(SQS_JOB_ITEMS_QUEUE)
 # Add job_items to SQS
 job_item_manager.add_job_item_to_queue(job_item_doc1.job_item_key)
 job_item_manager.add_job_item_to_queue(job_item_doc2.job_item_key)
-#job_item_manager.add_job_item_to_queue(job_item_doc3.job_item_key)
+job_item_manager.add_job_item_to_queue(job_item_doc3.job_item_key)
+job_item_manager.add_job_item_to_queue(job_item_doc4.job_item_key)
 
 print "Loaded test job item data"
 
