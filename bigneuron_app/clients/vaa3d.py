@@ -9,6 +9,7 @@ from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 from bigneuron_app.clients import s3
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES, PLUGINS
 from bigneuron_app.utils.constants import JOB_ITEMS_LOG_FILE
+from bigneuron_app.utils.command import Command
 
 class Vaa3dJob():
 	def __init__(self, input_filename, output_filename, input_file_path, 
@@ -43,15 +44,18 @@ def run_job(job):
 	items_log.info("Running Command: " + " ".join(cmd_args))
 	start_time = int(time.time())
 	max_runtime_sec = get_timeout(input_file_path)
+	cmd = Command(cmd_args, logfile)
 	try:
-		subprocess.call(cmd_args, stdout=logfile, stderr=logfile, timeout=max_runtime_sec)
+		status = cmd.run(max_runtime_sec)
 		items_log.info("Trace complete!")
 		runtime = int(time.time()) - start_time
-		logfile.write("\nActual Runtime = " + str(runtime) + " seconds")
-		items_log.info("\nActual Runtime = " + str(runtime) + " seconds")
-	except subprocess.TimeoutExpired, e:
-		logfile.write("\nJOB RAN TOO LONG. KILLING. Max Runtime Seconds = " + str(max_runtime_sec) + " seconds")
-		items_log.info("\nJOB RAN TOO LONG. KILLING. Max Runtime Seconds = " + str(max_runtime_sec) + " seconds")
+		if status == "OK":
+			logfile.write("\nActual Runtime = " + str(runtime) + " seconds")
+			items_log.info("\nActual Runtime = " + str(runtime) + " seconds")
+		elif status == "TIMEOUT":
+			logfile.write("\nJOB RAN TOO LONG. KILLING. Max Runtime is " + str(max_runtime_sec) + " seconds")
+			items_log.info("\nJOB RAN TOO LONG. KILLING. Max Runtime is " + str(max_runtime_sec) + " seconds")
+	except Exception, e:
 		raise Exception(traceback.format_exc())
 	finally:
 		logfile.close()
@@ -64,7 +68,7 @@ def get_timeout(file_path):
 	APP1 = 3.5 secs / MB
 	APP1 = .0000033457 secs / byte
 	"""
-	MIN_RUNTIME = 20 #sec
+	MIN_RUNTIME = 10 #sec
 	BYTES_PER_MEGABYTE = 1000000
 	SECONDS_PER_BYTE = .0000033457
 	BUFFER_MULTIPLIER = 5

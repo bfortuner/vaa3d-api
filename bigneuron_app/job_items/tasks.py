@@ -13,7 +13,7 @@ import bigneuron_app.clients.constants as client_constants
 from bigneuron_app.utils import logger
 
 POLL_JOB_ITEMS_SLEEP=2
-POLL_JOB_ITEMS_MAX_RUNS=20
+POLL_JOB_ITEMS_MAX_RUNS=10
 
 def poll_job_items_queue():
 	count = 0

@@ -35,16 +35,15 @@ def get_mail_handler(name, log_level=MAIL_LOG_LEVEL):
 	Message:
 
 	%(message)s
-	'''))
+	''', "%Y-%m-%d %H:%M:%S"))
 	return mail_handler
 
 def get_rotating_file_handler(logger_path, log_level=LOG_LEVEL):
 	create_log_dir(logger_path)
 	rotating_file_handler = TimedRotatingFileHandler(logger_path, 
 		when=LOG_INTERVAL_TYPE, interval=LOG_INTERVAL, backupCount=LOG_BACKUP_INCR)
-	rotating_file_handler.setFormatter(Formatter('''[%(levelname)s] %(asctime)s - %(module)s.%(funcName)s line %(lineno)d
-	  %(message)s'''
-	))
+	rotating_file_handler.setFormatter(Formatter("[%(levelname)s] %(asctime)s - %(module)s.%(funcName)s:%(lineno)d - %(message)s", 
+		"%Y-%m-%d %H:%M:%S"))
 	rotating_file_handler.setLevel(log_level)
 	rotating_file_handler.suffix = "%Y-%m-%d" #_%H:%M:%S" 
 	return rotating_file_handler

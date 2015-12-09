@@ -15,7 +15,7 @@ from bigneuron_app.utils import zipper
 from bigneuron_app.clients import vaa3d
 from bigneuron_app.jobs import job_manager
 from bigneuron_app.job_items import job_item_manager
-from bigneuron_app.utils import id_generator
+from bigneuron_app.utils import id_generator, command
 
 import bigneuron_app.job_items.tasks as job_item_tasks
 import bigneuron_app.jobs.tasks as job_tasks
@@ -57,5 +57,8 @@ vaa3d.test_single_plugin_local()
 #dynamo.test_scan_by_time()
 
 #zipper.test_is_compressed_filename()
+
+
+#command.test_command()
 
 
