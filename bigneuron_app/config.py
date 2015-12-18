@@ -29,7 +29,10 @@ class ProdConfig(Config):
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_USER_AWS_SECRET_KEY', 'password')
     DYNAMO_JOB_ITEMS_TABLE='job_items'
     SQS_JOB_ITEMS_QUEUE='vaa3d-job-items'
+    SQS_JOB_ITEMS_DEAD_LETTER='vaa3d-job-items-dead'
     SQS_JOBS_QUEUE='vaa3d-jobs'
+    SQS_MAX_JOB_ITEM_RUNS=3
+    SQS_VISIBILITY_TIMEOUT=21600 #6 hours
     APP_LOG_LEVEL=logging.INFO
     MAIL_LOG_LEVEL=logging.ERROR
 
@@ -47,7 +50,10 @@ class TestConfig(Config):
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
     DYNAMO_JOB_ITEMS_TABLE='test_job_items'
     SQS_JOB_ITEMS_QUEUE='test-vaa3d-job-items'
+    SQS_JOB_ITEMS_DEAD_LETTER='test-vaa3d-job-items-dead'
     SQS_JOBS_QUEUE='test-vaa3d-jobs'
+    SQS_MAX_JOB_ITEM_RUNS=2
+    SQS_VISIBILITY_TIMEOUT=1200 #20 mins
     APP_LOG_LEVEL=logging.INFO
     MAIL_LOG_LEVEL=logging.ERROR
 

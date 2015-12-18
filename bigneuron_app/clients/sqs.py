@@ -1,222 +1,168 @@
 import boto3
+import json
 import time
-from bigneuron_app.clients.constants import AWS_REGION, AWS_ACCESS_KEY, AWS_SECRET_KEY
-from bigneuron_app.clients.constants import SQS_JOB_ITEMS_QUEUE, SQS_JOBS_QUEUE
+from bigneuron_app.clients.constants import *
 from bigneuron_app import items_log
+from bigneuron_app.utils import id_generator
 
-def get_connection():
-	return boto3.resource('sqs', region_name=AWS_REGION, 
-		aws_access_key_id=AWS_ACCESS_KEY, 
-		aws_secret_access_key=AWS_SECRET_KEY)
 
-def get_client():
-	return boto3.client('sqs', region_name=AWS_REGION, 
-		aws_access_key_id=AWS_ACCESS_KEY, 
-		aws_secret_access_key=AWS_SECRET_KEY)
+class SQS:
+	def __init__(self):
+		self.conn = None
+		self.client = None
 
-def get_queue(conn, queue_name):
-	if queue_exists(conn, queue_name):
-		return conn.get_queue_by_name(QueueName=queue_name)
-	return None
+	def get_conn(self):
+		if self.conn:
+			return self.conn
+		self.conn = boto3.resource('sqs', region_name=AWS_REGION, 
+			aws_access_key_id=AWS_ACCESS_KEY, 
+			aws_secret_access_key=AWS_SECRET_KEY)
+		return self.conn
 
-def get_queue_name(queue):
-	start_pos = queue.url.rfind('/')
-	name = queue.url[start_pos+1:]
-	return name
+	def get_client(self):
+		if self.client:
+			return self.client
+		return boto3.client('sqs', region_name=AWS_REGION, 
+			aws_access_key_id=AWS_ACCESS_KEY, 
+			aws_secret_access_key=AWS_SECRET_KEY)
 
-def get_all_queues(conn):
-	queues = []
-	for queue in conn.queues.all():
-		queues.append(queue)
-	return queues
-
-def queue_exists(conn, queue_name):
-	queues = get_all_queues(conn)
-	for queue in queues:
-		if get_queue_name(queue) == queue_name:
-			return True
-	return False
-
-def create_queue(conn, queue_name):
-	return conn.create_queue(
-		QueueName=queue_name, 
-		Attributes={'DelaySeconds': '5'})
-
-def delete_queue(queue_name):
-	""" 
-	Takes up to 60 seconds 
-	"""
-	conn = get_connection()
-	client = get_client()
-	queue = get_queue(conn, queue_name)
-	if queue:
-		print "Deleting queue"
-		client.delete_queue(QueueUrl=queue.url)
-		time.sleep(60)
-	print "Queue does not exist"
-
-def clear_queue(queue_name):
-	conn = get_connection()
-	client = get_client()
-	queue = get_queue(conn, queue_name)
-	messages = get_messages(client, queue.url, num_msgs=10)
-	if len(messages) == 0:
-		return
-	while len(messages) > 0:
-		for message in messages:
-			delete_message(client, queue, message)
-		messages = get_messages(client, queue.url, num_msgs=10)
-
-def send_message(queue, msg_text, msg_dict={}):
-	"""
-	queue: sqs queue object
-	msg_text: required text
-	msg_dict: optional dictionary of key-value pairs
-	"""
-	response = queue.send_message(MessageBody=msg_text, MessageAttributes=msg_dict)
-	message_id = response.get('MessageId')
-	md5 = response.get('MD5OfMessageBody')
-	return message_id
-
-def get_messages(client, queue_url, num_msgs=1):
-	response = client.receive_message(
-		QueueUrl=queue_url,
-		MaxNumberOfMessages=num_msgs,
-		MessageAttributeNames=['All'])
-	if 'Messages' in response:
-		return response['Messages']
-	return []
-
-def get_next_message(client, queue):
-	messages = get_messages(client, queue.url, 1)
-	if len(messages) < 1:
+	def get_queue(self, queue_name):
+		if self.queue_exists(queue_name):
+			return self.get_conn().get_queue_by_name(QueueName=queue_name)
 		return None
-	return messages[0]
 
-def delete_message(client, queue, msg):
-	response = client.delete_message(
-    	QueueUrl=queue.url,
-    	ReceiptHandle=msg['ReceiptHandle']
-	)
-	return response
+	def get_queue_name(self, queue):
+		start_pos = queue.url.rfind('/')
+		name = queue.url[start_pos+1:]
+		return name
 
-def drop_and_recreate_queue(queue_name):
-	conn = get_connection()
-	if queue_exists(conn, queue_name):
-		print "Clearing existing SQS queue " + queue_name
-		clear_queue(queue_name)
-	else:
-		print "Creating new SQS queue " + queue_name
-		new_queue = create_queue(conn, queue_name)	
+	def get_all_queues(self):
+		queues = []
+		for queue in self.get_conn().queues.all():
+			queues.append(queue)
+		return queues
 
+	def queue_exists(self, queue_name):
+		queues = self.get_all_queues()
+		for queue in queues:
+			if self.get_queue_name(queue) == queue_name:
+				return True
+		return False
 
-
-
-
-
-### Unit Tests ###
-
-def test_get_queue_name():
-	queue_name = "test"
-	conn = get_connection()
-	queue = get_queue(conn, queue_name)
-	exp_queue_name = get_queue_name(queue)
-	print exp_queue_name
-	assert(queue_name == exp_queue_name)
-
-def test_clear_queue():
-	queue_name = "test"
-	conn = get_connection()
-	client = get_client()
-	queue = get_queue(conn, queue_name)
-	clear_queue(queue_name)
-	msgs = get_messages(client, queue.url)
-	assert len(msgs) == 0
-
-def test_get_queue():
-	conn = get_connection()
-	fake_queue = get_queue(conn, "fake-queue")
-	print fake_queue
-
-def test_all():
-	conn = get_connection()
-	client = get_client()
-	#new_queue = create_queue(conn, "test")
-	new_queue = get_queue(conn, "test")
-	print new_queue.url
-
-	queues = get_all_queues(conn)
-	print queues
-
-	message_id = send_message(new_queue, 'boto3', {
-    	'Author': {
-        	'StringValue': 'Daniel',
-        	'DataType': 'String'
-    	}
-	})
-	print message_id
-
-	message_id = send_message(new_queue, 'boto3', {
-		"job_item_key" : { 
-			"StringValue" : "OINOINON", 
-			"DataType" : "String"
-		},
-		"job_type" : { 
-			"StringValue" : "process_job_item", 
-			"DataType" : "String"
+	def create_queue(self, queue_name, timeout=30, redrive_policy=None):
+		attributes = {
+			'DelaySeconds': '0',
+			'VisibilityTimeout' : str(timeout),
 		}
-	})
+		if redrive_policy:
+			attributes['RedrivePolicy'] = json.dumps(redrive_policy)
+		return self.get_conn().create_queue(
+			QueueName=queue_name, 
+			Attributes=attributes
+		)
 
-	message = get_next_message(client, new_queue)
-	print message
+	def delete_queue(self, queue):
+		""" 
+		Takes up to 60 seconds 
+		"""
+		return self.get_client().delete_queue(QueueUrl=queue.url)
 
-	message = get_next_message(client, new_queue)
-	print message
-	#print message["MessageId"] == message_id
+	def clear_queue(self, queue):
+		""" 
+		Only one purge request is allowed every 60 seconds
+		"""
+		self.get_client().purge_queue(QueueUrl=queue.url)
 
-	clear_queue(new_queue.name)
-	#delete_queue(new_queue.name)
+	def send_message(self, queue, msg_text, msg_dict={}):
+		"""
+		queue: sqs queue object
+		msg_text: required text
+		msg_dict: optional dictionary of key-value pairs
+		"""
+		response = queue.send_message(MessageBody=msg_text, MessageAttributes=msg_dict)
+		message_id = response.get('MessageId')
+		md5 = response.get('MD5OfMessageBody')
+		return message_id
 
+	def get_messages(self, queue_url, num_msgs=1):
+		response = self.get_client().receive_message(
+			QueueUrl=queue_url,
+			MaxNumberOfMessages=num_msgs,
+			AttributeNames=['All'],
+			MessageAttributeNames=['All'])
+		if 'Messages' in response:
+			return response['Messages']
+		return []
 
+	def get_next_message(self, queue):
+		messages = self.get_messages(queue.url, 1)
+		if len(messages) < 1:
+			return None
+		message = messages[0]
+		return message
 
+	def delete_message(self, queue, msg):
+		response = self.get_client().delete_message(
+	    	QueueUrl=queue.url,
+	    	ReceiptHandle=msg['ReceiptHandle']
+		)
+		return response
 
+	def drop_and_recreate_queue(self, queue_name, dead_queue_name, timeout, max_receive):
+		dead_queue = self.get_queue(dead_queue_name)
+		if dead_queue:
+			print "Dropping existing SQS dead queue " + dead_queue_name
+			#self.clear_queue(queue)
+			self.delete_queue(dead_queue)
+			time.sleep(62)
 
-## Message request structure
+		queue = self.get_queue(queue_name)
+		if queue:
+			print "Dropping existing SQS queue " + queue_name
+			#self.clear_queue(queue)
+			self.delete_queue(queue)
+			time.sleep(62)
+		print "Creating new SQS queue " + queue_name
+		return self.create_queue_w_dead_letter(queue_name, dead_queue_name, 
+			timeout, max_receive)
 
-msg_text="job_item: {{job_item_id}}"
-msg_dict= { "message_type": "job_item",
-			"job_item_id" : "job-item-id"}
+	def get_message_by_key(self, queue_url, key):
+		msgs = self.get_messages(queue_url)
+		for msg in msgs:
+			job_item_key = msg['MessageAttributes']['job_item_key']['StringValue']
+			if job_item_key == key:
+				return msg
+		return None
 
+	def delete_message_by_key(self, queue, key):
+		msg = self.get_message_by_key(queue.url, key)
+		if msg:
+			self.delete_message(queue, msg)
 
-## Messages Response Syntax
+	def update_msg_visibility_timeout(self, queue_url, receipt, timeout):
+		response = self.get_client().change_message_visibility(
+			QueueUrl=queue_url,
+			ReceiptHandle=receipt,
+			VisibilityTimeout=timeout #seconds
+		)
+		return response
 
-"""
-{
-    'Messages': [
-        {
-            'MessageId': 'string',
-            'ReceiptHandle': 'string',
-            'MD5OfBody': 'string',
-            'Body': 'string',
-            'Attributes': {
-                'string': 'string'
-            },
-            'MD5OfMessageAttributes': 'string',
-            'MessageAttributes': {
-                'string': {
-                    'StringValue': 'string',
-                    'BinaryValue': b'bytes',
-                    'StringListValues': [
-                        'string',
-                    ],
-                    'BinaryListValues': [
-                        b'bytes',
-                    ],
-                    'DataType': 'string'
-                }
-            }
-        },
-    ]
-}
+	def set_queue_attributes(self, queue, attribs_dict):
+		response = queue.set_attributes(
+    		Attributes=attribs_dict
+		)
+		return response
 
-"""
+	def create_queue_w_dead_letter(self, queue_name, dead_queue_name, timeout, max_receive):
+		dead_queue = self.create_queue(dead_queue_name, 35000)
+		
+		dead_arn = dead_queue.attributes['QueueArn']
+		redrive_policy = {"maxReceiveCount":max_receive, "deadLetterTargetArn":dead_arn}
+		new_queue = self.create_queue(queue_name, timeout, redrive_policy)
+		return new_queue
+
+	def create_test_queue_w_dead_letter(self, timeout, max_receive):
+		queue_name = id_generator.generate_job_item_id()
+		dead_queue_name = queue_name + "_dead"
+		return self.create_queue_w_dead_letter(queue_name, dead_queue_name, 
+			timeout, max_receive)

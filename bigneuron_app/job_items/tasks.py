@@ -7,7 +7,7 @@ from bigneuron_app import tasks_log
 from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.job_items import job_item_manager
-from bigneuron_app.clients import sqs, dynamo
+from bigneuron_app.clients.sqs import SQS
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 import bigneuron_app.clients.constants as client_constants
 from bigneuron_app.utils import logger
@@ -35,18 +35,20 @@ def process_next_job_item():
 		return
 	tasks_log.info("Found new job_item")
 	job_item = job_item_manager.get_job_item_doc(job_item_key)
+	job_item['attempts'] += 1
 	job_item_manager.process_job_item(job_item)
 
 def get_next_job_item_from_queue():
+	sqs = SQS()
 	tasks_log.info("Getting next job_item from queue")
-	conn = sqs.get_connection()
-	client = sqs.get_client()
-	queue = sqs.get_queue(conn, client_constants.SQS_JOB_ITEMS_QUEUE)
-	msg = sqs.get_next_message(client, queue)
+	queue = sqs.get_queue(client_constants.SQS_JOB_ITEMS_QUEUE)
+	msg = sqs.get_next_message(queue)
 	if msg is None:
 		return None
 	job_item_key = msg['MessageAttributes']['job_item_key']['StringValue']
-	sqs.delete_message(client, queue, msg)
+	#We're going to rely on SQS and it's retry policy to handle this
+	#This way if a server/process crashes unexpectedly we will retry it a few times before deleting
+	#sqs.delete_message(client, queue, msg)
 	return job_item_key
 
 def signal_handler(signal, frame):

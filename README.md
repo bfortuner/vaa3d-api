@@ -152,6 +152,18 @@ pgrep -f task_runner
 pkill -f task_runner
 ```
 
+### Testing
+
+Running Unit Tests
+```
+python -m pytest tests/ (all tests)
+python -m pytest -k filenamekeyword (specific tests)
+python -m pytest tests/utils/test_sample.py (single test file)
+python -m pytest tests/utils/test_sample.py::test_answer_correct (single test method)
+python -m pytest --resultlog=testlog.log tests/ (send test output to file)
+python -m pytest -s tests/ (print output to console)
+```
+
 ### Links and Tutorials:
 * https://medium.com/@rodkey/deploying-a-flask-application-on-aws-a72daba6bb80
 * http://blog.uptill3.com/2012/08/25/python-on-elastic-beanstalk.html

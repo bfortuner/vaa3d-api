@@ -26,11 +26,8 @@ import bigneuron_app.utils.logger as logger
 
 #email_manager.test_email_manager()
 
-#vaa3d.test_plugins()
-#vaa3d.test_single_plugin()
-#vaa3d.cleanup_all_filename_not_found()
-#vaa3d.prepare_test_files_local(['smalltest.tif'])
 vaa3d.test_single_plugin_local()
+vaa3d.cleanup_all_filename_not_found()
 
 #job_manager.test_get_job_items()
 #job_manager.test_get_job_items()
@@ -39,14 +36,10 @@ vaa3d.test_single_plugin_local()
 #dynamo.test_all()
 #id_generator.test_all()
 
-#job_item_manager.test_all()
 #job_item_manager.test_convert_dynamo_item_to_dict()
-#job_item_manager.test_try_finally()
+#job_item_manager.test_run_job_items()
 
 #sqs.test_all()
-#sqs.test_clear_queue()
-#sqs.test_get_queue()
-#sqs.test_get_queue_name()
 
 #job_item_tasks.test_process_next_job_item()
 #job_item_tasks.poll_job_items_queue()

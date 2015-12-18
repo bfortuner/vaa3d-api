@@ -6,14 +6,15 @@ from bigneuron_app.jobs.models import Job, JobStatus
 from bigneuron_app.job_items.models import JobItemStatus
 from bigneuron_app.users.models import User
 from bigneuron_app.job_items import job_item_manager
-from bigneuron_app.clients import s3, dynamo, sqs
-from bigneuron_app.clients.constants import DYNAMO_JOB_ITEMS_TABLE, SQS_JOB_ITEMS_QUEUE
-from bigneuron_app.clients.constants import S3_INPUT_BUCKET, S3_OUTPUT_BUCKET
-from bigneuron_app.clients.constants import VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY
+from bigneuron_app.clients import s3, dynamo
+from bigneuron_app.clients.sqs import SQS
+from bigneuron_app.clients.constants import *
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 from bigneuron_app.emails.constants import ADMIN_EMAIL
 from bigneuron_app.utils import zipper
 from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
+
+sqs = SQS()
 
 def get_job(job_id):
 	job = Job.query.get(job_id)
@@ -59,10 +60,12 @@ def create_job(user, data):
 	db.add(job)
 	db.commit()
 
+	job_item_queue = sqs.get_queue(SQS_JOB_ITEMS_QUEUE)
 	for f in data['filenames']:
 		job_item_doc = job_item_manager.build_job_item_doc(job, f)
-		job_item_manager.create_job_item_doc(job_item_doc)
-		job_item_manager.add_job_item_to_queue(job_item_doc.job_item_key)
+		job_item_manager.store_job_item_doc(job_item_doc)
+		job_item_manager.add_job_item_to_queue(job_item_doc.job_item_key, 
+			job_item_queue)
 
 	return job.job_id
 

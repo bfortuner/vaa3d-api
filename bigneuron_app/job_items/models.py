@@ -29,7 +29,7 @@ class JobItemStatus(Base):
 class JobItemDocument():
 
 	def __init__(self, job_id, input_filename, output_filename, 
-		output_dir, plugin, method, channel=1, status_id=1):
+		output_dir, plugin, method, channel=1, status_id=1, attempts=0):
 		self.job_item_key = id_generator.generate_job_item_id()
 		self.job_id = int(job_id)
 		self.input_filename = input_filename
@@ -39,6 +39,7 @@ class JobItemDocument():
 		self.method = method
 		self.channel = int(channel)
 		self.status_id = int(status_id)
+		self.attempts = int(attempts)
 		self.creation_time = int(time.time()) #UTC = PST + 8
 
 	def __repr__(self):

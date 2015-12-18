@@ -2,17 +2,23 @@ import sys
 import traceback
 import zipfile
 import shutil
+import time
 from bigneuron_app import db
 from bigneuron_app import items_log
 from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
-from bigneuron_app.clients import s3, vaa3d, sqs, dynamo
+from bigneuron_app.clients import s3, vaa3d, dynamo
+from bigneuron_app.clients.sqs import SQS
 from bigneuron_app.clients.constants import *
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
+from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES, PLUGINS
 from bigneuron_app.utils import zipper
 from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 from decimal import Decimal
+from bigneuron_app.utils.exceptions import MaxRuntimeException
 
+
+sqs = SQS()
 
 def process_job_item(job_item):
 	job_item['status_id'] = get_job_item_status_id("IN_PROGRESS")
@@ -31,12 +37,27 @@ def run_job_item(job_item):
 			process_zip_file(job_item, local_file_path)
 		else:
 			process_non_zip_file(job_item)
+		#Clear msg from SQS b/c job_item succeeded
+		print "deleting job item from queue"
+		delete_job_item_from_queue(job_item['job_item_key'], SQS_JOB_ITEMS_QUEUE)
 		job_item['status_id'] = get_job_item_status_id("COMPLETE")
+	except MaxRuntimeException as e:
+		job_item['status_id'] = get_job_item_status_id("ERROR")		
+		items_log.error(str(e) + traceback.format_exc())		
 	except Exception as e:
 		job_item['status_id'] = get_job_item_status_id("ERROR")
 		items_log.error(traceback.format_exc())
 	finally:
+		print "Status " + str(job_item['status_id'])
+		#job_item['status_id'] = get_status_id_with_retry(job_item)
 		save_job_item(job_item)
+
+def get_status_id_with_retry(job_item):
+	status_id = job_item['status_id']
+	attempts = job_item['attempts']
+	if status_id == get_job_item_status_id("ERROR") and attempts < SQS_MAX_RECEIVES:
+		return get_job_item_status_id("CREATED")
+	return status_id
 
 def get_job_items_by_status(job_status):
 	job_item_status = JobItemStatus.query.filter_by(status_name=job_status).first()
@@ -45,17 +66,6 @@ def get_job_items_by_status(job_status):
 
 def get_job_item_status_id(name):
 	return JobItemStatus.query.filter_by(status_name=name).first().id
-
-def process_non_zip_file(job_item):
-	input_file_path = os.path.abspath(job_item['input_filename'])
-	log_file_path = None
-	output_file_path = None
-	try:
-		vaa3d.run_job(job_item)
-		output_file_path = upload_output_file(job_item['output_dir'], job_item['output_filename'])
-	finally:
-		log_file_path = upload_log_file(job_item['output_dir'], job_item['output_filename'])
-		vaa3d.cleanup_all([input_file_path, log_file_path]) #swc files already included
 
 def upload_output_file(output_dir, output_filename):
 	output_file_path = os.path.abspath(output_filename)
@@ -68,6 +78,18 @@ def upload_log_file(output_dir, output_filename):
 	s3_key = output_dir + "/logs/" + output_filename + USER_JOB_LOG_EXT
 	s3.upload_file(s3_key, log_file_path, S3_OUTPUT_BUCKET)
 	return log_file_path
+
+def process_non_zip_file(job_item):
+	# This will still throw an exception despite finally
+	input_file_path = os.path.abspath(job_item['input_filename'])
+	log_file_path = None
+	output_file_path = None
+	try:
+		vaa3d.run_job(job_item)
+		output_file_path = upload_output_file(job_item['output_dir'], job_item['output_filename'])
+	finally:
+		log_file_path = upload_log_file(job_item['output_dir'], job_item['output_filename'])
+		vaa3d.cleanup_all([input_file_path, log_file_path]) #swc files already included
 
 def process_zip_file(job_item, zip_file_path):
 	"""
@@ -106,13 +128,13 @@ def create_job_items_from_directory(job_item, dir_path):
 			})
 	for f in fileslist:
 		s3.upload_file(f['filename'], f['file_path'], S3_WORKING_INPUT_BUCKET)
-		create_job_item(job_item['job_id'], f['filename'])
+		create_job_item(job_item['job_id'], f['filename'], sqs.get_queue(SQS_JOB_ITEMS_QUEUE))
 
-def create_job_item(job_id, filename):
+def create_job_item(job_id, filename, queue):
 	job = Job.query.get(int(job_id))
 	job_item_doc = build_job_item_doc(job, filename)
-	create_job_item_doc(job_item_doc)
-	add_job_item_to_queue(job_item_doc.job_item_key)
+	store_job_item_doc(job_item_doc)
+	add_job_item_to_queue(job_item_doc.job_item_key, queue)
 	return get_job_item_doc(job_item_doc.job_item_key)
 
 def get_job_item_download_url(job_item_key):
@@ -128,7 +150,7 @@ def build_job_item_doc(job, input_filename):
 		job.output_dir, job.plugin, job.method)
 	return job_item
 
-def create_job_item_doc(job_item_doc):
+def store_job_item_doc(job_item_doc):
 	conn = dynamo.get_connection()
 	table = dynamo.get_table(conn, DYNAMO_JOB_ITEMS_TABLE)
 	dynamo.insert(table, job_item_doc.as_dict())
@@ -144,15 +166,16 @@ def save_job_item(job_item):
 	table = dynamo.get_table(conn, DYNAMO_JOB_ITEMS_TABLE)
 	table.put_item(Item=job_item)
 
-def add_job_item_to_queue(job_item_key):
-	conn = sqs.get_connection()
-	queue = sqs.get_queue(conn, SQS_JOB_ITEMS_QUEUE)
-	msg_text = "JOB_ITEM %s" % job_item_key
-	message_id = sqs.send_message(queue, msg_text, msg_dict={
+def add_job_item_to_queue(job_item_key, queue):
+	message_id = sqs.send_message(queue, job_item_key, msg_dict={
 		"job_item_key" : { "StringValue" : job_item_key, "DataType" : "String"},
 		"job_type" : { "StringValue" : PROCESS_JOB_ITEM_TASK, "DataType" : "String"}
 		})
 	return message_id
+
+def delete_job_item_from_queue(job_item_key, queue_name):
+	queue = sqs.get_queue(queue_name)
+	sqs.delete_message_by_key(queue, job_item_key)
 
 def convert_dynamo_job_item_to_dict(dynamo_item):
 	item_dict = {}
@@ -168,41 +191,48 @@ def convert_dynamo_job_item_to_dict(dynamo_item):
 ## Unit Tests ##
 
 def test_convert_dynamo_item_to_dict():
-	job_item = create_job_item(1, VAA3D_TEST_INPUT_FILE_1)
-	print "JOB_ITEM = " + str(job_item)
+	job_item = create_job_item(1, VAA3D_TEST_INPUT_FILE_1, sqs.get_queue(SQS_JOB_ITEMS_QUEUE))
 	job_item_dict = convert_dynamo_job_item_to_dict(job_item)
-	print "JOB_ITEM_DICT = " + str(job_item_dict)
 
-def test_all():
-	from bigneuron_app.utils import id_generator
-	input_filename = id_generator.generate_job_item_id()[:10] + ".tif"
-	conn = dynamo.get_connection()
-	table_name = id_generator.generate_job_item_id()[:10] + "_table"
-	table = dynamo.create_table(conn, table_name, 'job_item_id', 'S')
-	table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
+def create_test_job_item(filename, queue):
+	# Load job item into Dynamo and SQS
+	job_item_doc = build_job_item_doc(Job.query.get(1), filename) # JobItemDocument()
+	store_job_item_doc(job_item_doc) # Load into Dynamo
+	add_job_item_to_queue(job_item_doc.job_item_key, queue)
+	s3.download_file(filename, os.path.abspath(filename), S3_INPUT_BUCKET)
+	return job_item_doc.as_dict()
 
-	job = Job(1, 1, "mytestdir", VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, VAA3D_DEFAULT_OUTPUT_SUFFIX)
-	db.add(job)
-	db.commit()
-	print "job_id: " + str(job.job_id)
-	job_item_doc = build_job_item_doc(job, input_filename)
-	print job_item_doc.as_dict()
-	create_job_item_doc(job_item_doc)
-	print job_item_doc.job_item_key
-	job_item_record = get_job_item_doc(job_item_doc.job_item_key)
-	print job_item_record
+def test_run_job_item(filename, queue, max_retries, timeout):
+	"""
+	1) Create test job_item and load into queue
+	2) Pull from SQS and run job item_item
+	3) Fail job_item
+	4) Try again before visibility timeout reached
+	5) Loop until max retries reached
+	"""
+	queue_name = sqs.get_queue_name(queue)
+	job_item = create_test_job_item(filename, queue)
+	complete = False
+	current_attempt = 1
+	while not complete:
+		print "Attempt " + str(current_attempt)
+		msg = sqs.get_message_by_key(queue.url, job_item['job_item_key'])
+		assert msg is not None
+		process_job_item(job_item)
+		msg = sqs.get_message_by_key(queue.url, job_item['job_item_key'])		
+		assert msg is None
+		time.sleep(timeout-MIN_RUNTIME)
+		current_attempt += 1
+		if current_attempt > max_retries:
+			msg = sqs.get_message_by_key(queue.url, job_item['job_item_key'])			
+			assert msg is None
+			complete = True
 
-	print job_item_record['channel'], job_item_record['input_filename']
-
-	add_job_item_to_queue("fake_job_item_key")
-	
-
-	dynamo.drop_table(conn, table_name)
-
-def test_try_finally():
-	try:
-		raise Exception("hey there mister")
-	finally:
-		print "DO this regardless of exception"
-
-
+def test_run_job_items():
+	MAX_RUNS=3
+	TIMEOUT=15
+	queue = sqs.create_test_queue_w_dead_letter(TIMEOUT, MAX_RUNS)
+	filenames = [VAA3D_TEST_INPUT_FILE_4]
+	for f in filenames:
+		test_run_job_item(f, queue, MAX_RUNS, TIMEOUT)
+	sqs.delete_queue(queue)

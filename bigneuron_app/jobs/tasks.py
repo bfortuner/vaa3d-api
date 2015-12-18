@@ -6,7 +6,6 @@ from bigneuron_app import db
 from bigneuron_app import tasks_log
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.jobs import job_manager
-from bigneuron_app.clients import sqs, dynamo
 from bigneuron_app.jobs.constants import PROCESS_JOBS_CREATED_TASK, PROCESS_JOBS_IN_PROGRESS_TASK
 from bigneuron_app.emails import email_manager
 import bigneuron_app.clients.constants as client_constants
