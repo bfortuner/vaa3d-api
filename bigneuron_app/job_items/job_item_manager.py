@@ -27,30 +27,29 @@ def process_job_item(job_item):
 	bucket_name = s3.get_bucket_name_from_filename(job_item['input_filename'], 
 		[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
 	s3.download_file(job_item['input_filename'], local_file_path, bucket_name)
-	run_job_item(job_item)
+	status = run_job_item(job_item)
+	return status
 
 def run_job_item(job_item):
 	items_log.info("running job item " + str(job_item))
 	local_file_path = os.path.abspath(job_item['input_filename'])
+	job_item_status = "ERROR"
 	try:
 		if zipper.is_zip_file(local_file_path):
 			process_zip_file(job_item, local_file_path)
 		else:
 			process_non_zip_file(job_item)
-		#Clear msg from SQS b/c job_item succeeded
-		print "deleting job item from queue"
-		delete_job_item_from_queue(job_item['job_item_key'], SQS_JOB_ITEMS_QUEUE)
-		job_item['status_id'] = get_job_item_status_id("COMPLETE")
-	except MaxRuntimeException as e:
-		job_item['status_id'] = get_job_item_status_id("ERROR")		
+		job_item_status = "COMPLETE"
+	except MaxRuntimeException as e:	
 		items_log.error(str(e) + traceback.format_exc())		
 	except Exception as e:
-		job_item['status_id'] = get_job_item_status_id("ERROR")
 		items_log.error(traceback.format_exc())
 	finally:
-		print "Status " + str(job_item['status_id'])
+		print "Status " + job_item_status
+		job_item['status_id'] = get_job_item_status_id(job_item_status)
 		#job_item['status_id'] = get_status_id_with_retry(job_item)
 		save_job_item(job_item)
+		return job_item_status
 
 def get_status_id_with_retry(job_item):
 	status_id = job_item['status_id']
@@ -172,10 +171,6 @@ def add_job_item_to_queue(job_item_key, queue):
 		"job_type" : { "StringValue" : PROCESS_JOB_ITEM_TASK, "DataType" : "String"}
 		})
 	return message_id
-
-def delete_job_item_from_queue(job_item_key, queue_name):
-	queue = sqs.get_queue(queue_name)
-	sqs.delete_message_by_key(queue, job_item_key)
 
 def convert_dynamo_job_item_to_dict(dynamo_item):
 	item_dict = {}

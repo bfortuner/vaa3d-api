@@ -32,7 +32,7 @@ class ProdConfig(Config):
     SQS_JOB_ITEMS_DEAD_LETTER='vaa3d-job-items-dead'
     SQS_JOBS_QUEUE='vaa3d-jobs'
     SQS_MAX_JOB_ITEM_RUNS=3
-    SQS_VISIBILITY_TIMEOUT=21600 #6 hours
+    SQS_VISIBILITY_TIMEOUT=3600 #3 hours
     APP_LOG_LEVEL=logging.INFO
     MAIL_LOG_LEVEL=logging.ERROR
 
