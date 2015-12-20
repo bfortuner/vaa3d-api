@@ -1,8 +1,8 @@
-from bigneuron_app.jobs.models import Job
-from bigneuron_app.emails.email_manager import *
+from bigneuron_app.clients.ses import *
 
-def test_email_manager():
-	job = Job.query.first()
-	print get_job_complete_template(job)
-	send_job_created_email(job)
-	send_job_complete_email(job)
+def test_ses_client():
+	TEST_TO_EMAIL='bfortuner@gmail.com'
+	#send_address_verification_email(TEST_TO_EMAIL)
+	print is_email_address_verified(TEST_TO_EMAIL) == True
+	print is_email_address_verified('fake_email@address.com') == False
+	send_email('TEST', 'TEST BODY', TEST_TO_EMAIL)
