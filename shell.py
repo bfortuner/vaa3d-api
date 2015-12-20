@@ -26,9 +26,6 @@ import bigneuron_app.utils.logger as logger
 
 #email_manager.test_email_manager()
 
-vaa3d.test_single_plugin_local()
-vaa3d.cleanup_all_filename_not_found()
-
 #job_manager.test_get_job_items()
 
 #print s3.get_download_url('vaa3d-output', 'Mynewtest/smalltest.tif_x72_y57_z64_app2.swc', 3600)
