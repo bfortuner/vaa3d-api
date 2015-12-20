@@ -28,10 +28,5 @@ import bigneuron_app.utils.logger as logger
 
 #job_manager.test_get_job_items()
 
-#print s3.get_download_url('vaa3d-output', 'Mynewtest/smalltest.tif_x72_y57_z64_app2.swc', 3600)
-#dynamo.test_all()
-
 #job_tasks.poll_jobs_created_queue()
 #job_tasks.poll_jobs_in_progress_queue()
-
-#dynamo.test_scan_by_time()
