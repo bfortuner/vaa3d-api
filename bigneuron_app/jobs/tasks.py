@@ -77,11 +77,3 @@ def update_jobs_created():
 		db.commit()
 		email_manager.send_job_created_email(job)
 
-def signal_handler(signal, frame):
-	print "Exiting..."
-	sys.exit(0)
-
-
-
-# Unit Tests #
-

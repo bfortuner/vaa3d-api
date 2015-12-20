@@ -127,17 +127,15 @@ class SQS:
 			timeout, max_receive)
 
 	def get_message_by_key(self, queue_url, key):
-		msgs = self.get_messages(queue_url)
+		"""
+		Used for testing. Not how SQS is designed to be used.
+		"""
+		msgs = self.get_messages(queue_url, 10)
 		for msg in msgs:
 			job_item_key = msg['MessageAttributes']['job_item_key']['StringValue']
 			if job_item_key == key:
 				return msg
 		return None
-
-	def delete_message_by_key(self, queue, key):
-		msg = self.get_message_by_key(queue.url, key)
-		if msg:
-			self.delete_message(queue, msg)
 
 	def update_msg_visibility_timeout(self, queue_url, receipt, timeout):
 		response = self.get_client().change_message_visibility(

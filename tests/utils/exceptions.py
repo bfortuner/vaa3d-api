@@ -1,4 +1,0 @@
-
-
-class MaxRuntimeException(Exception):
-	pass

@@ -15,6 +15,8 @@ from bigneuron_app.utils import logger
 POLL_JOB_ITEMS_SLEEP=2
 POLL_JOB_ITEMS_MAX_RUNS=10
 
+sqs = SQS()
+
 def poll_job_items_queue():
 	count = 0
 	while count < POLL_JOB_ITEMS_MAX_RUNS:
@@ -29,7 +31,6 @@ def poll_job_items_queue():
 	db.remove()
 
 def process_next_job_item():
-	sqs = SQS()
 	tasks_log.info("Getting next job_item from queue")
 	queue = sqs.get_queue(client_constants.SQS_JOB_ITEMS_QUEUE)
 	msg = sqs.get_next_message(queue)
@@ -47,17 +48,4 @@ def process_next_job_item():
 	else:
 		# We are going to let SQS handle retries
 		items_log.info("Leaving job_item in queue")
-
-
-# Unit Tests #
-
-def test_process_next_job_item():
-	sqs = SQS()
-	queue = sqs.get_queue(client_constants.SQS_JOB_ITEMS_QUEUE)
-	job = Job(1, 1, "mytestdir", client_constants.VAA3D_DEFAULT_PLUGIN, 
-		client_constants.VAA3D_DEFAULT_FUNC, 1, client_constants.VAA3D_DEFAULT_OUTPUT_SUFFIX)
-	db.add(job)
-	db.commit()
-	job_item = job_item_manager.create_job_item(job.job_id, client_constants.VAA3D_TEST_INPUT_FILE_1, queue)
-	print "JOB_ITEM_KEY " + job_item['job_item_key']
-	process_next_job_item()
+		
