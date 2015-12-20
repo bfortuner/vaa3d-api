@@ -36,8 +36,6 @@ import bigneuron_app.utils.logger as logger
 
 #dynamo.test_scan_by_time()
 
-#zipper.test_is_compressed_filename()
-
 #command.test_command()
 
 

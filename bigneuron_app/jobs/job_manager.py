@@ -85,7 +85,6 @@ def get_output_file_suffix(plugin_name, settings):
 
 ## Unit Tests ##
 
-
 def test_get_job_items():
 	job_id = 2
 	job_items = get_job_items(job_id)
