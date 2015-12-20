@@ -23,10 +23,3 @@ import bigneuron_app.jobs.tasks as job_tasks
 import task_runner
 
 import bigneuron_app.utils.logger as logger
-
-#email_manager.test_email_manager()
-
-#job_manager.test_get_job_items()
-
-#job_tasks.poll_jobs_created_queue()
-#job_tasks.poll_jobs_in_progress_queue()

@@ -80,43 +80,4 @@ def get_job_status_id(name):
 def get_output_file_suffix(plugin_name, settings):
 	return OUTPUT_FILE_SUFFIXES[plugin_name]
 
-
-
-
-## Unit Tests ##
-
-def test_get_job_items():
-	job_id = 2
-	job_items = get_job_items(job_id)
-	print job_items
-
-def test_update_jobs_in_progress():
-	update_jobs_in_progress()
-
-def test_all():
-	data = {
-		"output_dir" : "testdir",
-		"plugin" : {
-			"name" : "test_plugin",
-			"method" : "test_method",
-			"settings" : {
-				"params" : {
-					"channel" : 1
-				}
-			}
-		},
-
-	}
-	user = user_manager.get_or_create_user(ADMIN_EMAIL)
-	job = create_job(user, data)
-
-	# plugin_name = data['plugin']['name']
-	# method = data['plugin']['method']
-	# settings = data['plugin']['settings']
-	# output_dir = data['outputDir']
-	# channel = data['plugin']['settings']['params']['channel']
-	# output_file_suffix = get_output_file_suffix(plugin_name, settings)
-	# job = Job(user.id, 1, output_dir, plugin_name, method, 
-	# 	channel, output_file_suffix)
-
 	
