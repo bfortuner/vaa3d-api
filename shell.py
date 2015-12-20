@@ -35,7 +35,3 @@ import bigneuron_app.utils.logger as logger
 #job_tasks.poll_jobs_in_progress_queue()
 
 #dynamo.test_scan_by_time()
-
-#command.test_command()
-
-

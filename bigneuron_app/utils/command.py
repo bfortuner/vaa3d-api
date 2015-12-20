@@ -56,21 +56,3 @@ class Command(object):
             except:
                 print "PID cannot be killed because it does not exist"
 
-
-## Unit Tests
-
-def test_command():
-    c = Command("echo 'Process started'; sleep 2; echo 'Process finished'", shell=True)
-    c.run(timeout=3)
-    c.run(timeout=1)
-
-
-    log_f = open("testlogfile.txt","w")
-    c = Command(["echo","'Process started'"], log_f)
-    c.run(timeout=3)
-    c.run(timeout=1)
-    log_f.close()
-
-
-
-
