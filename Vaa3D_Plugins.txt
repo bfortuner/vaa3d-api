@@ -28,6 +28,7 @@ vaa3d -x tips_GD -f help
 vaa3d -x TReMap -f help
 vaa3d -x Vaa3D-FarSight_snake_tracing -f help
 vaa3d -x Vaa3D_Neuron2 -f help
+vaa3d -x gaussian -f help
 
 
 
@@ -47,9 +48,6 @@ vaa3d -x CWlab_method1_version1 -f tracing_func -i ~/testfiles/smalltest.v3dpbd 
 vaa3d -x MOST_tracing -f MOST_trace -i ~/testfiles/smalltest.v3dpbd -p 1
 * outputs filename - smalltest.v3dpbd_MOST.swc
 
-vaa3d -x CWlab_method1_version1 -f tracing_func -i ~/testfiles/smalltest.v3dpbd -p 1
-* outputs filename - smalltest.v3dpbd_Cwlab_ver1.swc
-
 vaa3d -x neuTube -f neutube_trace -i ~/testfiles/smalltest.v3dpbd -p 1
 * outputs filename - smalltest.v3dpbd_neutube.swc
 
@@ -62,17 +60,69 @@ vaa3d -x MST_tracing -f trace_mst -i ~/testfiles/smalltest.v3dpbd -p 1
 vaa3d -x SimpleAxisAnalyzer -f medial_axis_analysis -i ~/testfiles/smalltest.v3dpbd -p 1
 * outputs filename smalltest.v3dpbd_axis_analyzer.swc
 
+vaa3d -x BJUT_meanshift -f meanshift -i ~/testfiles/smalltest.tif -p 1
+* runs very slow
 
-### Killed on EC2 ###
+vaa3d -x LCM_boost -f LCM_boost -i ~/testfiles/smalltest.v3dpbd -o ~/testfiles/smalltest.v3dpbd_LCM_boost.swc
+* needs output file specified
+
+vaa3d -x Advantra -f advantra_func -i ~/testfiles/smalltest.tif -o ~/testfiles/smalltest.tif_Advantra.swc -p 12 0.5 99 0.6 5 60 30 5 1
+** Needs all 9 parameters
+
+vaa3d -x nctuTW -f tracing_func -i ~/testfiles/smalltest.v3dpbd -p 1
+* can't include -p flag
+
+vaa3d -x NeuronChaser -f nc_func -i ~/testfiles/smalltest.v3dpbd -p 1 10 90 0.6 15 60 30 5 1 0
+* needs all 10 parameters
+
+vaa3d -x NeuroStalker -f tracing_func -i ~/testfiles/smalltest.v3dpbd -p 1 1 1 5 5 30
+
+vaa3d -x neutu_autotrace -f tracing -i ~/testfiles/smalltest.v3dpbd -p 1
+
 vaa3d -x smartTrace -f smartTrace -i ~/testfiles/smalltest.v3dpbd -p 1
-vaa3d -x SimpleTracing -f tracing -i ~/testfiles/smalltest.v3dpbd
-vaa3d -x NeuronAssembler_neuroGPSTree -f trace_tc -i ~/testfiles/smalltest.v3dpbd (special req)
+
+vaa3d -x tips_GD -f tracing_func -i ~/testfiles/smalltest.v3dpbd -p 1
+
+vaa3d -x EnsembleNeuronTracerBasic -f tracing_func -i ~/testfiles/smalltest.v3dpbd
+
+vaa3d -x EnsembleNeuronTracerV2n -f tracing_func -i ~/testfiles/smalltest.v3dpbd
+
+vaa3d -x EnsembleNeuronTracerV2s -f tracing_func -i ~/testfiles/smalltest.v3dpbd
+
+vaa3d -x SimpleTracing -f [tracing|ray_shooting|dfs] -i ~/testfiles/smalltest.v3dpbd -o ~/testfiles/smalltest.v3dpbd_simple.swc -p 1
+
+vaa3d -x fastmarching_spanningtree -f tracing_func -i ~/smalltest.v3dpbd -o ~/smalltest.v3dpbd_BJUT_fastmarching_spanningtree.swc -p 1
+
+
+----
+
+# Killed on EC2 #
+vaa3d -x NeuronAssembler_neuroGPSTree -f trace_tc -i ~/testfiles/smalltest.v3dpbd -p ~/testfiles/smalltest.v3dpbd.marker ~/testfiles/smalltest.v3dpbd.tc
+vaa3d -x aVaaTrace3D -f func1 -i ~/testfiles/smalltest.v3dpbd -p 20 2 2.5
+vaa3d -x Rivulet -f tracing_func -i ~/testfiles/smalltest.v3dpbd
+
+# Needs more complex config
+vaa3d -x RegMST -f tracing_func -i ~/testfiles/smalltest.v3dpbd -p ~/testfiles/oof_fb_3d_scale_1_2_3_5_size_13_sep_cpd_rank_49.txt  ~/testfiles/oof_fb_3d_scale_1_2_3_5_size_13_weigths_cpd_rank_49.txt ~/testfiles/proto_filter_AC_lap_633_822_sep_cpd_rank_49.txt ~/testfiles/proto_filter_AC_lap_633_822_weigths_cpd_rank_49.txt 1 2 ~/testfiles/Regressor_ac_0.cfg ~/testfiles/Regressor_ac_1.cfg 21 200 
+
+
+
+
+### Imaging Filtering ###
+
+vaa3d -x anisodiff_littlequick -f anisodiff_littlequick_func -i ~/testfiles/smalltest.tif
+* only takes image files like .tif ??
+
+vaa3d -x gaussian -f gf -i ~/testfiles/smalltest.raw ~/testfiles/smalltest.raw -p 7 7 2 1 2
+* only takes .raw files
+
+----
+
 
 
 
 ######## Sample Commands ########
 
-### Advantra ###
+### Advantra ### - added
 vaa3d -x Advantra -f help
 vaa3d -x Advantra -f advantra_func -i <inimg_file> -p <scal bratio perc znccTh Ndir angSig Ni Ns zDist>
 vaa3d -x Advantra -f advantra_func -i ~/smalltest.tif -o ~/smalltest.tif_Advantra.swc -p 12 0.5 99 0.6 5 60 30 5 1
@@ -91,7 +141,7 @@ zDist               z layer dist [1, 4] pix.
 outswc_file         Will be named automatically based on the input image file name, so you don't have to specify it
 
 
-#### BJUT_fastmarching_spanningtree ###
+#### BJUT_fastmarching_spanningtree ### - added
 vaa3d -x BJUT_fastmarching_spanningtree -f help
 vaa3d -x fastmarching_spanningtree -f tracing_func -i <inimg_file> -p <channel> <other parameters>
 vaa3d -x fastmarching_spanningtree -f tracing_func -i ~/smalltest.tif -o ~/smalltest.tif_BJUT_fastmarching_spanningtree.swc -p 1
@@ -102,7 +152,7 @@ outswc_file      Will be named automatically based on the input image file name,
 # File Types: smalltest.tif || smalltest.v3draw
 ** Killed on EC2
 
-#### BJUT_meanshift ###
+#### BJUT_meanshift ### - added
 vaa3d -x BJUT_meanshift -f help
 vaa3d -x BJUT_meanshift -f meanshift -i <inimg_file>
 vaa3d -x BJUT_meanshift -f meanshift -i <inimg_file> -p <channel>
@@ -112,7 +162,7 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### CWlab_method1_version1 ###
+#### CWlab_method1_version1 ### - added
 vaa3d -x CWlab_method1_version1 -f help
 vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file>
 vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file> -p <channel> <other parameters>
@@ -122,7 +172,7 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### EnsembleNeuronTracerBasic ###
+#### EnsembleNeuronTracerBasic ### - added - bad help docs
 vaa3d -x EnsembleNeuronTracerBasic -f help
 vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file>
 vaa3d -x CWlab_method1_version1 -f tracing_func -i <inimg_file> -p <channel> <other parameters>
@@ -132,7 +182,7 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### EnsembleNeuronTracerV2n - DOES NOT WORK -- HELP DOCS BAD !!
+#### EnsembleNeuronTracerV2n - added - bad help docs
 vaa3d -x EnsembleNeuronTracerV2n -f help
 vaa3d -x CWlab_method1_version2 -f tracing_func -i <inimg_file>
 vaa3d -x CWlab_method1_version3 -f tracing_func -i <inimg_file> -p <channel> <other parameters>
@@ -142,7 +192,7 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### HUST_NeuroGPSTree ###
+#### HUST_NeuroGPSTree ### - killed
 vaa3d -x HUST_NeuroGPSTree -f help
 # Method trace_tc
 vaa3d -x NeuronAssembler_neuroGPSTree -f trace_tc -i <inimg_file> -p <inmarker_file> <tc_file> <block size> <xR> <yR> <zR> <th>
@@ -158,7 +208,7 @@ zR			Required by the tracing algorithm. Default value is 1
 th			Required by the tracing algorithm. Default value is 10
 outswc_file		Will be named automatically based on the input image file name, so you don't have to specify it.
 
-# Method trace_raw
+# Method trace_raw - killed
 * only accepts 8 bit v3draw/raw image
 vaa3d -x NeuronAssembler_neuroGPSTree -f trace_raw -i <inimg_file> -p <inmarker_file> <block size> <tracing_entire_image> <xR> <yR> <zR> <th>
 vaa3d -x NeuronAssembler_neuroGPSTree -f trace_raw -i <inimg_file>
@@ -174,10 +224,10 @@ th			Required by the tracing algorithm. Default value is 10
 outswc_file		Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### LCM_boost ###
+#### LCM_boost ### - added
 vaa3d -x LCM_boost -f help
 vaa3d -x LCM_boost -f LCM_boost -i <inimg_file>
-vaa3d -x LCM_boost -f LCM_boost -i <inimg_file> -o  <outswc_file>
+vaa3d -x LCM_boost -f LCM_boost -i <inimg_file> -o <outswc_file>
 # Help Menu
 e.g.    ./vaa3d -x LCM_boost -f LCM_boost -i B4.v3draw -o tmp_tst.swc 
 inimg_file       The input image
@@ -196,7 +246,7 @@ The default base method is multiScale enhancement. Users could also denote alter
  The function name LCM_boost_10 corresponds to neurontracing_mst base method. 
 
 
-#### MOST_tracing ###
+#### MOST_tracing ### - added
 vaa3d -x MOST_tracing -f help
 vaa3d -x dllname -f MOST_trace -i <inimg_file>
 vaa3d -x dllname -f MOST_trace -i <inimg_file> -p <ch> <th> <seed> <slip>
@@ -208,7 +258,7 @@ slip         window size to slip from seed, default 20
 The output swc file will be named automatically based on the input image file name
 
 
-#### MST_tracing ###
+#### MST_tracing ### - added
 vaa3d -x MST_tracing -f help
 vaa3d -x MST_tracing -f trace_mst -i <inimg_file>
 vaa3d -x MST_tracing -f trace_mst -i <inimg_file> -p <channel> <window size>
@@ -219,7 +269,7 @@ window size      Window size for seed detection. Default 10
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### nctuTW ###
+#### nctuTW ### - added
 vaa3d -x nctuTW -f help
 vaa3d -x nctuTW -f tracing_func -i <inimg_file>
 vaa3d -x nctuTW -f tracing_func -i <inimg_file> -p <inmarker_file> <threshold>
@@ -230,7 +280,7 @@ threshold        Default 0.9, otherwise the threshold (from 0 to 1) specified by
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### NeuronChaser ###
+#### NeuronChaser ### - added
 vaa3d -x NeuronChaser -f help
 vaa3d -x NeuronChaser -f nc_func -i <inimg_file>
 vaa3d -x NeuronChaser -f nc_func -i <inimg_file> -p <channel> <scal perc znccTh Ndir angSig Ni Ns zDist saveMidres>
@@ -249,7 +299,7 @@ saveMidres          Save midresults 0-no, 1 -yes.
 outswc_file         Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### NeuroStalker ###
+#### NeuroStalker ### - added
 vaa3d -x NeuroStalker -f help
 vaa3d -x NeuroStalker -f tracing_func -i <inimg_file>
 vaa3d -x NeuroStalker -f tracing_func -i <inimg_file> -p <channel> <preprocessing> <run unit-tests>
@@ -261,7 +311,7 @@ run unit-tests   - 1: Run Tracing Only; 2: Run unit-tests only; 3: Run Both Unit
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### neutu_autotrace ###
+#### neutu_autotrace ### - added
 vaa3d -x neutu_autotrace -f help
 vaa3d -x neutube_v2 -f tracing -i <inimg_file>
 vaa3d -x neutube_v2 -f tracing -i <inimg_file> -p <channel> <other parameters>
@@ -271,7 +321,7 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### neuTube ###
+#### neuTube ### - added
 vaa3d -x neuTube -f help
 vaa3d -x dllname -f neutube_trace -i <inimg_file>
 vaa3d -x dllname -f neutube_trace -i <inimg_file> -p <ch> <merge>
@@ -281,7 +331,7 @@ merge        Merge close nodes after enhancement, 1: merge, 0: not merge, defaul
 The output swc file will be named automatically based on the input image file nmae
 
 
-#### RegMST ###
+#### RegMST ### - killed but need clarity on params
 vaa3d -x RegMST -f help
 vaa3d -x RegMST -f tracing_func -i <inimg_file>
 vaa3d -x RegMST -f tracing_func -i <inimg_file> -p <channel> <n_AC> <reg_path_1.cfg> ... <reg_path_n_AC.cfg> <window size> <threshold>
@@ -295,7 +345,7 @@ threshold                                 Threshold for seed detection in MST. (
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### SimpleAxisAnalyzer ###
+#### SimpleAxisAnalyzer ### - added
 vaa3d -x SimpleAxisAnalyzer -f help
 vaa3d -x SimpleAxisAnalyzer -f medial_axis_analysis -i <inimg_file>
 vaa3d -x SimpleAxisAnalyzer -f medial_axis_analysis -i <inimg_file> -p <parameters>
@@ -306,7 +356,7 @@ numberOfTrees    Number of trees to include in reconstruction (default 1)channel
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### SimpleTracing ###
+#### SimpleTracing ### - killed
 vaa3d -x SimpleTracing -f help
 vaa3d -x SimpleTracing -f <one of the above options> -i <input_image_file>
 vaa3d -x SimpleTracing -f <one of the above options> -i <input_image_file> -o <out_swc_file>
@@ -318,7 +368,7 @@ vaa3d -x SimpleTracing -f <one of the above options> -i <input_image_file> -o <o
 -f ray_shooting : Additional tracing method 1
 -f dfs          : Additional tracing method 2
 
-#### smartTrace ###
+#### smartTrace ### - added
 vaa3d -x smartTrace -f help
 # Func selfCorrection
 vaa3d -x smartTrace -f selfCorrection -i <inimg_file>
@@ -336,7 +386,7 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### tips_GD ###
+#### tips_GD ### - added
 vaa3d -x tips_GD -f help
 vaa3d -x nctuTW_tips -f tracing_func -i <inimg_file>
 vaa3d -x nctuTW_tips -f tracing_func -i <inimg_file> -p <channel> <other parameters>
@@ -346,7 +396,7 @@ channel          Data channel for tracing. Start from 1 (default 1).
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### TReMap ###
+#### TReMap ### - added
 vaa3d -x TReMap -f help
 vaa3d -x TReMap -f trace_mip -i <inimg_file>
 vaa3d -x TReMap -f trace_mip -i <inimg_file> -p <mip_plane> <channel> <bkg_thresh> <b_256cube> <is_gsdt> <is_gap> <length_thresh>
@@ -362,7 +412,7 @@ length_thresh    Default 5
 outswc_file      Will be named automatically based on the input image file name, so you don't have to specify it.
 
 
-#### Vaa3D-FarSight_snake_tracing ###
+#### Vaa3D-FarSight_snake_tracing ### - added
 vaa3d -x Vaa3D-FarSight_snake_tracing -f help
 vaa3d -x Vaa3D-FarSight_snake_tracing -f snake_trace -i <inimg_file> -p <ch> 
 # Help Menu
@@ -370,7 +420,7 @@ ch           the input channel value, start from 1, default 1.1
 The output swc file will be named automatically based on the input image file nmae
 
 
-#### Vaa3D_Neuron2 ###
+#### Vaa3D_Neuron2 ### - added
 vaa3d -x Vaa3D_Neuron2 -f help
 vaa3d -x Vaa3D_Neuron2 -f app2 -i <inimg_file>
 vaa3d -x Vaa3D_Neuron2 -f app2 -i <inimg_file> -o <outswc_file> -p [<inmarker_file> [<channel> [<bkg_thresh> [<b_256cube> [<b_RadiusFrom2D> [<is_gsdt> [<is_gap> [<length_thresh> [is_resample][is_brightfield][is_high_intensity]]]]]]]]]

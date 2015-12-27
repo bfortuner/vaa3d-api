@@ -34,7 +34,7 @@ def build_vaa3d_job(job_item):
 	return Vaa3dJob(input_filename, output_filename, input_file_path, output_file_path, 
 		job_item.job.plugin, job_item.job.method, job_item.job.channel)
 
-def run_job(job):
+def run_job(job, max_runtime_sec=300): #pass this in 
 	items_log.info("Tracing neuron... " + job['input_filename'])
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
@@ -46,6 +46,7 @@ def run_job(job):
 	start_time = int(time.time())
 	max_runtime_sec = get_timeout(input_file_path)
 	cmd = Command(cmd_args, logfile)
+	print "Running " + str(" ".join(cmd_args))
 	try:
 		status = cmd.run(max_runtime_sec)
 		runtime = int(time.time()) - start_time
@@ -74,6 +75,7 @@ def get_timeout(file_path):
 	APP1 = .0000033457 secs / byte
 	"""
 	file_size_bytes = os.stat(file_path).st_size
+	print "bytes " + str(file_size_bytes)
 	items_log.info("Filesize in MB " + str(file_size_bytes/BYTES_PER_MEGABYTE))
 	estimated_runtime = SECONDS_PER_BYTE * file_size_bytes
 	items_log.info("Estimated Runtime " + str(int(estimated_runtime)) + " seconds")
