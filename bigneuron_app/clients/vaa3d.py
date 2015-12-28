@@ -78,7 +78,7 @@ def get_timeout(file_path):
 	items_log.info("Filesize in MB " + str(file_size_bytes/BYTES_PER_MEGABYTE))
 	estimated_runtime = SECONDS_PER_BYTE * file_size_bytes
 	items_log.info("Estimated Runtime " + str(int(estimated_runtime)) + " seconds")
-	timeout = max(MIN_RUNTIME, int(estimated_runtime * BUFFER_MULTIPLIER))
+	timeout = max(VAA3D_MIN_RUNTIME, int(estimated_runtime * BUFFER_MULTIPLIER))
 	items_log.info("Runtime w Buffer " + str(timeout) + " seconds")
 	return timeout
 
@@ -92,6 +92,7 @@ def cleanup(input_file_path, output_file_path):
 def cleanup_all(list_of_filenames):
 	filelist = [ f for f in os.listdir(".") if f.endswith(".swc") ]
 	loglist = [ f for f in os.listdir(".") if f.endswith("log.txt") ]
+	reconstructlist = [f for f in os.listdir(".") if f.startswith("tmp_binarized_Reconstruction") ]
 	filelist.extend(loglist)
 	filelist.extend(list_of_filenames)
 	print "Files " + str(filelist)

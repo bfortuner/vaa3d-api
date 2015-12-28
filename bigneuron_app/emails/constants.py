@@ -3,14 +3,17 @@ from bigneuron_app.clients.constants import AWS_IAM_USER_LOGIN_LINK
 
 WEBSITE_URL=config.WEBSITE_URL
 
-ADMIN_EMAIL='vaa3dapi@gmail.com'
+ADMIN_EMAIL='bfortuner@gmail.com'
 DEV_EMAIL='bfortuner@gmail.com'
 ERRORS_EMAIL=ADMIN_EMAIL
 
 HEADER="<html>"
 FOOTER="</html>"
 CREATE_JOB_CONFIRMATION_TEMPLATE="""<p>Hello,</p>
-<p>Your new Vaa3D job is running! You will receive a confirmation email when your job completes.</p>
+<p>Your new Vaa3D job is running! You will receive a confirmation email when your job completes. 
+Use the output link below to check the status of your job.</p>
+<p>Job Status: %s</p>
+<p><a href="%s">View Output Files</a></p>
 <p>Thanks,<br>
 Vaa3D Team</p>
 """

@@ -115,6 +115,8 @@ def process_zip_file(job_item, zip_file_path, timeout):
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
 		job_item['input_filename'] = filename
+		timeout = vaa3d.get_timeout(file_path)
+		print "FILE_PATH_AFTER_ZIP " + file_path
 		run_job_item(job_item, timeout)
 	os.remove(zip_file_path)
 

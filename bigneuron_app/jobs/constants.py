@@ -12,8 +12,8 @@ OUTPUT_FILE_SUFFIXES = {
 	'MST_tracing' : '_MST_Tracing.swc',   #error on Mac
 	'MOST_tracing' : '_MOST.swc',
 	'neuTube' : '_neutube.swc',
-	'TReMap' : '_XY_3D_TreMap.swc',
-	'fastmarching_spanningtree' : '_BJUT_fastmarching_spanningtree.swc',    #timeout on mac
+	'TReMap' : '_XY_3D_TreMap.swc', #timeout on mac after 200 seconds
+	'fastmarching_spanningtree' : '_fastmarching_spanningtree.swc',    #timeout on mac
 	'BJUT_meanshift' : '_meanshift.swc',
 	'LCM_boost' : '_LCM_boost.swc',  #can't find this plugin on Mac
 	'Advantra' : '_Advantra.swc',  #timeout on mac
@@ -21,8 +21,8 @@ OUTPUT_FILE_SUFFIXES = {
 	'NeuronChaser' : '_NeuronChaser.swc',
 	'NeuroStalker' : '_NeuroStalker.swc', #killed on mac
 	'neutu_autotrace' : '_neutu_autotrace.swc',
-	'smartTrace' : '_smartTrace.swc', #killed on mac
-	'tips_GD' : '_tips_GD.swc', #killed on mac
+	'smartTrace' : '_smartTracing.swc', #killed on mac
+	'tips_GD' : '_nctuTW_GD.swc',
 	'EnsembleNeuronTracerBasic' : '_EnsembleNeuronTracerBasic.swc',
 	'EnsembleNeuronTracerV2n' : '_EnsembleNeuronTracerV2n.swc',
 	'EnsembleNeuronTracerV2s' : '_EnsembleNeuronTracerV2s.swc',
@@ -264,7 +264,7 @@ PLUGINS = {
 		    'order' : ['channel'],
 		    'params': { 
 				'channel' : {
-	              	'values' : ['1'],
+					'values' : ['1'],
 					'default' : '1'
 				}
 			}

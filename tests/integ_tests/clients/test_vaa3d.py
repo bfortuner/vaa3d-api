@@ -7,29 +7,37 @@ from bigneuron_app.jobs.constants import *
 @pytest.mark.skipif(True, reason="Too slow")
 def test_all_plugins():
 	#skip = ['MST_tracing','fastmarching_spanningtree','LCM_boost','Advantra','nctuTW','NeuroStalker','smartTrace','tips_GD']
-	skip = ['nctuTW']
+	skip = [] #['nctuTW']
 	START = 0
 	STOP = 30
 	filename = VAA3D_TEST_INPUT_FILE_5
 	prepare_test_files_local([filename])
 	i = START
+	errored = []
 	while i < STOP and i < len(JOB_TYPE_PLUGINS['Neuron Tracing']):
 		plugin = JOB_TYPE_PLUGINS['Neuron Tracing'][i]
 		if plugin not in skip:
-			print "PLUGIN: " + plugin + ", FILENAME: " + filename 
-			input_file_path = os.path.abspath(filename)
-			timeout = get_timeout(input_file_path)
-			print input_file_path
-			run_plugin_local(plugin, PLUGINS[plugin], 
-			filename, input_file_path, timeout)	
+			try:
+				print "PLUGIN: " + plugin + ", FILENAME: " + filename 
+				input_file_path = os.path.abspath(filename)
+				timeout = get_timeout(input_file_path)
+				print input_file_path
+				run_plugin_local(plugin, PLUGINS[plugin], 
+				filename, input_file_path, timeout)	
+			except Exception, e:
+				print "####### Plugin " + plugin + " failed ########\n" + str(e)
+				errored.append([plugin,filename])
 		i+=1
 	cleanup_all([input_file_path])
+	print "##### Plugins Errored ###### "
+	for p in errored:
+		print p
 
 #@pytest.mark.skipif(True, reason="Too slow")
 def test_single_plugin():
 	filenames = [VAA3D_TEST_INPUT_FILE_5, VAA3D_TEST_INPUT_FILE_1]
 	prepare_test_files_local(filenames)
-	plugin_name = 'MOST_tracing' #'MST_tracing'
+	plugin_name = 'MST_tracing' #'MST_tracing'
 	for f in filenames:
 		input_file_path = os.path.abspath(f)
 		timeout = get_timeout(input_file_path)
