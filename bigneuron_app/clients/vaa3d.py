@@ -34,7 +34,7 @@ def build_vaa3d_job(job_item):
 	return Vaa3dJob(input_filename, output_filename, input_file_path, output_file_path, 
 		job_item.job.plugin, job_item.job.method, job_item.job.channel)
 
-def run_job(job, max_runtime_sec=300): #pass this in 
+def run_job(job, timeout):
 	items_log.info("Tracing neuron... " + job['input_filename'])
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
@@ -44,18 +44,17 @@ def run_job(job, max_runtime_sec=300): #pass this in
 		"-i", input_file_path, "-p", str(job['channel']), "-o", output_file_path]
 	items_log.info("Running Command: " + " ".join(cmd_args))
 	start_time = int(time.time())
-	max_runtime_sec = get_timeout(input_file_path)
 	cmd = Command(cmd_args, logfile)
 	print "Running " + str(" ".join(cmd_args))
 	try:
-		status = cmd.run(max_runtime_sec)
+		status = cmd.run(timeout)
 		runtime = int(time.time()) - start_time
 		if status == "OK":
 			ok_msg = "\nTrace complete! Runtime = " + str(runtime) + " seconds"
 			logfile.write("\n" + ok_msg)
 			items_log.info(ok_msg)
 		elif status == "TIMEOUT":
-			max_runtime_msg = "Throwing Exception b/c Max Runtime Exceeded: " + str(max_runtime_sec) + " seconds"
+			max_runtime_msg = "Throwing Exception b/c Max Runtime Exceeded: " + str(timeout) + " seconds"
 			logfile.write("\n" + max_runtime_msg)
 			items_log.info(max_runtime_msg)
 			raise MaxRuntimeException(max_runtime_msg)

@@ -20,25 +20,27 @@ from bigneuron_app.utils.exceptions import MaxRuntimeException
 
 sqs = SQS()
 
-def process_job_item(job_item):
+def process_job_item(job_item, timeout=None):
 	job_item['status_id'] = get_job_item_status_id("IN_PROGRESS")
 	save_job_item(job_item)
 	local_file_path = os.path.abspath(job_item['input_filename'])
 	bucket_name = s3.get_bucket_name_from_filename(job_item['input_filename'], 
 		[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
 	s3.download_file(job_item['input_filename'], local_file_path, bucket_name)
-	status = run_job_item(job_item)
+	if not timeout:
+		timeout = vaa3d.get_timeout(local_file_path)
+	status = run_job_item(job_item, timeout)
 	return status
 
-def run_job_item(job_item):
+def run_job_item(job_item, timeout):
 	items_log.info("running job item " + str(job_item))
 	local_file_path = os.path.abspath(job_item['input_filename'])
 	job_item_status = "ERROR"
 	try:
 		if zipper.is_zip_file(local_file_path):
-			process_zip_file(job_item, local_file_path)
+			process_zip_file(job_item, local_file_path, timeout)
 		else:
-			process_non_zip_file(job_item)
+			process_non_zip_file(job_item, timeout)
 		job_item_status = "COMPLETE"
 	except MaxRuntimeException as e:	
 		items_log.error(str(e) + traceback.format_exc())		
@@ -78,19 +80,19 @@ def upload_log_file(output_dir, output_filename):
 	s3.upload_file(s3_key, log_file_path, S3_OUTPUT_BUCKET)
 	return log_file_path
 
-def process_non_zip_file(job_item):
+def process_non_zip_file(job_item, timeout):
 	# This will still throw an exception despite finally
 	input_file_path = os.path.abspath(job_item['input_filename'])
 	log_file_path = None
 	output_file_path = None
 	try:
-		vaa3d.run_job(job_item)
+		vaa3d.run_job(job_item, timeout)
 		output_file_path = upload_output_file(job_item['output_dir'], job_item['output_filename'])
 	finally:
 		log_file_path = upload_log_file(job_item['output_dir'], job_item['output_filename'])
 		vaa3d.cleanup_all([input_file_path, log_file_path]) #swc files already included
 
-def process_zip_file(job_item, zip_file_path):
+def process_zip_file(job_item, zip_file_path, timeout):
 	"""
 	Unzip compressed file
 	Create new job_item record(s)
@@ -113,7 +115,7 @@ def process_zip_file(job_item, zip_file_path):
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
 		job_item['input_filename'] = filename
-		run_job_item(job_item)
+		run_job_item(job_item, timeout)
 	os.remove(zip_file_path)
 
 def create_job_items_from_directory(job_item, dir_path):

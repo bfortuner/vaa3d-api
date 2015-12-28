@@ -18,9 +18,10 @@ def test_all_plugins():
 		if plugin not in skip:
 			print "PLUGIN: " + plugin + ", FILENAME: " + filename 
 			input_file_path = os.path.abspath(filename)
+			timeout = get_timeout(input_file_path)
 			print input_file_path
 			run_plugin_local(plugin, PLUGINS[plugin], 
-			filename, input_file_path)	
+			filename, input_file_path, timeout)	
 		i+=1
 	cleanup_all([input_file_path])
 
@@ -31,8 +32,9 @@ def test_single_plugin():
 	plugin_name = 'MOST_tracing' #'MST_tracing'
 	for f in filenames:
 		input_file_path = os.path.abspath(f)
+		timeout = get_timeout(input_file_path)
 		run_plugin_local(plugin_name, PLUGINS[plugin_name], 
-			f, input_file_path)
+			f, input_file_path, timeout)
 		cleanup_all([input_file_path])
 
 #@pytest.mark.xfail(raises=Exception)
@@ -63,13 +65,13 @@ def test_try_finally_exception():
 
 # Helpers
 
-def run_plugin_local(plugin_name, plugin, input_filename, input_file_path):
+def run_plugin_local(plugin_name, plugin, input_filename, input_file_path, timeout):
 	output_filename = input_filename + OUTPUT_FILE_SUFFIXES[plugin_name]
 	output_file_path = os.path.abspath(output_filename)
 	job = Vaa3dJob(input_filename, output_filename, input_file_path,
 	output_file_path, plugin_name, plugin['method']['default'], 
 	plugin['settings']['params']['channel']['default'])
-	run_job(job.as_dict())
+	run_job(job.as_dict(), timeout)
 	assert os.path.isfile(job.output_file_path)
 	os.remove(job.output_file_path)
 
