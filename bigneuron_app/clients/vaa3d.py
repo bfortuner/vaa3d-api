@@ -5,6 +5,7 @@ import subprocess32 as subprocess
 import traceback
 from bigneuron_app import items_log
 from bigneuron_app.clients.constants import *
+from bigneuron_app.jobs.constants import PLUGINS
 from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 from bigneuron_app.clients import s3
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES, PLUGINS
@@ -26,22 +27,13 @@ class Vaa3dJob():
 	def as_dict(self):
 		return self.__dict__
 
-def build_vaa3d_job(job_item):
-	input_filename = job_item.filename
-	output_filename = input_filename + job_item.job.output_file_suffix
-	input_file_path = os.path.abspath(input_filename)
-	output_file_path = os.path.abspath(output_filename)
-	return Vaa3dJob(input_filename, output_filename, input_file_path, output_file_path, 
-		job_item.job.plugin, job_item.job.method, job_item.job.channel)
-
 def run_job(job, timeout):
 	items_log.info("Tracing neuron... " + job['input_filename'])
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
 	log_file_path = output_file_path + USER_JOB_LOG_EXT
 	logfile = open(log_file_path, "w")
-	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
-		"-i", input_file_path, "-p", str(job['channel']), "-o", output_file_path]
+	cmd_args = build_cmd_args(job, input_file_path, output_file_path)
 	items_log.info("Running Command: " + " ".join(cmd_args))
 	start_time = int(time.time())
 	cmd = Command(cmd_args, logfile)
@@ -64,6 +56,13 @@ def run_job(job, timeout):
 			raise Exception(job_failed_msg)
 	finally:
 		logfile.close()
+
+def build_cmd_args(job, input_file_path, output_file_path):
+	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
+	"-i", input_file_path, "-o", output_file_path]
+	if (PLUGINS[job['plugin']]['settings']):
+		cmd_args.extend(["-p", str(job['channel'])])
+	return cmd_args
 
 def get_timeout(file_path):
 	"""

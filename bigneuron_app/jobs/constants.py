@@ -259,16 +259,7 @@ PLUGINS = {
 		}                  
 	},
   	'nctuTW' : {
-		'settings' : { 
-		    'flag' : '-p',
-		    'order' : ['channel'],
-		    'params': { 
-				'channel' : {
-					'values' : ['1'],
-					'default' : '1'
-				}
-			}
-		},
+		'settings' : {},
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
