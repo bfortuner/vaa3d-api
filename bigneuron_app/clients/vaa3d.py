@@ -27,7 +27,7 @@ class Vaa3dJob():
 	def as_dict(self):
 		return self.__dict__
 
-def run_job(job, timeout):
+def run_job(job, max_runtime):
 	items_log.info("Tracing neuron... " + job['input_filename'])
 	input_file_path = os.path.abspath(job['input_filename'])
 	output_file_path = os.path.abspath(job['output_filename'])
@@ -39,14 +39,14 @@ def run_job(job, timeout):
 	cmd = Command(cmd_args, logfile)
 	print "Running " + str(" ".join(cmd_args))
 	try:
-		status = cmd.run(timeout)
+		status = cmd.run(max_runtime)
 		runtime = int(time.time()) - start_time
 		if status == "OK":
 			ok_msg = "\nTrace complete! Runtime = " + str(runtime) + " seconds"
 			logfile.write("\n" + ok_msg)
 			items_log.info(ok_msg)
 		elif status == "TIMEOUT":
-			max_runtime_msg = "Throwing Exception b/c Max Runtime Exceeded: " + str(timeout) + " seconds"
+			max_runtime_msg = "Throwing Exception b/c Max Runtime Exceeded: " + str(max_runtime) + " seconds"
 			logfile.write("\n" + max_runtime_msg)
 			items_log.info(max_runtime_msg)
 			raise MaxRuntimeException(max_runtime_msg)
@@ -63,23 +63,6 @@ def build_cmd_args(job, input_file_path, output_file_path):
 	if (PLUGINS[job['plugin']]['settings']):
 		cmd_args.extend(["-p", str(job['channel'])])
 	return cmd_args
-
-def get_timeout(file_path):
-	"""
-	Returns filesize in bytes
-	1000 bytes = 1 KB
-	1000000 bytes = 1 MB
-	APP1 = 3.5 secs / MB
-	APP1 = .0000033457 secs / byte
-	"""
-	file_size_bytes = os.stat(file_path).st_size
-	print "bytes " + str(file_size_bytes)
-	items_log.info("Filesize in MB " + str(file_size_bytes/BYTES_PER_MEGABYTE))
-	estimated_runtime = SECONDS_PER_BYTE * file_size_bytes
-	items_log.info("Estimated Runtime " + str(int(estimated_runtime)) + " seconds")
-	timeout = max(VAA3D_MIN_RUNTIME, int(estimated_runtime * BUFFER_MULTIPLIER))
-	items_log.info("Runtime w Buffer " + str(timeout) + " seconds")
-	return timeout
 
 def cleanup(input_file_path, output_file_path):
 	os.remove(input_file_path)

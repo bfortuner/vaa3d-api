@@ -2,6 +2,7 @@ import os
 import shutil
 import pytest
 from bigneuron_app.clients.vaa3d import *
+from bigneuron_app.utils import timeout
 from bigneuron_app.jobs.constants import *
 
 @pytest.mark.skipif(True, reason="Too slow")
@@ -20,10 +21,10 @@ def test_all_plugins():
 			try:
 				print "PLUGIN: " + plugin + ", FILENAME: " + filename 
 				input_file_path = os.path.abspath(filename)
-				timeout = get_timeout(input_file_path)
+				max_runtime = timeout.get_timeout_from_file(input_file_path)
 				print input_file_path
 				run_plugin_local(plugin, PLUGINS[plugin], 
-				filename, input_file_path, timeout)	
+				filename, input_file_path, max_runtime)	
 			except Exception, e:
 				print "####### Plugin " + plugin + " failed ########\n" + str(e)
 				errored.append([plugin,filename])
@@ -39,13 +40,12 @@ def test_single_plugin():
 	plugin_name = 'CWlab_method1_version1' #'MST_tracing'
 	for f in filenames:
 		input_file_path = os.path.abspath(f)
-		timeout = get_timeout(input_file_path)
+		max_runtime = timeout.get_timeout_from_file(input_file_path)
 		run_plugin_local(plugin_name, PLUGINS[plugin_name], 
-			f, input_file_path, timeout)
+			f, input_file_path, max_runtime)
 		cleanup_all([input_file_path])
 
-#@pytest.mark.xfail(raises=Exception)
-@pytest.mark.skipif(True, reason="Too slow")
+@pytest.mark.xfail(raises=Exception)
 def test_job_run_failures():
 	filenames = [VAA3D_TEST_INPUT_FILE_4] #corrupt.tif
 	prepare_test_files_local(filenames)
@@ -53,7 +53,7 @@ def test_job_run_failures():
 	for f in filenames:
 		input_file_path = os.path.abspath(f)
 		run_plugin_local(plugin_name, PLUGINS[plugin_name], 
-			f, input_file_path)
+			f, input_file_path, 10)
 		cleanup_all([input_file_path])
 
 def test_build_cmd_args():
@@ -89,7 +89,7 @@ def test_try_finally_exception():
 
 # Helpers
 
-def run_plugin_local(plugin_name, plugin, input_filename, input_file_path, timeout):
+def run_plugin_local(plugin_name, plugin, input_filename, input_file_path, max_runtime):
 	output_filename = input_filename + OUTPUT_FILE_SUFFIXES[plugin_name]
 	output_file_path = os.path.abspath(output_filename)
 	if PLUGINS[plugin_name]['settings']:
@@ -98,7 +98,7 @@ def run_plugin_local(plugin_name, plugin, input_filename, input_file_path, timeo
 		channel = 1
 	job = Vaa3dJob(input_filename, output_filename, input_file_path,
 	output_file_path, plugin_name, plugin['method']['default'], channel)
-	run_job(job.as_dict(), timeout)
+	run_job(job.as_dict(), max_runtime)
 	assert os.path.isfile(job.output_file_path)
 	os.remove(job.output_file_path)
 

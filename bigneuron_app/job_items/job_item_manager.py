@@ -12,7 +12,7 @@ from bigneuron_app.clients.sqs import SQS
 from bigneuron_app.clients.constants import *
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES, PLUGINS
-from bigneuron_app.utils import zipper
+from bigneuron_app.utils import zipper, timeout
 from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 from decimal import Decimal
 from bigneuron_app.utils.exceptions import MaxRuntimeException
@@ -20,27 +20,27 @@ from bigneuron_app.utils.exceptions import MaxRuntimeException
 
 sqs = SQS()
 
-def process_job_item(job_item, timeout=None):
+def process_job_item(job_item, max_runtime=None):
 	job_item['status_id'] = get_job_item_status_id("IN_PROGRESS")
 	save_job_item(job_item)
 	local_file_path = os.path.abspath(job_item['input_filename'])
 	bucket_name = s3.get_bucket_name_from_filename(job_item['input_filename'], 
 		[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
 	s3.download_file(job_item['input_filename'], local_file_path, bucket_name)
-	if not timeout:
-		timeout = vaa3d.get_timeout(local_file_path)
-	status = run_job_item(job_item, timeout)
+	if not max_runtime:
+		max_runtime = timeout.get_timeout_from_file(local_file_path)
+	status = run_job_item(job_item, max_runtime)
 	return status
 
-def run_job_item(job_item, timeout):
+def run_job_item(job_item, max_runtime):
 	items_log.info("running job item " + str(job_item))
 	local_file_path = os.path.abspath(job_item['input_filename'])
 	job_item_status = "ERROR"
 	try:
 		if zipper.is_zip_file(local_file_path):
-			process_zip_file(job_item, local_file_path, timeout)
+			process_zip_file(job_item, local_file_path, max_runtime)
 		else:
-			process_non_zip_file(job_item, timeout)
+			process_non_zip_file(job_item, max_runtime)
 		job_item_status = "COMPLETE"
 	except MaxRuntimeException as e:	
 		items_log.error(str(e) + traceback.format_exc())		
@@ -80,19 +80,19 @@ def upload_log_file(output_dir, output_filename):
 	s3.upload_file(s3_key, log_file_path, S3_OUTPUT_BUCKET)
 	return log_file_path
 
-def process_non_zip_file(job_item, timeout):
+def process_non_zip_file(job_item, max_runtime):
 	# This will still throw an exception despite finally
 	input_file_path = os.path.abspath(job_item['input_filename'])
 	log_file_path = None
 	output_file_path = None
 	try:
-		vaa3d.run_job(job_item, timeout)
+		vaa3d.run_job(job_item, max_runtime)
 		output_file_path = upload_output_file(job_item['output_dir'], job_item['output_filename'])
 	finally:
 		log_file_path = upload_log_file(job_item['output_dir'], job_item['output_filename'])
 		vaa3d.cleanup_all([input_file_path, log_file_path]) #swc files already included
 
-def process_zip_file(job_item, zip_file_path, timeout):
+def process_zip_file(job_item, zip_file_path, max_runtime):
 	"""
 	Unzip compressed file
 	Create new job_item record(s)
@@ -115,9 +115,9 @@ def process_zip_file(job_item, zip_file_path, timeout):
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
 		job_item['input_filename'] = filename
-		timeout = vaa3d.get_timeout(file_path)
+		max_runtime = timeout.get_timeout_from_file(file_path)
 		print "FILE_PATH_AFTER_ZIP " + file_path
-		run_job_item(job_item, timeout)
+		run_job_item(job_item, max_runtime)
 	os.remove(zip_file_path)
 
 def create_job_items_from_directory(job_item, dir_path):
