@@ -46,7 +46,8 @@ def run_job(job, max_runtime):
 			logfile.write("\n" + ok_msg)
 			items_log.info(ok_msg)
 		elif status == "TIMEOUT":
-			max_runtime_msg = "Throwing Exception b/c Max Runtime Exceeded: " + str(max_runtime) + " seconds"
+			max_runtime_msg = "Throwing Exception b/c Max Runtime Exceeded: " + \
+				str(max_runtime) + " seconds"
 			logfile.write("\n" + max_runtime_msg)
 			items_log.info(max_runtime_msg)
 			raise MaxRuntimeException(max_runtime_msg)
@@ -61,7 +62,8 @@ def build_cmd_args(job, input_file_path, output_file_path):
 	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
 	"-i", input_file_path, "-o", output_file_path]
 	if (PLUGINS[job['plugin']]['settings']):
-		cmd_args.extend(["-p", str(job['channel'])])
+		cmd_args.extend(["-p", 
+			str(PLUGINS[job['plugin']]['settings']['params']['channel']['default'])])
 	return cmd_args
 
 def cleanup(input_file_path, output_file_path):

@@ -37,7 +37,7 @@ def test_all_plugins():
 def test_single_plugin():
 	filenames = [VAA3D_TEST_INPUT_FILE_5, VAA3D_TEST_INPUT_FILE_1]
 	prepare_test_files_local(filenames)
-	plugin_name = 'CWlab_method1_version1' #'MST_tracing'
+	plugin_name = 'Advantra' #'MST_tracing'
 	for f in filenames:
 		input_file_path = os.path.abspath(f)
 		max_runtime = timeout.get_timeout_from_file(input_file_path)
