@@ -47,7 +47,7 @@ print "JobItemStatusType table loaded"
 
 # Insert Test Job
 job = Job(User.query.filter_by(iam_username=DEFAULT_IAM_USER).first().id, 1, 
-		'testjob1', VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, VAA3D_DEFAULT_OUTPUT_SUFFIX)
+		'testjob1', VAA3D_DEFAULT_PLUGIN, VAA3D_DEFAULT_FUNC, 1, OUTPUT_FILE_SUFFIXES[VAA3D_DEFAULT_PLUGIN])
 db.add(job)
 db.commit()
 
