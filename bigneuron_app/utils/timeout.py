@@ -19,7 +19,7 @@ def get_timeout(file_bytes, bytes_per_sec, max_time, min_time, buffer_multiplier
         return min_time
     elif timeout > max_time:
         return max_time
-    return timeout
+    return VAA3D_MAX_RUNTIME #timeout
 
 def get_timeout_from_file(file_path, bytes_per_sec=BASE_BYTES_PER_SEC, max_time=VAA3D_MAX_RUNTIME,
     min_time=VAA3D_MIN_RUNTIME, buffer_multiplier=BUFFER_MULTIPLIER):
