@@ -61,7 +61,7 @@ def run_job(job, max_runtime):
 def build_cmd_args(job, input_file_path, output_file_path):
 	cmd_args = [VAA3D_PATH, "-x", job['plugin'], "-f", job['method'], 
 	"-i", input_file_path, "-o", output_file_path]
-	if (PLUGINS[job['plugin']]['settings']):
+	if PLUGINS[job['plugin']]['settings']:
 		cmd_args.extend(["-p", 
 			str(PLUGINS[job['plugin']]['settings']['params']['channel']['default'])])
 	return cmd_args

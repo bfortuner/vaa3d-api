@@ -28,7 +28,9 @@ def process_job_item(job_item, max_runtime=None):
 		[S3_INPUT_BUCKET, S3_WORKING_INPUT_BUCKET])
 	s3.download_file(job_item['input_filename'], local_file_path, bucket_name)
 	if not max_runtime:
-		max_runtime = timeout.get_timeout_from_file(local_file_path)
+		runtimes = PLUGINS[job_item['plugin']]['runtime']
+		max_runtime = timeout.get_timeout_from_file(local_file_path, runtimes['bytes_per_sec'], 
+			runtimes['max'], runtimes['min'])
 	status = run_job_item(job_item, max_runtime)
 	return status
 
@@ -115,7 +117,9 @@ def process_zip_file(job_item, zip_file_path, max_runtime):
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
 		job_item['input_filename'] = filename
-		max_runtime = timeout.get_timeout_from_file(file_path)
+		runtimes = PLUGINS[job_item['plugin']]['runtime']
+		max_runtime = timeout.get_timeout_from_file(file_path, runtimes['bytes_per_sec'], 
+			runtimes['max'], runtimes['min'])
 		print "FILE_PATH_AFTER_ZIP " + file_path
 		run_job_item(job_item, max_runtime)
 	os.remove(zip_file_path)

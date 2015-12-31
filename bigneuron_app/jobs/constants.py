@@ -1,4 +1,5 @@
 import os
+from bigneuron_app.clients.constants import *
 
 JOB_STATUS_TYPES = ['CREATED','IN_PROGRESS','COMPRESSING_FILES','COMPLETE','COMPLETE_WITH_ERRORS']
 PROCESS_JOBS_CREATED_TASK='process_jobs_created'
@@ -80,6 +81,11 @@ PLUGINS = {
 	    'method' : {
 	        'values' : ['app2','app1'],
             'default' : 'app2'
+	    },
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
 	    }
   	},
   	'Vaa3D-FarSight_snake_tracing' : {
@@ -96,7 +102,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['snake_trace'],
 	    	'default' : 'snake_trace'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'SimpleAxisAnalyzer' : {
 		'settings' : { 
@@ -112,7 +123,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['medial_axis_analysis'],
 	    	'default' : 'medial_axis_analysis'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'CWlab_method1_version1' : {
 		'settings' : { 
@@ -128,7 +144,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'MST_tracing' : {
 		'settings' : { 
@@ -144,7 +165,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['trace_mst'],
 	    	'default' : 'trace_mst'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'MOST_tracing' : {
 		'settings' : { 
@@ -160,7 +186,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['MOST_trace'],
 	    	'default' : 'MOST_trace'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'neuTube' : {
 		'settings' : { 
@@ -176,7 +207,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['neutube_trace'],
 	    	'default' : 'neutube_trace'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'TReMap' : {
 		'settings' : { 
@@ -192,7 +228,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['trace_mip'],
 	    	'default' : 'trace_mip'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'fastmarching_spanningtree' : {
 		'settings' : { 
@@ -208,7 +249,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'BJUT_meanshift' : {
 		'settings' : { 
@@ -224,7 +270,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['meanshift'],
 	    	'default' : 'meanshift'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'LCM_boost' : {
 		'settings' : { 
@@ -240,7 +291,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['LCM_boost'],
 	    	'default' : 'LCM_boost'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'Advantra' : {
 		'settings' : { 
@@ -256,14 +312,24 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['advantra_func'],
 	    	'default' : 'advantra_func'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'nctuTW' : {
 		'settings' : {},
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'NeuronChaser' : {
 		'settings' : { 
@@ -279,7 +345,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['nc_func'],
 	    	'default' : 'nc_func'
-		}                  
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }                  
 	},
   	'NeuroStalker' : {
 		'settings' : { 
@@ -295,7 +366,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
   	'neutu_autotrace' : {
 		'settings' : { 
@@ -311,7 +387,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing'],
 	    	'default' : 'tracing'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
   	'smartTrace' : {
 		'settings' : { 
@@ -327,7 +408,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['smartTrace'],
 	    	'default' : 'smartTrace'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
   	'tips_GD' : {
 		'settings' : { 
@@ -343,7 +429,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
   	'EnsembleNeuronTracerBasic' : {
 		'settings' : { 
@@ -359,7 +450,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
   	'EnsembleNeuronTracerV2n' : {
 		'settings' : { 
@@ -375,7 +471,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
   	'EnsembleNeuronTracerV2s' : {
 		'settings' : { 
@@ -391,7 +492,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing_func'],
 	    	'default' : 'tracing_func'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
   	'SimpleTracing' : {
 		'settings' : { 
@@ -407,7 +513,12 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['tracing','ray_shooting','dfs'],
 	    	'default' : 'tracing'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	},
 	'anisodiff_littlequick' : {
 		'settings' : { 
@@ -423,6 +534,11 @@ PLUGINS = {
 		'method' : {
 	    	'values' : ['anisodiff_littlequick_func'],
 	    	'default' : 'anisodiff_littlequick_func'
-		}
+		},
+	    'runtime' : {
+	    	'max' : VAA3D_MAX_RUNTIME,
+	    	'min' : VAA3D_MIN_RUNTIME,
+	    	'bytes_per_sec' : BASE_BYTES_PER_SEC
+	    }
 	}
 }

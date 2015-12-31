@@ -1,6 +1,5 @@
 import os
 from bigneuron_app import config
-from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 
 # AWS Config
 AWS_REGION = config.AWS_REGION
@@ -33,12 +32,10 @@ SQS_VISIBILITY_TIMEOUT=config.SQS_VISIBILITY_TIMEOUT
 VAA3D_PATH=os.getenv('VAA3D_PATH', '/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh')
 VAA3D_DEFAULT_PLUGIN='Vaa3D_Neuron2'
 VAA3D_DEFAULT_FUNC='app2'
-VAA3D_DEFAULT_OUTPUT_SUFFIX=OUTPUT_FILE_SUFFIXES[VAA3D_DEFAULT_PLUGIN]
 VAA3D_MIN_RUNTIME=config.VAA3D_MIN_RUNTIME #seconds
 VAA3D_MAX_RUNTIME=config.VAA3D_MAX_RUNTIME
-SECONDS_PER_BYTE = .0000033457
-BUFFER_MULTIPLIER = 5.0
-
+BUFFER_MULTIPLIER = 2
+BASE_BYTES_PER_SEC = 20000 #APP2 = 298891 bytes = 300KB / sec
 
 # Test Data
 VAA3D_TEST_INPUT_FILE_1='smalltest.tif'
@@ -46,6 +43,7 @@ VAA3D_TEST_INPUT_FILE_2='smalltest.tif.zip'
 VAA3D_TEST_INPUT_FILE_3='smalltestdir.zip'
 VAA3D_TEST_INPUT_FILE_4='corruptfile.tif'
 VAA3D_TEST_INPUT_FILE_5='smalltest.v3dpbd'
+VAA3D_TEST_INPUT_FILE_6='small.v3dpbd'
 
 
 CREATE_JOB_JSON={

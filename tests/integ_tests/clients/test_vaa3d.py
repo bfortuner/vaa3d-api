@@ -21,7 +21,9 @@ def test_all_plugins():
 			try:
 				print "PLUGIN: " + plugin + ", FILENAME: " + filename 
 				input_file_path = os.path.abspath(filename)
-				max_runtime = timeout.get_timeout_from_file(input_file_path)
+				runtimes = PLUGINS[plugin]['runtime']
+				max_runtime = timeout.get_timeout_from_file(input_file_path, runtimes['bytes_per_sec'], 
+					runtimes['max'], runtimes['min'])
 				print input_file_path
 				run_plugin_local(plugin, PLUGINS[plugin], 
 				filename, input_file_path, max_runtime)	
@@ -40,7 +42,9 @@ def test_single_plugin():
 	plugin_name = 'Advantra' #'MST_tracing'
 	for f in filenames:
 		input_file_path = os.path.abspath(f)
-		max_runtime = timeout.get_timeout_from_file(input_file_path)
+		runtimes = PLUGINS[plugin_name]['runtime']
+		max_runtime = timeout.get_timeout_from_file(input_file_path, runtimes['bytes_per_sec'], 
+			runtimes['max'], runtimes['min'])
 		run_plugin_local(plugin_name, PLUGINS[plugin_name], 
 			f, input_file_path, max_runtime)
 		cleanup_all([input_file_path])
@@ -62,14 +66,13 @@ def test_build_cmd_args():
 		"output_file_path", plugin_name, "method", "channel").as_dict()
 	args = build_cmd_args(job, job['input_file_path'], job['output_file_path'])
 	assert "-p" in args
-	assert "channel" in args
+	assert PLUGINS[plugin_name]['settings']['params']['channel']['default'] in args
 
 	plugin_name = 'nctuTW' #cannot include -p flag
 	job = Vaa3dJob("input_filename", "output_filename", "input_file_path",
 		"output_file_path", plugin_name, "method", "channel").as_dict()
 	args = build_cmd_args(job, job['input_file_path'], job['output_file_path'])
 	assert "-p" not in args
-	assert "channel" not in args
 	
 @pytest.mark.xfail(raises=Exception)
 def test_try_finally():

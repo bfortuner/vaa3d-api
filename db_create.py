@@ -1,6 +1,6 @@
 from bigneuron_app.database import db, init_db
 from bigneuron_app.jobs.models import Job, JobStatus
-from bigneuron_app.jobs.constants import JOB_STATUS_TYPES
+from bigneuron_app.jobs.constants import JOB_STATUS_TYPES, OUTPUT_FILE_SUFFIXES
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.job_items.models import JobItemStatus
 from bigneuron_app.job_items.constants import JOB_ITEM_STATUS_TYPES
