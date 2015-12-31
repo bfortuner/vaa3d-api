@@ -43,7 +43,9 @@ def insert(table, data_dict):
 
 def get(table, key):
 	key_column = get_primary_key(table)
-	response = table.get_item(Key={key_column : key})
+	response = table.get_item(
+		Key={key_column : key},
+		ConsistentRead=True) #waits until prior write operations have completed 
 	return response['Item']
 
 def delete(table, key):
@@ -55,7 +57,9 @@ def get_primary_key(table):
 
 def query_all(table, name, value):
 	# boto3.readthedocs.org/en/latest/reference/customizations/dynamodb.html#dynamodb-conditions
-	response = table.scan(FilterExpression=Attr(name).eq(value))
+	response = table.scan(
+		FilterExpression=Attr(name).eq(value), 
+		ConsistentRead=True)
 	items = response['Items']
 	return items
 
@@ -79,10 +83,16 @@ def table_exists(conn, table_name):
 
 def scan_by_time(table, time_field, time_sec, operator):
 	if operator == "lt":
-		response = table.scan(FilterExpression=Attr(time_field).lt(time_sec))
+		response = table.scan(
+			FilterExpression=Attr(time_field).lt(time_sec),
+			ConsistentRead=True)
 	elif operator == "gt":
-		response = table.scan(FilterExpression=Attr(time_field).gt(time_sec))
+		response = table.scan(
+			FilterExpression=Attr(time_field).gt(time_sec),
+			ConsistentRead=True)
 	else:
-		response = table.scan(FilterExpression=Attr(time_field).eq(time_sec))		
+		response = table.scan(
+			FilterExpression=Attr(time_field).eq(time_sec),
+			ConsistentRead=True)		
 	return response['Items']
 

@@ -1,7 +1,6 @@
 import os
 from bigneuron_app import items_log
-from bigneuron_app.clients.constants import VAA3D_MIN_RUNTIME, VAA3D_MAX_RUNTIME
-from bigneuron_app.clients.constants import BASE_BYTES_PER_SEC, BUFFER_MULTIPLIER
+import bigneuron_app.clients.constants as c
 
 BYTES_PER_MEGABYTE = 1000000.0
 
@@ -19,10 +18,10 @@ def get_timeout(file_bytes, bytes_per_sec, max_time, min_time, buffer_multiplier
         return min_time
     elif timeout > max_time:
         return max_time
-    return VAA3D_MAX_RUNTIME #timeout
+    return c.VAA3D_MAX_RUNTIME #timeout
 
-def get_timeout_from_file(file_path, bytes_per_sec=BASE_BYTES_PER_SEC, max_time=VAA3D_MAX_RUNTIME,
-    min_time=VAA3D_MIN_RUNTIME, buffer_multiplier=BUFFER_MULTIPLIER):
+def get_timeout_from_file(file_path, bytes_per_sec=c.BASE_BYTES_PER_SEC, max_time=c.VAA3D_MAX_RUNTIME,
+    min_time=c.VAA3D_MIN_RUNTIME, buffer_multiplier=c.BUFFER_MULTIPLIER):
     file_bytes = os.stat(file_path).st_size
     return get_timeout(file_bytes, bytes_per_sec, max_time, min_time, 
         buffer_multiplier)

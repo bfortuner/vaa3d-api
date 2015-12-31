@@ -29,6 +29,7 @@ class ProdConfig(Config):
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_USER_AWS_SECRET_KEY', 'password')
     VAA3D_MIN_RUNTIME=1200 #20 mins
     VAA3D_MAX_RUNTIME=3600 #1 hour
+    VAA3D_TIMEOUT_BUFFER_MULTIPLE=2
     DYNAMO_JOB_ITEMS_TABLE='job_items'
     SQS_JOB_ITEMS_QUEUE='vaa3d-job-items'
     SQS_JOB_ITEMS_DEAD_LETTER='vaa3d-job-items-dead'
@@ -37,6 +38,8 @@ class ProdConfig(Config):
     SQS_VISIBILITY_TIMEOUT=3960 #1.1 hours
     APP_LOG_LEVEL=logging.INFO
     MAIL_LOG_LEVEL=logging.ERROR
+    DYNAMO_READS_PER_SEC=10
+    DYNAMO_WRITES_PER_SEC=4
 
 class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
@@ -52,6 +55,7 @@ class TestConfig(Config):
     VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
     VAA3D_MIN_RUNTIME=120 #2 mins
     VAA3D_MAX_RUNTIME=600 #10 mins
+    VAA3D_TIMEOUT_BUFFER_MULTIPLE=2
     DYNAMO_JOB_ITEMS_TABLE='test_job_items'
     SQS_JOB_ITEMS_QUEUE='test-vaa3d-job-items'
     SQS_JOB_ITEMS_DEAD_LETTER='test-vaa3d-job-items-dead'
@@ -60,5 +64,7 @@ class TestConfig(Config):
     SQS_VISIBILITY_TIMEOUT=1200 #20 mins
     APP_LOG_LEVEL=logging.INFO
     MAIL_LOG_LEVEL=logging.ERROR
+    DYNAMO_READS_PER_SEC=3
+    DYNAMO_WRITES_PER_SEC=2
 
 config = globals()[os.getenv('VAA3D_CONFIG', 'ProdConfig')]

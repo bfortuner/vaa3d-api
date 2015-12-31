@@ -47,7 +47,7 @@ def run_job_item(job_item, max_runtime):
 	except MaxRuntimeException as e:	
 		items_log.error(str(e) + traceback.format_exc())		
 	except Exception as e:
-		items_log.error(traceback.format_exc())
+		items_log.error(traceback.format_exc() + "\n" + str(e))
 	finally:
 		print "Status " + job_item_status
 		job_item['status_id'] = get_job_item_status_id(job_item_status)

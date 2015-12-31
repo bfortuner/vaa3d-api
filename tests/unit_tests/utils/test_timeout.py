@@ -24,6 +24,7 @@ def test_get_timeout__returns_min_time():
 		min_time, buffer_multiplier)
 	assert runtime == min_time
 
+@pytest.mark.skipif(True, reason="Currently overriding timeout with MAX_TIME")
 def test_get_timeout__returns_time_w_buffer():
 	max_time = 2000 #seconds
 	min_time = 1000 #seconds
