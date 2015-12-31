@@ -55,16 +55,27 @@ def delete(table, key):
 def get_primary_key(table):
 	return table.key_schema[0]['AttributeName']
 
-def query_all(table, name, value):
+def query_all(table, index, name, value, select='ALL_ATTRIBUTES'):
 	# boto3.readthedocs.org/en/latest/reference/customizations/dynamodb.html#dynamodb-conditions
+	response = table.query(
+		IndexName=index,
+		KeyConditionExpression=Key(name).eq(value),
+		Select=select)
+	if select == 'COUNT':
+		return response['Count']
+	return response['Items']
+
+def scan_all(table, name, value, select='ALL_ATTRIBUTES'):
 	response = table.scan(
 		FilterExpression=Attr(name).eq(value), 
-		ConsistentRead=True)
-	items = response['Items']
-	return items
+		ConsistentRead=False,
+		Select=select)
+	if select == 'COUNT':
+		return response['Count']
+	return response['Items']
 
 def query_first(table, name, value):
-	items = query_all(table, name, value)
+	items = scan_all(table, name, value)
 	return items[0]
 
 def drop_table(conn, table_name):
@@ -85,14 +96,63 @@ def scan_by_time(table, time_field, time_sec, operator):
 	if operator == "lt":
 		response = table.scan(
 			FilterExpression=Attr(time_field).lt(time_sec),
-			ConsistentRead=True)
+			ConsistentRead=False)
 	elif operator == "gt":
 		response = table.scan(
 			FilterExpression=Attr(time_field).gt(time_sec),
-			ConsistentRead=True)
+			ConsistentRead=False)
 	else:
 		response = table.scan(
 			FilterExpression=Attr(time_field).eq(time_sec),
-			ConsistentRead=True)		
+			ConsistentRead=False)		
 	return response['Items']
+
+
+def create_table_w_index(conn, table_name, primary_key, key_type,
+		index_name, secondary_key, secondary_key_type):
+	table = conn.create_table(
+	    TableName=table_name,
+	    KeySchema=[
+	        {
+	            'AttributeName': primary_key,
+	            'KeyType': 'HASH'
+	        }
+	    ],
+	    AttributeDefinitions=[
+	        {
+	            'AttributeName': primary_key,
+	            'AttributeType': key_type # boto3.readthedocs.org/en/latest/reference/customizations/dynamodb.html
+	        },
+	        {
+	            'AttributeName': secondary_key,
+	            'AttributeType': secondary_key_type
+	        }
+
+	    ],
+	    ProvisionedThroughput={
+	        'ReadCapacityUnits': DYNAMO_READS_PER_SEC,
+	        'WriteCapacityUnits': DYNAMO_WRITES_PER_SEC
+	    },
+	    GlobalSecondaryIndexes=[
+			{
+				'IndexName': index_name,
+				'KeySchema': [
+					{
+						'AttributeName': secondary_key,
+						'KeyType': 'HASH'
+					},
+				],
+				'Projection': {
+					'ProjectionType': 'ALL' #'KEYS_ONLY'
+				},
+				'ProvisionedThroughput': {
+					'ReadCapacityUnits': DYNAMO_READS_PER_SEC,
+					'WriteCapacityUnits': DYNAMO_WRITES_PER_SEC
+				}
+			}
+		]
+	)
+	table.meta.client.get_waiter('table_exists').wait(TableName=table_name)
+	return table
+
 

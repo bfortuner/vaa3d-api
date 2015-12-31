@@ -59,7 +59,10 @@ job = Job.query.first()
 # Dynamo - Drop and recreate DB
 dynamo_conn = dynamo.get_connection()
 dynamo.drop_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE)
-dynamo.create_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE, 'job_item_key', 'S')
+dynamo.create_table_w_index(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE, 
+	'job_item_key', 'S', 'job_index', 'job_id', 'N')
+
+print "Created Job Items table"
 
 # Dynamo - Insert Test Data
 job_item_doc1 = job_item_manager.build_job_item_doc(job, VAA3D_TEST_INPUT_FILE_1)
