@@ -40,16 +40,18 @@ def run_job_item(job_item, max_runtime):
 	job_item_status = "ERROR"
 	try:
 		if zipper.is_zip_file(local_file_path):
-			process_zip_file(job_item, local_file_path, max_runtime)
+			job_item_status = process_zip_file(job_item, local_file_path, max_runtime)
 		else:
 			process_non_zip_file(job_item, max_runtime)
-		job_item_status = "COMPLETE"
-	except MaxRuntimeException as e:	
-		items_log.error(str(e) + traceback.format_exc())		
+			items_log.info("Job Item Succeeded")
+			job_item_status = "COMPLETE"
+	except MaxRuntimeException as e:
+		job_item_status = 'TIMEOUT'	
+		items_log.error("Job Item Timeout " + str(e) + traceback.format_exc())		
 	except Exception as e:
-		items_log.error(traceback.format_exc() + "\n" + str(e))
+		items_log.error("Job Item Error " + traceback.format_exc() + "\n" + str(e))
 	finally:
-		print "Status " + job_item_status
+		items_log.info("Job_Item Status: " + job_item_status)
 		job_item['status_id'] = get_job_item_status_id(job_item_status)
 		#job_item['status_id'] = get_status_id_with_retry(job_item)
 		save_job_item(job_item)
@@ -110,6 +112,7 @@ def process_zip_file(job_item, zip_file_path, max_runtime):
 		zip_archive.close()
 		create_job_items_from_directory(job_item, output_dir)
 		shutil.rmtree(output_dir)
+		status = "COMPLETE"
 	else:
 		items_log.info("found only 1 file inside .zip")
 		filename = filenames[0]
@@ -122,9 +125,9 @@ def process_zip_file(job_item, zip_file_path, max_runtime):
 		runtimes = PLUGINS[job_item['plugin']]['runtime']
 		max_runtime = timeout.get_timeout_from_file(file_path, runtimes['bytes_per_sec'], 
 			runtimes['max'], runtimes['min'])
-		print "FILE_PATH_AFTER_ZIP " + file_path
-		run_job_item(job_item, max_runtime)
+		status = run_job_item(job_item, max_runtime)
 	os.remove(zip_file_path)
+	return status
 
 def create_job_items_from_directory(job_item, dir_path):
 	items_log.info("Creating job items from directory")

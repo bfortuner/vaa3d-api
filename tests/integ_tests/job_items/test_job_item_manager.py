@@ -3,13 +3,12 @@ from bigneuron_app.clients.constants import *
 import pytest
 
 QUEUE_TIMEOUT=30 # This needs to be long enough to run vaa3d job otherwise msg will become visible again
-JOB_ITEM_TIMEOUT=10
 
 def test_convert_dynamo_item_to_dict():
 	job_item = create_job_item(1, VAA3D_TEST_INPUT_FILE_1, sqs.get_queue(SQS_JOB_ITEMS_QUEUE))
 	job_item_dict = convert_dynamo_job_item_to_dict(job_item)
 
-def test_run_job_item():
+def test_run_job_item__complete():
 	queue = sqs.create_test_queue_w_dead_letter(120, 1)
 	filenames = [VAA3D_TEST_INPUT_FILE_2,VAA3D_TEST_INPUT_FILE_5,VAA3D_TEST_INPUT_FILE_7]
 	for f in filenames:
@@ -18,11 +17,20 @@ def test_run_job_item():
 	
 	sqs.delete_queue(queue)
 
+def test_run_job_item__timeout():
+	queue = sqs.create_test_queue_w_dead_letter(120, 1)
+	filename = VAA3D_TEST_INPUT_FILE_1
+	filenames = [VAA3D_TEST_INPUT_FILE_5] #VAA3D_TEST_INPUT_FILE_2 - need to mock out timeout module to test zip files
+	for f in filenames:
+		job_item = create_test_job_item(f, queue)
+		status = run_job_item(job_item, max_runtime=1)
+		assert status == 'TIMEOUT'
+	sqs.delete_queue(queue)
+
 def test_failed_job_item_retry():
-	MAX_RUNS=3
-	queue = sqs.create_test_queue_w_dead_letter(QUEUE_TIMEOUT, MAX_RUNS)
+	queue = sqs.create_test_queue_w_dead_letter(QUEUE_TIMEOUT, 3)
 	filename = VAA3D_TEST_INPUT_FILE_4 # Corrupt file to simulate failure quickly (< MIN_RUNTIME)
-	run_job_item_w_retry(filename, queue, MAX_RUNS, JOB_ITEM_TIMEOUT)
+	run_job_item_w_retry(filename, queue, 3, 10)
 	sqs.delete_queue(queue)
 
 def run_job_item_w_retry(filename, queue, max_retries, timeout):

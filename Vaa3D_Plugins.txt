@@ -31,6 +31,28 @@ vaa3d -x Vaa3D_Neuron2 -f help
 vaa3d -x gaussian -f help
 
 
+## Intermittently Failing on EC2 - 8GB RAM ##
+
+Killed on 1GB file
+smartTrace - Segmentation fault. Timeout on 20MB .tif - http://vaa3d-website.s3-website-us-west-2.amazonaws.com/#/view_job_items/14
+fastmarching_spanningtree - Killed on 1GB file - http://vaa3d-website.s3-website-us-west-2.amazonaws.com/#/view_job_items/22
+neuTube - Out of memory, shows complete status?
+
+Timeout on 1GB AND 20MB .tif files:
+tips_GD
+SimpleTracing
+
+Timeout on 1GB file Only:
+EnsembleNeuronTracerV2s
+Advantra
+BJUT_meanshift - still running?
+
+Some jobs Not Going into Error Status after timeout??
+http://vaa3d-website.s3-website-us-west-2.amazonaws.com/#/view_job_items/10
+
+Failed to call plugin function
+nctuTW
+
 
 ####### Beta Plugins w Required Parameters ########
 
