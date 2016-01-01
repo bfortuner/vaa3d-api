@@ -117,6 +117,8 @@ def process_zip_file(job_item, zip_file_path, max_runtime):
 		zipper.extract_file_from_archive(zip_archive, filename, file_path)
 		zip_archive.close()
 		job_item['input_filename'] = filename
+		job_item['output_filename'] = filename + OUTPUT_FILE_SUFFIXES[job_item['plugin']]
+		items_log.info("New output filename: " + job_item['output_filename'])
 		runtimes = PLUGINS[job_item['plugin']]['runtime']
 		max_runtime = timeout.get_timeout_from_file(file_path, runtimes['bytes_per_sec'], 
 			runtimes['max'], runtimes['min'])

@@ -44,6 +44,7 @@ VAA3D_TEST_INPUT_FILE_3='smalltestdir.zip'
 VAA3D_TEST_INPUT_FILE_4='corruptfile.tif'
 VAA3D_TEST_INPUT_FILE_5='smalltest.v3dpbd'
 VAA3D_TEST_INPUT_FILE_6='small.v3dpbd'
+VAA3D_TEST_INPUT_FILE_7='zip_dir_w_single_zip_file.zip'
 
 
 CREATE_JOB_JSON={

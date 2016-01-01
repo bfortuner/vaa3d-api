@@ -9,15 +9,23 @@ def test_convert_dynamo_item_to_dict():
 	job_item = create_job_item(1, VAA3D_TEST_INPUT_FILE_1, sqs.get_queue(SQS_JOB_ITEMS_QUEUE))
 	job_item_dict = convert_dynamo_job_item_to_dict(job_item)
 
-def test_run_job_items():
-	MAX_RUNS=3
-	queue = sqs.create_test_queue_w_dead_letter(QUEUE_TIMEOUT, MAX_RUNS)
-	filenames = [VAA3D_TEST_INPUT_FILE_4] # Corrupt file to simulate failure quickly (< MIN_RUNTIME)
+def test_run_job_item():
+	queue = sqs.create_test_queue_w_dead_letter(120, 1)
+	filenames = [VAA3D_TEST_INPUT_FILE_2,VAA3D_TEST_INPUT_FILE_5,VAA3D_TEST_INPUT_FILE_7]
 	for f in filenames:
-		run_job_item(f, queue, MAX_RUNS, JOB_ITEM_TIMEOUT)
+		job_item = create_test_job_item(f, queue)
+		run_job_item(job_item, max_runtime=60)
+	
 	sqs.delete_queue(queue)
 
-def run_job_item(filename, queue, max_retries, timeout):
+def test_failed_job_item_retry():
+	MAX_RUNS=3
+	queue = sqs.create_test_queue_w_dead_letter(QUEUE_TIMEOUT, MAX_RUNS)
+	filename = VAA3D_TEST_INPUT_FILE_4 # Corrupt file to simulate failure quickly (< MIN_RUNTIME)
+	run_job_item_w_retry(filename, queue, MAX_RUNS, JOB_ITEM_TIMEOUT)
+	sqs.delete_queue(queue)
+
+def run_job_item_w_retry(filename, queue, max_retries, timeout):
 	"""
 	1) Create test job_item and load into queue
 	2) Pull from SQS and run job item_item
