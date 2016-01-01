@@ -29,7 +29,7 @@ def get_job(job_id):
 def get_job_items(job_id, include_zip=True):
 	dynamo_conn = dynamo.get_connection()
 	table = dynamo.get_table(dynamo_conn, DYNAMO_JOB_ITEMS_TABLE)
-	job_items = dynamo.scan_all(table, "job_id", job_id)
+	job_items = dynamo.query_all(table, "job_index", "job_id", job_id)
 	link_expiry_secs = 3600 # 1 hour
 	s3_conn = s3.S3Connection(VAA3D_USER_AWS_ACCESS_KEY, VAA3D_USER_AWS_SECRET_KEY)
 	job_items_list = []

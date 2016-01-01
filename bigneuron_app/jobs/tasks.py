@@ -11,8 +11,8 @@ from bigneuron_app.emails import email_manager
 import bigneuron_app.clients.constants as client_constants
 
 
-POLL_JOBS_SLEEP=20
-POLL_JOBS_MAX_RUNS=30
+POLL_JOBS_SLEEP=60
+POLL_JOBS_MAX_RUNS=10
 
 def poll_jobs_queue():
 	count = 0
