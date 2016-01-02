@@ -55,9 +55,9 @@ def update_jobs_in_progress():
 		complete = True
 		has_error = False
 		for job_item in job_items:
-			if job_item['job_item_status'] == 'ERROR':
+			if job_item['job_item_status'] in ['ERROR','TIMEOUT']:
 				has_error = True
-			elif job_item['job_item_status'] not in ['COMPLETE', 'ERROR']:
+			elif job_item['job_item_status'] in ['CREATED', 'IN_PROGRESS']:
 				complete = False
 				break
 
