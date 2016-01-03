@@ -5,6 +5,9 @@
 logs/
 circus.log
 
+# Docker
+Dockerfile
+
 # Credentials
 credentials.py
 
