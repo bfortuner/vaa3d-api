@@ -9,7 +9,8 @@ RUN mkdir -p /home/ec2-user && \
 git clone https://github.com/bfortuner/vaa3d-api /home/ec2-user/vaa3d-api && \
 cd /home/ec2-user/vaa3d-api && \
 pip install -r requirements.txt && \
-pip install awscli
+pip install awscli && \
+easy_install supervisor
 
 # Install Vaa3D
 WORKDIR /home/ec2-user
@@ -17,7 +18,6 @@ RUN aws s3 cp s3://vaa3d-test-data/Vaa3D_CentOS_64bit_v3.100.tar.gz /home/ec2-us
 gunzip Vaa3D_CentOS_64bit_v3.100.tar.gz && \
 tar -xvf Vaa3D_CentOS_64bit_v3.100.tar && \
 rm Vaa3D_CentOS_64bit_v3.100.tar
-
 # Set ENV variables
 ENV VAA3D_AWS_ACCESS_KEY=''
 ENV VAA3D_AWS_SECRET_KEY=''
@@ -28,6 +28,8 @@ ENV VAA3D_PATH='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
 ENV TASK_RUNNER_PATH='xvfb-run python task_runner.py'
 
 # Start worker
-EXPOSE 9999
-#CMD ["circusd", "--daemon", "/home/ec2-user/vaa3d-api/circus.ini"]
-CMD ["/home/ec2-user/vaa3d-api/start.sh"]
+WORKDIR /home/ec2-user/vaa3d-api
+CMD ["circusd", "circus.ini"]
+
+#RUN cp supervisord.conf /etc/supervisord.conf
+#CMD ["supervisord", "-c", "/etc/supervisor.conf"]
