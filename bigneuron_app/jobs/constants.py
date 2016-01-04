@@ -13,7 +13,7 @@ OUTPUT_FILE_SUFFIXES = {
 	'MST_tracing' : '_MST_Tracing.swc',   #error on Mac
 	'MOST_tracing' : '_MOST.swc',
 	'neuTube' : '_neutube.swc',
-	'TReMap' : '_XY_3D_TreMap.swc', #timeout on mac after 200 seconds
+	'TReMap' : '_XZ_3D_TreMap.swc', #timeout on mac after 200 seconds
 	'fastmarching_spanningtree' : '_fastmarching_spanningtree.swc',    #timeout on mac
 	'BJUT_meanshift' : '_meanshift.swc',
 	'LCM_boost' : '_LCM_boost.swc',  #can't find this plugin on Mac

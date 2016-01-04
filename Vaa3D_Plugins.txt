@@ -41,14 +41,14 @@ neuTube - Out of memory, shows complete status?
 Timeout on 1GB AND 20MB .tif files:
 tips_GD
 SimpleTracing
+BJUT_meanshift
 
 Timeout on 1GB file Only:
 EnsembleNeuronTracerV2s
 Advantra
-BJUT_meanshift - still running?
-
-Some jobs Not Going into Error Status after timeout??
-http://vaa3d-website.s3-website-us-west-2.amazonaws.com/#/view_job_items/10
+Vaa3D-FarSight_snake_tracing
+SimpleAxisAnalyzer
+TReMap
 
 Failed to call plugin function
 nctuTW
