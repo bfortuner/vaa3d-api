@@ -10,6 +10,7 @@ class Config(object):
     AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID', 'password')
     AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', 'password')
     AWS_REGION='us-west-2'
+    AWS_ACCOUNT_ID='647215175976'
 
 class ProdConfig(Config):
     WEBSITE_URL = 'http://vaa3d-website.s3-website-us-west-2.amazonaws.com'
@@ -41,6 +42,8 @@ class ProdConfig(Config):
     DYNAMO_READS_PER_SEC=10
     DYNAMO_WRITES_PER_SEC=4
     ECS_CLUSTER='vaa3d'
+    ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-prod:latest'
+    AUTOSCALING_GROUP='Vaa3D-ECS-Prod-Autoscaling'
 
 class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
@@ -68,5 +71,7 @@ class TestConfig(Config):
     DYNAMO_READS_PER_SEC=3
     DYNAMO_WRITES_PER_SEC=2
     ECS_CLUSTER='vaa3d-test'
+    ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-test:latest'
+    AUTOSCALING_GROUP='Vaa3D-ECS-Test-Autoscaling'
 
 config = globals()[os.getenv('VAA3D_CONFIG', 'ProdConfig')]
