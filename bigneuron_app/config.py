@@ -7,8 +7,8 @@ class Config(object):
     SQLALCHEMY_POOL_RECYCLE = 3600
     WTF_CSRF_ENABLED = True
     BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-    AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
-    AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
+    AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID', 'password')
+    AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', 'password')
     AWS_REGION='us-west-2'
 
 class ProdConfig(Config):
@@ -40,6 +40,7 @@ class ProdConfig(Config):
     MAIL_LOG_LEVEL=logging.ERROR
     DYNAMO_READS_PER_SEC=10
     DYNAMO_WRITES_PER_SEC=4
+    ECS_CLUSTER='vaa3d'
 
 class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
@@ -51,8 +52,8 @@ class TestConfig(Config):
     S3_INPUT_BUCKET='test-vaa3d-input'
     S3_OUTPUT_BUCKET='test-vaa3d-output'
     S3_WORKING_INPUT_BUCKET='test-vaa3d-working'
-    VAA3D_USER_AWS_ACCESS_KEY = os.getenv('VAA3D_AWS_ACCESS_KEY', 'password')
-    VAA3D_USER_AWS_SECRET_KEY = os.getenv('VAA3D_AWS_SECRET_KEY', 'password')
+    VAA3D_USER_AWS_ACCESS_KEY = os.getenv('AWS_ACCESS_KEY_ID', 'password')
+    VAA3D_USER_AWS_SECRET_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', 'password')
     VAA3D_MIN_RUNTIME=120 #2 mins
     VAA3D_MAX_RUNTIME=600 #10 mins
     VAA3D_TIMEOUT_BUFFER_MULTIPLE=2
@@ -66,5 +67,6 @@ class TestConfig(Config):
     MAIL_LOG_LEVEL=logging.ERROR
     DYNAMO_READS_PER_SEC=3
     DYNAMO_WRITES_PER_SEC=2
+    ECS_CLUSTER='vaa3d-test'
 
 config = globals()[os.getenv('VAA3D_CONFIG', 'ProdConfig')]

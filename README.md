@@ -127,6 +127,8 @@ Clone GitHub
 git clone https://github.com/bfortuner/vaa3d-api
 cd vaa3d-api
 sudo pip install -r requirements.txt
+---
+pip freeze > requirements.txt (to add new reqs)
 ```
 
 Command To Run Circus Workers
@@ -161,6 +163,48 @@ python -m pytest tests/utils/test_sample.py (single test file)
 python -m pytest tests/utils/test_sample.py::test_answer_correct (single test method)
 python -m pytest --resultlog=testlog.log tests/ (send test output to file)
 python -m pytest -s tests/ (print output to console)
+```
+
+### Docker
+
+Setup for Mac
+* https://docs.docker.com/engine/installation/mac/
+* https://docs.docker.com/machine/
+
+Docker Commands
+```
+docker-machine ls
+docker-machine env default
+eval "$(docker-machine env default)"
+docker pull/push 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
+cp dockerfiles/Dockerfile .
+Update Dockerfile w TestConfig
+docker build /path/to/Dockerfile/directory (or just . in in same directory)
+docker images
+docker run -d 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
+docker ps
+docker exec -t -i container_id bash
+show envvariables (printenv)
+docker rm -v $(docker ps -a -q) (remove all containers and volumes)
+docker rmi $(docker images -q)
+```
+
+### ECS Setup (AWS Container Service)
+
+Add Capacity to ECS Cluster via EC2
+```
+#http://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_container_instance.html
+type amazon-ecs-optimized in the Search community AMIs
+#!/bin/bash
+echo ECS_CLUSTER=your_cluster_name >> /etc/ecs/ecs.config
+```
+
+###ECR Setup (AWS Container Repository)
+
+```
+#http://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_AWSCLI.html#AWSCLI_get-login
+aws ecr get-login --region us-east-1
+docker pull/push 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
 ```
 
 ### Links and Tutorials:
