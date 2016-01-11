@@ -42,7 +42,8 @@ class ProdConfig(Config):
     DYNAMO_READS_PER_SEC=10
     DYNAMO_WRITES_PER_SEC=4
     ECS_CLUSTER='vaa3d'
-    ECS_JOB_ITEM_TASK='vaa3d-prod'
+    ECS_JOB_TASK='vaa3d-jobs-prod'
+    ECS_JOB_ITEM_TASK='vaa3d-job-items-prod'
     ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-prod:latest'
     AUTOSCALING_GROUP='Vaa3D-ECS-Prod-Autoscaling'
 
@@ -79,7 +80,8 @@ class TestConfig(Config):
     DYNAMO_READS_PER_SEC=3
     DYNAMO_WRITES_PER_SEC=2
     ECS_CLUSTER='vaa3d-test'
-    ECS_JOB_ITEM_TASK='vaa3d-test'
+    ECS_JOB_TASK='vaa3d-jobs-test'
+    ECS_JOB_ITEM_TASK='vaa3d-job-items-test'
     ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-test:latest'
     AUTOSCALING_GROUP='Vaa3D-ECS-Test-Autoscaling'
 
