@@ -42,6 +42,7 @@ class ProdConfig(Config):
     DYNAMO_READS_PER_SEC=10
     DYNAMO_WRITES_PER_SEC=4
     ECS_CLUSTER='vaa3d'
+    ECS_JOB_ITEM_TASK='vaa3d-prod'
     ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-prod:latest'
     AUTOSCALING_GROUP='Vaa3D-ECS-Prod-Autoscaling'
 
@@ -49,7 +50,14 @@ class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
     TESTING = True
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+    #SQLALCHEMY_DATABASE_URI = 'sqlite:///test.db'
+    DB_DRIVER = 'mysql+pymysql://'
+    DB_HOSTNAME = 'bigneuron.clwja7eltdnj.us-west-2.rds.amazonaws.com'
+    DB_PORT = '3306'
+    DB_NAME = 'vaa3d-test'
+    DB_USERNAME = 'vaa3d'
+    DB_PASSWORD = os.getenv('VAA3D_DB_PASSWORD', 'password')
+    SQLALCHEMY_DATABASE_URI = DB_DRIVER + DB_USERNAME + ':' + DB_PASSWORD + '@' + DB_HOSTNAME + ':' + DB_PORT + '/' + DB_NAME    
     DB_ISOLATION_LEVEL='READ UNCOMMITTED'
     SECRET_KEY = 'secret'
     S3_INPUT_BUCKET='test-vaa3d-input'
@@ -71,6 +79,7 @@ class TestConfig(Config):
     DYNAMO_READS_PER_SEC=3
     DYNAMO_WRITES_PER_SEC=2
     ECS_CLUSTER='vaa3d-test'
+    ECS_JOB_ITEM_TASK='vaa3d-test'
     ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-test:latest'
     AUTOSCALING_GROUP='Vaa3D-ECS-Test-Autoscaling'
 

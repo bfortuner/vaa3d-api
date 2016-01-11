@@ -175,18 +175,22 @@ Docker Commands
 ```
 docker-machine ls
 docker-machine env default
-eval "$(docker-machine env default)"
+eval "$(docker-machine env default)" (set docker env variables in terminal)
 docker pull/push 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
 cp dockerfiles/Dockerfile .
 Update Dockerfile w TestConfig
 docker build /path/to/Dockerfile/directory (or just . in in same directory)
+docker build --no-cache -t dev . (build with tag "dev")
 docker images
 docker run -d 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
+
 docker ps
 docker exec -t -i container_id bash
 show envvariables (printenv)
 docker rm -v $(docker ps -a -q) (remove all containers and volumes)
 docker rmi $(docker images -q)
+docker cp foo.txt mycontainer:/foo.txt
+docker cp mycontainer:/foo.txt foo.txt
 ```
 
 ### ECS Setup (AWS Container Service)
@@ -204,6 +208,7 @@ echo ECS_CLUSTER=your_cluster_name >> /etc/ecs/ecs.config
 ```
 #http://docs.aws.amazon.com/AmazonECR/latest/userguide/ECR_AWSCLI.html#AWSCLI_get-login
 aws ecr get-login --region us-east-1
+docker tag image_id 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
 docker pull/push 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
 ```
 
@@ -215,6 +220,7 @@ docker pull/push 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
 * https://gist.github.com/mjul/54c7c9e936588e713537 (RDS postgres config)
 * http://circus.readthedocs.org/en/latest/tutorial/step-by-step
 * https://github.com/circus-tent/circus/tree/master/examples
+* http://stackoverflow.com/questions/31990757/network-timed-out-while-trying-to-connect-to-https-index-docker-io
 
 ### Permissions:
 Request access tokens and permissions from bfortuner@gmail.com
