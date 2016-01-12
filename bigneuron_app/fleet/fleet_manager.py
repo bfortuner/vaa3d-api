@@ -23,25 +23,33 @@ sqs = SQS()
 ecs = ECS()
 autoscaling = Autoscaling()
 
-def update_fleet():
+def update_fleet_capacity():
 	update_jobs_fleet_capacity()
 	update_job_items_fleet_capacity()
 
 def update_jobs_fleet_capacity():
+	container_count = update_jobs_fleet_containers()
+	#update_jobs_fleet_instances(container_count)
+
+def update_jobs_fleet_containers():
 	current_containers = ecs.get_service_capacity(ECS_JOBS_CLUSTER, ECS_JOBS_SERVICE)
 	optimal_containers = calculate_optimal_job_container_capacity()
 	print "Jobs - Containers: " + str(current_containers) + " " + str(optimal_containers)
 	if optimal_containers > current_containers and current_containers < MAX_JOB_CONTAINERS:
 		tasks_log.info("Jobs - Increasing Container Capacity")
 		ecs.set_service_capacity(ECS_JOBS_CLUSTER, ECS_JOBS_SERVICE, current_containers+1)
+		return current_containers+1
 	elif optimal_containers < current_containers and current_containers > MIN_JOB_CONTAINERS:
 		tasks_log.info("Jobs - Reducing Container Capacity")
 		ecs.set_service_capacity(ECS_JOBS_CLUSTER, ECS_JOBS_SERVICE, current_containers-1)
+		return current_containers-1
 	else:
 		tasks_log.info("Jobs - Container Capacity Unchanged")
+		return current_containers
 
+def update_jobs_fleet_instances(container_count):
 	current_instances = autoscaling.get_capacity(AUTOSCALING_GROUP_JOBS)
-	optimal_instances = calculate_optimal_job_instance_capacity(optimal_containers)
+	optimal_instances = calculate_optimal_job_instance_capacity(container_count)
 	print "Jobs - Instances: " + str(current_instances) + " " + str(optimal_instances)
 	if optimal_instances > current_instances and current_instances < MAX_JOB_INSTANCES:
 		tasks_log.info("Jobs - Increasing Instance Capacity")

@@ -11,7 +11,7 @@ def update_fleet():
 	while count < FLEET_UPDATE_MAX_RUNS:
 		try:
 			tasks_log.info("Update Jobs and JobItems Fleets. Attempt " + str(count))
-			fleet_manager.update_fleet()
+			fleet_manager.update_fleet_capacity()
 		except Exception, err:
 			tasks_log.error(traceback.format_exc())
 		finally:
