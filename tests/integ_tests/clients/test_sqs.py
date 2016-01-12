@@ -54,6 +54,34 @@ def test_get_queue(sqs):
 	queue = sqs.create_queue(queue_name)
 	assert queue is not None
 
+def test_get_queue_attributes(sqs):
+	queue_name = id_generator.generate_job_item_id()
+	queue = get_test_queue(sqs, queue_name)
+	expected_message_id = sqs.send_message(queue, 'boto3', {
+    	'Author': {
+        	'StringValue': 'Daniel',
+        	'DataType': 'String'
+    	}
+	})
+	attributes = sqs.get_queue_attributes(queue.url)
+	assert attributes is not None
+	sqs.clear_queue(queue)
+	sqs.delete_queue(queue)
+
+def test_get_queue_size(sqs):
+	queue_name = id_generator.generate_job_item_id()
+	queue = get_test_queue(sqs, queue_name)
+	expected_message_id = sqs.send_message(queue, 'boto3', {
+    	'Author': {
+        	'StringValue': 'Daniel',
+        	'DataType': 'String'
+    	}
+	})
+	size = sqs.get_queue_size(queue.url)
+	assert size == 1
+	sqs.clear_queue(queue)
+	sqs.delete_queue(queue)
+
 def test_get_all_queues(sqs):
 	queues = sqs.get_all_queues()
 	assert len(queues) > 0	

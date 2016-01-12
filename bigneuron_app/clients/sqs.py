@@ -145,11 +145,24 @@ class SQS:
 		)
 		return response
 
+	def get_queue_attributes(self, queue_url):
+		response = self.get_client().get_queue_attributes(
+			QueueUrl=queue_url,
+			AttributeNames=['All']
+		)
+		return response['Attributes']
+
 	def set_queue_attributes(self, queue, attribs_dict):
 		response = queue.set_attributes(
     		Attributes=attribs_dict
 		)
 		return response
+
+	def get_queue_size(self, queue_url):
+		attributes = self.get_queue_attributes(queue_url)
+		visible = int(attributes['ApproximateNumberOfMessages'])
+		not_visible = int(attributes['ApproximateNumberOfMessagesNotVisible'])
+		return visible + not_visible
 
 	def create_queue_w_dead_letter(self, queue_name, dead_queue_name, timeout, max_receive):
 		dead_queue = self.create_queue(dead_queue_name, 35000)
