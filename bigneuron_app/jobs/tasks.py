@@ -8,6 +8,7 @@ from bigneuron_app.jobs.models import Job
 from bigneuron_app.jobs import job_manager
 from bigneuron_app.jobs.constants import PROCESS_JOBS_CREATED_TASK, PROCESS_JOBS_IN_PROGRESS_TASK
 from bigneuron_app.emails import email_manager
+from bigneuron_app.fleet import fleet_manager
 import bigneuron_app.clients.constants as client_constants
 
 
@@ -27,26 +28,6 @@ def poll_jobs_queue():
 			count += 1
 			time.sleep(POLL_JOBS_SLEEP)
 	db.remove()
-
-def poll_jobs_created_queue():
-	while True:
-		try:
-			tasks_log.info("Polling jobs_created queue")
-			update_jobs_created()
-		except Exception, err:
-			tasks_log.error("ERROR while reading and processing job_created \n" + str(err))
-		finally:
-			time.sleep(20)
-
-def poll_jobs_in_progress_queue():
-	while True:
-		try:
-			tasks_log.info("Polling jobs_in_progress queue")
-			update_jobs_in_progress()
-		except Exception, err:
-			tasks_log.error("ERROR while reading and processing job_in_progress \n" + str(err))
-		finally:
-			time.sleep(20)
 
 def update_jobs_in_progress():
 	jobs_in_progress = job_manager.get_jobs_by_status("IN_PROGRESS")

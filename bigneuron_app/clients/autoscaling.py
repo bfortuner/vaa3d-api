@@ -45,7 +45,7 @@ class Autoscaling:
 		self.get_client().set_desired_capacity(
 			AutoScalingGroupName=autoscaling_group,
 			DesiredCapacity=capacity,
-			HonorCooldown=True
+			HonorCooldown=False
 		)
 
 	def get_instances(self, autoscaling_group):

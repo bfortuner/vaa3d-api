@@ -4,6 +4,7 @@ from multiprocessing import Process
 
 import bigneuron_app.job_items.tasks as job_item_tasks
 import bigneuron_app.jobs.tasks as job_tasks
+import bigneuron_app.fleet.tasks as fleet_tasks
 
 
 def start_workers():
@@ -30,6 +31,8 @@ def start_process(method_name):
 		job_tasks.poll_jobs_queue()
 	elif method_name == "job_items":
 		job_item_tasks.poll_job_items_queue()
+	elif method_name == "fleet":
+		fleet_tasks.update_fleet()
 
 def signal_handler(signal, frame):
 	print "Exiting..."

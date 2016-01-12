@@ -59,8 +59,29 @@ class ECS:
 		)
 		return response
 
+	def get_service(self, cluster, service):
+		print cluster + " " + service
+		response = self.get_client().describe_services(
+			cluster=cluster,
+			services=[service]
+		)
+		print response
+		return response['services'][0]
+
+	def get_service_capacity(self, cluster, service):
+		info = self.get_service(cluster, service)
+		return info['desiredCount']
+
+	def set_service_capacity(self, cluster, service, new_capacity):
+		response = self.get_client().update_service(
+			cluster=cluster,
+			service=service,
+			desiredCount=new_capacity
+		)
+		return response
+
 	def update_service(self, cluster, service, count, task):
-		response = client.update_service(
+		response = self.get_client().update_service(
 			cluster=cluster,
 			service=service,
 			desiredCount=count,

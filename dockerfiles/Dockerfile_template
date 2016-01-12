@@ -1,7 +1,7 @@
 FROM centos
 
 # Install dependencies
-RUN yum update && yum install -y gcc gcc-c++ git wget which epel-release python python-distribute python-devel tar zip unzip gzip freeglut mesa-libGL-devel mesa-libGLU-devel libXrender-devel.x86_64 xorg-x11-server-Xvfb libpng12.x86_64 libjpeg fontconfig
+RUN yum -y update && yum install -y gcc gcc-c++ git wget which epel-release python python-distribute python-devel tar zip unzip gzip freeglut mesa-libGL-devel mesa-libGLU-devel libXrender-devel.x86_64 xorg-x11-server-Xvfb libpng12.x86_64 libjpeg fontconfig
 RUN yum install -y python-pip
 
 # Install Vaa3d Task Runner
@@ -12,24 +12,25 @@ pip install -r requirements.txt && \
 pip install awscli && \
 easy_install supervisor
 
-# Install Vaa3D
-WORKDIR /home/ec2-user
-RUN aws s3 cp s3://vaa3d-test-data/Vaa3D_CentOS_64bit_v3.100.tar.gz /home/ec2-user && \
-gunzip Vaa3D_CentOS_64bit_v3.100.tar.gz && \
-tar -xvf Vaa3D_CentOS_64bit_v3.100.tar && \
-rm Vaa3D_CentOS_64bit_v3.100.tar
 # Set ENV variables
-ENV VAA3D_AWS_ACCESS_KEY=''
-ENV VAA3D_AWS_SECRET_KEY=''
+ENV AWS_ACCESS_KEY_ID=''
+ENV AWS_SECRET_ACCESS_KEY=''
 ENV VAA3D_USER_AWS_ACCESS_KEY=''
 ENV VAA3D_USER_AWS_SECRET_KEY=''
 ENV VAA3D_DB_PASSWORD=''
 ENV VAA3D_PATH='/home/ec2-user/Vaa3D_CentOS_64bit_v3.100/start_vaa3d.sh'
 ENV TASK_RUNNER_PATH='xvfb-run python task_runner.py'
 
+# Install Vaa3D
+WORKDIR /home/ec2-user
+RUN aws s3 cp s3://vaa3d-test-data/Vaa3D_CentOS_64bit_v3.100.tar.gz /home/ec2-user && \
+gunzip Vaa3D_CentOS_64bit_v3.100.tar.gz && \
+tar -xvf Vaa3D_CentOS_64bit_v3.100.tar && \
+rm Vaa3D_CentOS_64bit_v3.100.tar
+
 # Start worker
 WORKDIR /home/ec2-user/vaa3d-api
-CMD ["circusd", "circus.ini"]
 
+#CMD ["circusd", "circus.ini"]
 #RUN cp supervisord.conf /etc/supervisord.conf
 #CMD ["supervisord", "-c", "/etc/supervisor.conf"]

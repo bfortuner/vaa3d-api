@@ -1,6 +1,6 @@
 import time
 import pytest
-from bigneuron_app.clients.constants import AUTOSCALING_GROUP
+from bigneuron_app.clients.constants import AUTOSCALING_GROUP_JOBS
 from bigneuron_app.clients.autoscaling import Autoscaling
 
 
@@ -14,7 +14,7 @@ def autoscaling(request):
 
 @pytest.fixture(scope="module")
 def group():
-	return AUTOSCALING_GROUP
+	return AUTOSCALING_GROUP_JOBS
 
 def test_get_autoscaling_group(autoscaling, group):
 	resp = autoscaling.get_autoscaling_group(group)

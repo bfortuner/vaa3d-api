@@ -41,11 +41,15 @@ class ProdConfig(Config):
     MAIL_LOG_LEVEL=logging.ERROR
     DYNAMO_READS_PER_SEC=10
     DYNAMO_WRITES_PER_SEC=4
-    ECS_CLUSTER='vaa3d'
-    ECS_JOB_TASK='vaa3d-jobs-prod'
-    ECS_JOB_ITEM_TASK='vaa3d-job-items-prod'
+    ECS_JOBS_CLUSTER='vaa3d-jobs-prod'
+    ECS_JOB_ITEMS_CLUSTER='vaa3d-job-items-prod'
+    ECS_JOBS_SERVICE='vaa3d-jobs'
+    ECS_JOB_ITEMS_SERVICE='vaa3d-job-items'
+    ECS_JOBS_TASK='vaa3d-jobs-prod'
+    ECS_JOB_ITEMS_TASK='vaa3d-job-items-prod'
     ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-prod:latest'
-    AUTOSCALING_GROUP='Vaa3D-ECS-Prod-Autoscaling'
+    AUTOSCALING_GROUP_JOBS='Vaa3d-Jobs-Prod-Autoscaling'
+    AUTOSCALING_GROUP_JOB_ITEMS='Vaa3d-Job-Items-Prod-Autoscaling'
 
 class TestConfig(Config):
     WEBSITE_URL = 'http://localhost:9000'
@@ -79,10 +83,14 @@ class TestConfig(Config):
     MAIL_LOG_LEVEL=logging.ERROR
     DYNAMO_READS_PER_SEC=3
     DYNAMO_WRITES_PER_SEC=2
-    ECS_CLUSTER='vaa3d-test'
-    ECS_JOB_TASK='vaa3d-jobs-test'
-    ECS_JOB_ITEM_TASK='vaa3d-job-items-test'
+    ECS_JOBS_CLUSTER='vaa3d-jobs-test'
+    ECS_JOB_ITEMS_CLUSTER='vaa3d-job-items-test'
+    ECS_JOBS_SERVICE='vaa3d-jobs'
+    ECS_JOB_ITEMS_SERVICE='vaa3d-job-items'
+    ECS_JOBS_TASK='vaa3d-jobs-test'
+    ECS_JOB_ITEMS_TASK='vaa3d-job-items-test'
     ECR_IMAGE=Config.AWS_ACCOUNT_ID+'.dkr.ecr.us-east-1.amazonaws.com/vaa3d-test:latest'
-    AUTOSCALING_GROUP='Vaa3D-ECS-Test-Autoscaling'
+    AUTOSCALING_GROUP_JOBS='Vaa3d-Jobs-Test-Autoscaling'
+    AUTOSCALING_GROUP_JOB_ITEMS='Vaa3d-Job-Items-Test-Autoscaling'
 
 config = globals()[os.getenv('VAA3D_CONFIG', 'ProdConfig')]

@@ -66,13 +66,17 @@ def create_job(user, data):
 		job_item_manager.store_job_item_doc(job_item_doc)
 		job_item_manager.add_job_item_to_queue(job_item_doc.job_item_key, 
 			job_item_queue)
-
+	
 	return job.job_id
 
 def get_jobs_by_status(job_status):
 	job_status = JobStatus.query.filter_by(status_name=job_status).first()
 	jobs = job_status.jobs.all()
 	return jobs
+
+def get_last_updated_job():
+	last_updated = Job.query.order_by(Job.last_updated.desc()).first()
+	return last_updated
 
 def get_job_status_id(name):
 	return JobStatus.query.filter_by(status_name=name).first().id
