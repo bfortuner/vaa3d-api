@@ -37,7 +37,7 @@ def update_jobs_fleet_capacity():
 def update_jobs_fleet_containers():
 	current_containers = ecs.get_service_capacity(ECS_JOBS_CLUSTER, ECS_JOBS_SERVICE)
 	optimal_containers = calculate_optimal_job_container_capacity()
-	print "JobsContainers - Current:%s Optimal:%s" % (str(current_containers), str(optimal_containers))
+	tasks_log.info("JobsContainers - Current:%s Optimal:%s" % (str(current_containers), str(optimal_containers)))
 	if optimal_containers > current_containers and current_containers < MAX_JOB_CONTAINERS:
 		tasks_log.info("Jobs - Increasing Container Capacity")
 		ecs.set_service_capacity(ECS_JOBS_CLUSTER, ECS_JOBS_SERVICE, current_containers+1)
@@ -53,7 +53,7 @@ def update_jobs_fleet_containers():
 def update_jobs_fleet_instances(container_count):
 	current_instances = autoscaling.get_capacity(AUTOSCALING_GROUP_JOBS)
 	optimal_instances = calculate_optimal_job_instance_capacity(container_count)
-	print "JobsInstances - Current:%s Optimal:%s" % (str(current_instances), str(optimal_instances))
+	tasks_log.info("JobsInstances - Current:%s Optimal:%s" % (str(current_instances), str(optimal_instances)))
 	if optimal_instances > current_instances and current_instances < MAX_JOB_INSTANCES:
 		tasks_log.info("Jobs - Increasing Instance Capacity")
 		autoscaling.increase_capacity(AUTOSCALING_GROUP_JOBS)
@@ -69,15 +69,15 @@ def calculate_optimal_job_container_capacity():
 		len(job_manager.get_jobs_by_status("CREATED")))
 	msg = ("SITUATION:\nSecondsSinceLastJobRun: %s\nJobCount: %s")
 	msg = msg % (seconds_since_last_job, jobs_in_flight)
-	print msg
+	tasks_log.info(msg)
 	if jobs_in_flight == 0:
-		print "no jobs in flight"
+		tasks_log.info("no jobs in flight")
 		if seconds_since_last_job > NEW_JOB_WAIT_PERIOD_SECONDS:
 			return 0
 		else:
 			return 1
 	else:
-		print "found jobs in flight"
+		tasks_log.info("found jobs in flight")
 		return 1
 
 def get_seconds_since_last_job_run():
@@ -102,7 +102,7 @@ def update_job_items_fleet_containers():
 	"""
 	current_containers = ecs.get_total_tasks_in_cluster(ECS_JOB_ITEMS_CLUSTER)
 	optimal_containers = calculate_optimal_job_item_container_capacity()
-	print "JobItemsContainers - Current:%s Optimal:%s" % (str(current_containers), str(optimal_containers))
+	tasks_log.info("JobItemsContainers - Current:%s Optimal:%s" % (str(current_containers), str(optimal_containers)))
 	if optimal_containers > current_containers and current_containers < MAX_JOB_ITEM_CONTAINERS:
 		tasks_log.info("JobItems - Increasing Container Capacity")
 		add_job_item_containers(current_containers+1)
@@ -113,7 +113,7 @@ def update_job_items_fleet_containers():
 		return current_containers-1
 	else:
 		tasks_log.info("JobItems - Leaving Container Capacity Unchanged")
-		return current_containers
+		return optimal_containers
 
 def update_job_items_fleet_instances(container_count):
 	"""
@@ -121,7 +121,7 @@ def update_job_items_fleet_instances(container_count):
 	"""
 	current_instances = autoscaling.get_capacity(AUTOSCALING_GROUP_JOB_ITEMS)
 	optimal_instances = calculate_optimal_job_item_instance_capacity(container_count)
-	print "JobItemsInstances: Current:%s Optimal:%s" % (str(current_instances), str(optimal_instances))
+	tasks_log.info("JobItemsInstances: Current:%s Optimal:%s" % (str(current_instances), str(optimal_instances)))
 	if optimal_instances > current_instances and current_instances < MAX_JOB_ITEM_INSTANCES:
 		tasks_log.info("JobItems - Increasing Instance Capacity")
 		autoscaling.increase_capacity(AUTOSCALING_GROUP_JOB_ITEMS)
@@ -145,7 +145,7 @@ def calculate_optimal_job_item_container_capacity():
 	msg = ("SITUATION:\nCurrentTime: %s\nLast_Updated: %s\nSecondsSinceLastUpdate: %s\nJobItemQueueSize: " + 
 		"%s\nOptimalContainers: %s")
 	msg = msg % (current_time, last_updated_job_item_time, seconds_since_last_job_item, queue_size, optimal_containers)
-	print msg
+	tasks_log.info(msg)
 	return optimal_containers
 
 def calculate_job_item_containers(queue_size):	
@@ -154,8 +154,11 @@ def calculate_job_item_containers(queue_size):
 	return int(math.ceil(float(queue_size) / JOB_ITEMS_PER_CONTAINER))
 
 def calculate_optimal_job_item_instance_capacity(optimal_containers):
-	instances = int(math.ceil(float(optimal_containers) / JOB_ITEM_CONTAINERS_PER_INSTANCE))
-	return instances
+	optimal_instances = int(math.ceil(float(optimal_containers) / JOB_ITEM_CONTAINERS_PER_INSTANCE))
+	msg = "SITUATION:\nOptimalJobItemContainers: %s\nJobItemContainerPerInstance: %s\nOptimalJobItemInstances: %s"
+	msg = msg % (optimal_containers, JOB_ITEM_CONTAINERS_PER_INSTANCE, optimal_instances)
+	tasks_log.info(msg)
+	return optimal_instances
 
 def add_job_item_containers(count):
 	"""

@@ -26,9 +26,9 @@ def test_calculate_job_item_containers():
 def test_calculate_optimal_job_item_instance_capacity():
 	optimal_containers = 5
 	expected_instances = int(math.ceil(float(optimal_containers) / JOB_ITEM_CONTAINERS_PER_INSTANCE))
-	instances = calculate_optimal_job_instance_capacity(optimal_containers)
+	instances = calculate_optimal_job_item_instance_capacity(optimal_containers)
 	assert instances == expected_instances
-	print "Optimal Instances: " + str(instances)
+	print "Optimal JobItem Instances: " + str(instances)
 
 def test_update_job_items_fleet_capacity():
 	update_job_items_fleet_capacity()
