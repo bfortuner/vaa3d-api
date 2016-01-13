@@ -175,7 +175,9 @@ Docker Commands
 ```
 docker-machine ls
 docker-machine env default
+docker-machine restart default (if connection gets stale and you see network errors building image)
 eval "$(docker-machine env default)" (set docker env variables in terminal)
+docker tag image_id 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d-test:latest
 docker pull/push 647215175976.dkr.ecr.us-east-1.amazonaws.com/vaa3d:latest
 cp dockerfiles/Dockerfile .
 Update Dockerfile w TestConfig

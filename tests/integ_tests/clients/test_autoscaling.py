@@ -18,6 +18,8 @@ def group():
 
 def test_get_autoscaling_group(autoscaling, group):
 	resp = autoscaling.get_autoscaling_group(group)
+	print "Autoscaling Group"
+	print resp
 	assert resp is not None
 
 @pytest.mark.skipif(True, reason="Too slow")

@@ -1,7 +1,7 @@
 import time
 import pytest
 from bigneuron_app.clients.constants import ECS_JOB_ITEMS_TASK
-from bigneuron_app.clients.constants import ECS_JOB_ITEMS_CLUSTER
+from bigneuron_app.clients.constants import ECS_JOB_ITEMS_CLUSTER, ECS_JOBS_CLUSTER
 from bigneuron_app.clients.constants import ECS_JOB_ITEMS_SERVICE
 from bigneuron_app.clients.ecs import ECS
 
@@ -25,6 +25,11 @@ def service(request):
 @pytest.fixture(scope="module")
 def task(request):
 	return ECS_JOB_ITEMS_TASK
+
+def test_get_cluster(ecs, cluster):
+	cluster = ecs.get_cluster(cluster)
+	print "CLUSTER:\n%s" % str(cluster)
+	assert cluster is not None
 
 def test_get_instance_ids_in_cluster(ecs, cluster):
 	ids = ecs.get_instance_ids_in_cluster(cluster)
@@ -95,3 +100,9 @@ def test_get_id_from_arn(ecs, cluster):
 	arn = "arn:aws:ecs:us-west-2:647215175976:container-instance/037e6b29-8cef-4c41-bd9b-606f72c88054"
 	task_id = ecs.get_id_from_arn(arn)
 	assert task_id == "037e6b29-8cef-4c41-bd9b-606f72c88054"
+
+def test_get_task_count_on_instance(ecs):
+	instance_id = "5ae981f8-c8ca-4eca-8579-eaa51cd7797a"
+	count = ecs.get_task_count_on_instance(ECS_JOBS_CLUSTER, instance_id)
+	print count
+	assert count is not None

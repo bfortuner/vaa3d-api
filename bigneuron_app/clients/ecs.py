@@ -16,6 +16,19 @@ class ECS:
 			aws_access_key_id=AWS_ACCESS_KEY, 
 			aws_secret_access_key=AWS_SECRET_KEY)
 
+	def get_cluster(self, cluster):
+		#boto3.readthedocs.org/en/latest/reference/services/ecs.html#ECS.Client.describe_clusters
+		response = self.get_client().describe_clusters(
+			clusters=[cluster]
+		)	
+		return response['clusters'][0]
+
+	def get_total_tasks_in_cluster(self, cluster):
+		cluster = self.get_cluster(cluster)
+		running = int(cluster['runningTasksCount'])
+		pending = int(cluster['pendingTasksCount'])
+		return running + pending
+
 	def start_task_on_instances(self, cluster, task_name, instance_ids, env_vars):
 		#Start task on the specified container instance w ENV/CMD overrides
 		#boto3.readthedocs.org/en/latest/reference/services/ecs.html#ECS.Client.start_task
@@ -35,6 +48,14 @@ class ECS:
 			},
 			containerInstances=instance_ids,
 			startedBy='vaa3d_worker'
+		)
+		return response
+
+	def start_task_on_instance(self, cluster, task_name, instance_id):
+		response = self.get_client().start_task(
+			cluster=cluster,
+			taskDefinition=task_name,
+			containerInstances=[instance_id]
 		)
 		return response
 
@@ -129,6 +150,12 @@ class ECS:
 		for arn in response['taskArns']:
 			ids.append(self.get_id_from_arn(arn))
 		return ids
+
+	def get_task_count_on_instance(self, cluster, instance_id):
+		instance = self.describe_instances(cluster, [instance_id])[0]
+		running = int(instance['runningTasksCount'])
+		pending = int(instance['pendingTasksCount'])
+		return running + pending
 
 	def get_id_from_arn(self, arn):
 		return arn[arn.find("/")+1:]

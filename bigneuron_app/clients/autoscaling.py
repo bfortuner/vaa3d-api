@@ -17,6 +17,7 @@ class Autoscaling:
 			aws_secret_access_key=AWS_SECRET_KEY)
 
 	def get_autoscaling_group(self, autoscaling_group):
+		#boto3.readthedocs.org/en/latest/reference/services/autoscaling.html#AutoScaling.Client.describe_auto_scaling_groups
 		response = self.get_client().describe_auto_scaling_groups(
 			AutoScalingGroupNames=[autoscaling_group]
 		)
