@@ -7,15 +7,13 @@ from bigneuron_app import tasks_log, items_log
 from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.job_items import job_item_manager
-from bigneuron_app.clients.sqs import SQS
+from bigneuron_app.clients.sqs import sqs
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 import bigneuron_app.clients.constants as client_constants
 from bigneuron_app.utils import logger
 
 POLL_JOB_ITEMS_SLEEP=2
 POLL_JOB_ITEMS_MAX_RUNS=30
-
-sqs = SQS()
 
 def poll_job_items_queue():
 	count = 0

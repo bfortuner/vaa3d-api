@@ -81,12 +81,10 @@ class ECS:
 		return response
 
 	def get_service(self, cluster, service):
-		print cluster + " " + service
 		response = self.get_client().describe_services(
 			cluster=cluster,
 			services=[service]
 		)
-		print response
 		return response['services'][0]
 
 	def get_service_capacity(self, cluster, service):
@@ -160,3 +158,4 @@ class ECS:
 	def get_id_from_arn(self, arn):
 		return arn[arn.find("/")+1:]
 
+ecs = ECS()

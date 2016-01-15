@@ -36,6 +36,7 @@ def test_list_scaling_activities(group):
 	activities = autoscaling.list_scaling_activities(group)
 	assert activities is not None
 
+@pytest.mark.skipif(True, reason="Do not want to remove running instances")
 def test_remove_instance(group):
 	instances = autoscaling.get_instances(group)
 	print "current instances: " + str(instances)

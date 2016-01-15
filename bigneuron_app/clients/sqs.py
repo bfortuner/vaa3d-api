@@ -177,3 +177,5 @@ class SQS:
 		dead_queue_name = queue_name + "_dead"
 		return self.create_queue_w_dead_letter(queue_name, dead_queue_name, 
 			timeout, max_receive)
+
+sqs = SQS()

@@ -67,6 +67,7 @@ def test_get_service_capacity(cluster, service):
 	capacity = ecs.get_service_capacity(cluster, service)
 	print "Capacity is " + str(capacity)
 
+@pytest.mark.skipif(reason="Unwanted side effects")
 def test_set_service_capacity(cluster, service):
 	initial_capacity = ecs.get_service_capacity(cluster, service)
 	resp = ecs.set_service_capacity(cluster, service, initial_capacity+1)

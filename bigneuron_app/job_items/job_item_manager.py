@@ -8,7 +8,7 @@ from bigneuron_app import items_log
 from bigneuron_app.job_items.models import JobItemStatus, JobItemDocument
 from bigneuron_app.jobs.models import Job
 from bigneuron_app.clients import s3, vaa3d, dynamo
-from bigneuron_app.clients.sqs import SQS
+from bigneuron_app.clients.sqs import sqs
 from bigneuron_app.clients.constants import *
 from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES, PLUGINS
@@ -17,8 +17,6 @@ from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 from decimal import Decimal
 from bigneuron_app.utils.exceptions import MaxRuntimeException
 
-
-sqs = SQS()
 
 def process_job_item(job_item, max_runtime=None):
 	job_item['status_id'] = get_job_item_status_id("IN_PROGRESS")

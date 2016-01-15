@@ -8,7 +8,7 @@ from bigneuron_app.users.models import User
 from bigneuron_app.users.constants import DEFAULT_IAM_USER, DEFAULT_EMAIL, ADMIN_EMAIL, ADMIN_IAM_USER
 from bigneuron_app.clients.constants import *
 from bigneuron_app.clients import dynamo
-from bigneuron_app.clients.sqs import SQS
+from bigneuron_app.clients.sqs import sqs
 
 
 """
@@ -76,7 +76,6 @@ job_item_manager.store_job_item_doc(job_item_doc3)
 #job_item_manager.store_job_item_doc(job_item_doc4)
 
 # Drop and Recreate SQS queues
-sqs = SQS()
 queue = sqs.drop_and_recreate_queue(SQS_JOB_ITEMS_QUEUE, SQS_JOB_ITEMS_DEAD_LETTER, SQS_VISIBILITY_TIMEOUT, SQS_MAX_RECEIVES)
 
 # Add job_items to SQS

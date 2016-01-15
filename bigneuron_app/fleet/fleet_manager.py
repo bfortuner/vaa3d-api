@@ -7,14 +7,14 @@ from bigneuron_app import db
 from bigneuron_app.jobs import job_manager
 from bigneuron_app.clients import dynamo
 from bigneuron_app.clients.constants import SQS_JOB_ITEMS_QUEUE
-from bigneuron_app.clients.sqs import SQS
-from bigneuron_app.clients.ecs import ECS
+from bigneuron_app.clients.sqs import sqs
+from bigneuron_app.clients.ecs import ecs
+from bigneuron_app.clients.autoscaling import autoscaling
 from bigneuron_app.clients.constants import ECS_JOBS_CLUSTER, ECS_JOB_ITEMS_CLUSTER
 from bigneuron_app.clients.constants import ECS_JOBS_SERVICE, ECS_JOB_ITEMS_SERVICE
 from bigneuron_app.clients.constants import ECS_JOBS_TASK, ECS_JOB_ITEMS_TASK
 from bigneuron_app.fleet.constants import MIN_JOB_CONTAINERS, MAX_JOB_CONTAINERS
 from bigneuron_app.fleet.constants import MIN_JOB_ITEM_CONTAINERS, MAX_JOB_ITEM_CONTAINERS
-from bigneuron_app.clients.autoscaling import Autoscaling
 from bigneuron_app.clients.constants import AUTOSCALING_GROUP_JOBS, AUTOSCALING_GROUP_JOB_ITEMS
 from bigneuron_app.fleet.constants import MIN_JOB_INSTANCES, MAX_JOB_INSTANCES
 from bigneuron_app.fleet.constants import MIN_JOB_ITEM_INSTANCES, MAX_JOB_ITEM_INSTANCES
@@ -22,9 +22,6 @@ from bigneuron_app.fleet.constants import JOB_CONTAINERS_PER_INSTANCE, JOB_ITEM_
 from bigneuron_app.fleet.constants import NEW_JOB_WAIT_PERIOD_SECONDS
 from bigneuron_app.fleet.constants import JOB_ITEMS_PER_CONTAINER
 
-sqs = SQS()
-ecs = ECS()
-autoscaling = Autoscaling()
 
 def update_fleet_capacity():
 	update_jobs_fleet_capacity()

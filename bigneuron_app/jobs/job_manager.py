@@ -7,14 +7,13 @@ from bigneuron_app.job_items.models import JobItemStatus
 from bigneuron_app.users.models import User
 from bigneuron_app.job_items import job_item_manager
 from bigneuron_app.clients import s3, dynamo
-from bigneuron_app.clients.sqs import SQS
+from bigneuron_app.clients.sqs import sqs
 from bigneuron_app.clients.constants import *
 from bigneuron_app.jobs.constants import OUTPUT_FILE_SUFFIXES
 from bigneuron_app.emails.constants import ADMIN_EMAIL
 from bigneuron_app.utils import zipper
 from bigneuron_app.utils.constants import USER_JOB_LOG_EXT
 
-sqs = SQS()
 
 def get_job(job_id):
 	job = Job.query.get(job_id)

@@ -68,3 +68,5 @@ class Autoscaling:
 			EndTime=end_time
 		)
 		return response
+
+autoscaling = Autoscaling()
