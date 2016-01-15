@@ -2,27 +2,19 @@ import time
 import pytest
 from bigneuron_app.clients.constants import *
 from bigneuron_app.utils import id_generator
-from bigneuron_app.clients.sqs import SQS
+from bigneuron_app.clients.sqs import sqs
 
 
-@pytest.fixture(scope="module")
-def sqs(request):
-	sqs = SQS()
-	def fin():
-		print ("finalizing %s" % sqs)
-	request.addfinalizer(fin)
-	return sqs
-
-def test_get_queue_name(sqs):
+def test_get_queue_name():
 	expected_queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, expected_queue_name)
+	queue = get_test_queue(expected_queue_name)
 	queue_name = sqs.get_queue_name(queue)
 	assert queue_name == expected_queue_name
 
-def test_clear_queue(sqs):
+def test_clear_queue():
 	# Only one clear request is allowed every 60 seconds
 	queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, queue_name)
+	queue = get_test_queue(queue_name)
 	expected_message_id = sqs.send_message(queue, 'boto3', {
     	'Author': {
         	'StringValue': 'Daniel',
@@ -35,7 +27,7 @@ def test_clear_queue(sqs):
 	sqs.delete_queue(queue)
 
 @pytest.mark.skipif(True, reason="Too slow")
-def test_delete_queue(sqs):
+def test_delete_queue():
 	"""
 	SLOW! Takes 60 seconds to delete a queue
 	"""
@@ -46,7 +38,7 @@ def test_delete_queue(sqs):
 	queue = sqs.get_queue(queue_name)
 	assert queue is None
 
-def test_get_queue(sqs):
+def test_get_queue():
 	fake_queue = sqs.get_queue("fake-queue")
 	assert fake_queue is None
 
@@ -54,9 +46,9 @@ def test_get_queue(sqs):
 	queue = sqs.create_queue(queue_name)
 	assert queue is not None
 
-def test_get_queue_attributes(sqs):
+def test_get_queue_attributes():
 	queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, queue_name)
+	queue = get_test_queue(queue_name)
 	expected_message_id = sqs.send_message(queue, 'boto3', {
     	'Author': {
         	'StringValue': 'Daniel',
@@ -68,9 +60,9 @@ def test_get_queue_attributes(sqs):
 	sqs.clear_queue(queue)
 	sqs.delete_queue(queue)
 
-def test_get_queue_size(sqs):
+def test_get_queue_size():
 	queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, queue_name)
+	queue = get_test_queue(queue_name)
 	expected_message_id = sqs.send_message(queue, 'boto3', {
     	'Author': {
         	'StringValue': 'Daniel',
@@ -82,13 +74,13 @@ def test_get_queue_size(sqs):
 	sqs.clear_queue(queue)
 	sqs.delete_queue(queue)
 
-def test_get_all_queues(sqs):
+def test_get_all_queues():
 	queues = sqs.get_all_queues()
 	assert len(queues) > 0	
 
-def test_get_message_attributes(sqs):
+def test_get_message_attributes():
 	queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, queue_name)
+	queue = get_test_queue(queue_name)
 	expected_message_id = sqs.send_message(queue, 'boto3', {
     	'Author': {
         	'StringValue': 'Daniel',
@@ -100,7 +92,7 @@ def test_get_message_attributes(sqs):
 	print message['Attributes']['ApproximateReceiveCount']
 	print message['Attributes']['ApproximateFirstReceiveTimestamp']
 
-def test_create_queue(sqs):
+def test_create_queue():
 	queue_name = id_generator.generate_job_item_id()
 	dead_letter_queue_name = queue_name + "_dead"
 
@@ -113,7 +105,7 @@ def test_create_queue(sqs):
 	sqs.delete_queue(dead_queue)
 	sqs.delete_queue(new_queue)
 
-def test_retry_logic(sqs):
+def test_retry_logic():
 	VISIBILITY_TIMEOUT = 2
 	MAX_RECEIVE_COUNT = 2
 	queue_name = id_generator.generate_job_item_id()
@@ -164,9 +156,9 @@ def test_retry_logic(sqs):
 	sqs.delete_queue(dead_queue)
 	sqs.delete_queue(queue)
 
-def test_send_and_get_message(sqs):
+def test_send_and_get_message():
 	queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, queue_name)
+	queue = get_test_queue(queue_name)
 	message_id = sqs.send_message(queue, 'boto3', {
     	'Author': {
         	'StringValue': 'Daniel',
@@ -178,10 +170,10 @@ def test_send_and_get_message(sqs):
 	assert message_id == message['MessageId']
 	sqs.delete_queue(queue)
 
-def test_get_message_by_key(sqs):
+def test_get_message_by_key():
 	TEST_JOB_ITEM_KEY = id_generator.generate_job_item_id()
 	queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, queue_name)
+	queue = get_test_queue(queue_name)
 	message_id = sqs.send_message(queue, 'boto3', {
 		"job_item_key" : { 
 			"StringValue" : TEST_JOB_ITEM_KEY, 
@@ -197,10 +189,10 @@ def test_get_message_by_key(sqs):
 	assert message['MessageAttributes']['job_item_key']['StringValue'] == TEST_JOB_ITEM_KEY
 	sqs.delete_queue(queue)
 
-def test_update_msg_visibility_timeout(sqs):
+def test_update_msg_visibility_timeout():
 	job_item_key = id_generator.generate_job_item_id()
 	queue_name = id_generator.generate_job_item_id()
-	queue = get_test_queue(sqs, queue_name)
+	queue = get_test_queue(queue_name)
 
 	attribs = {}
 	attribs['VisibilityTimeout'] = str(120)
@@ -238,7 +230,7 @@ def test_update_msg_visibility_timeout(sqs):
 
 	sqs.delete_queue(queue)
 
-def get_test_queue(sqs, queue_name):
+def get_test_queue(queue_name):
 	queue = sqs.create_queue(queue_name)
 	return queue
 

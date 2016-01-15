@@ -38,4 +38,4 @@ def test_update_job_items_fleet_containers():
 
 def test_get_available_instance_w_most_containers():
 	instance_id = get_available_instance_w_most_containers(ECS_JOBS_CLUSTER, JOB_ITEM_CONTAINERS_PER_INSTANCE)
-	print "Instance_id: " + instance_id
+	print "Instance_id: " + str(instance_id)
