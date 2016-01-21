@@ -12,8 +12,8 @@ from bigneuron_app.job_items.constants import PROCESS_JOB_ITEM_TASK
 import bigneuron_app.clients.constants as client_constants
 from bigneuron_app.utils import logger
 
-POLL_JOB_ITEMS_SLEEP=2
-POLL_JOB_ITEMS_MAX_RUNS=30
+POLL_JOB_ITEMS_SLEEP=1
+POLL_JOB_ITEMS_MAX_RUNS=120
 
 def poll_job_items_queue():
 	count = 0

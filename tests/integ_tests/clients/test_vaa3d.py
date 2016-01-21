@@ -39,7 +39,7 @@ def test_all_plugins():
 def test_single_plugin():
 	filenames = [VAA3D_TEST_INPUT_FILE_5, VAA3D_TEST_INPUT_FILE_1]
 	prepare_test_files_local(filenames)
-	plugin_name = 'Advantra' #'MST_tracing'
+	plugin_name = 'Vaa3D_Neuron2' #'MST_tracing'
 	for f in filenames:
 		input_file_path = os.path.abspath(f)
 		runtimes = PLUGINS[plugin_name]['runtime']

@@ -77,6 +77,9 @@ def test_method_called_with_params(my_second_mock):
 	my_second_mock.assert_called_with(5, 5)
 
 
+@pytest.mark.parametrize("input,expected", [("3+5", 8),("2+4", 6),pytest.mark.xfail(("6*9", 42)),])
+def test_eval(input, expected):
+	assert eval(input) == expected
 
 ### Creating Customer Decorators ###
 # slow = pytest.mark.skipif(
