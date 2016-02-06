@@ -17,9 +17,11 @@ def test_update_fleet_capacity(mocker):
 	fleet_manager.update_jobs_fleet_capacity.assert_called_with()
 	fleet_manager.update_job_items_fleet_capacity.assert_called_with()
 
-def test_update_jobs_fleet_capacity(mocker):
+def test_update_jobs_fleet_capacity(mocker, monkeypatch):
 	mocker.patch.object(fleet_manager, 'update_jobs_fleet_containers')
 	mocker.patch.object(fleet_manager, 'update_jobs_fleet_instances')
+	monkeypatch.setattr(fleet_manager, 'MAX_JOB_INSTANCES', 1)
+	monkeypatch.setattr(fleet_manager, 'MIN_JOB_INSTANCES', 0)
 
 	fleet_manager.update_jobs_fleet_containers.return_value = 5
 
